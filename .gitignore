@@ -1,0 +1,16 @@
+.DS_Store
+.idea/
+.vscode/
+.gradle/
+.kotlin/
+**/build/
+**/out/
+*.iml
+*.log
+*.tmp
+*.swp
+.env
+.env.*
+local.properties
+.claude/*
+!.claude/settings.json

@@ -1,0 +1,31 @@
+# Yap
+
+Gradle monorepo for Yap, an app for English speaking practice.
+
+| Module | What it is |
+| --- | --- |
+| `server` | Ktor server. Holds scenarios, prompts and model keys. Deployed to Timeweb. |
+| `admin` | Compose Desktop app for the owner. Talks only to the server; holds no keys. |
+| `contract-admin` | DTOs of the admin API, shared by `server` and `admin`. Data only, no logic. |
+
+`convention-plugins` holds the shared Gradle setup. Versions live in `gradle/libs.versions.toml`.
+
+## Rules
+
+- No secrets in the repository. Keys and prompts live on the server and in its database.
+- A DTO module holds only wire data. The server maps DTOs to its own models.
+- Add a rule to this file only when code it applies to exists.
+
+## Verification
+
+- `./gradlew build` — compilation, tests and Detekt. Run it before every push.
+- `./gradlew :admin:run` — opens the admin window.
+- CI (`.github/workflows/build.yml`) runs `build` and a `docker` image build on every non-draft PR
+  into `develop` or `main` and on every push to them. Merge only when both checks are green.
+
+## Git
+
+- Branch names start with the kind: `feature/...`, `tech/...` or `test/...`.
+- Start every branch from `develop` and open every PR into `develop`. A release is a PR from
+  `develop` into `main`.
+- Keep PR descriptions short: what changed and why, then what was verified.

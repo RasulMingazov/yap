@@ -1,0 +1,16 @@
+complexity:
+  LongMethod:
+    ignoreAnnotated: ['Composable']
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+    # Backtick scenario names are the test convention.
+    excludes:
+      - '**/test/**'
+
+style:
+  MagicNumber:
+    ignoreAnnotated: ['Composable']
+  MaxLineLength:
+    active: false
