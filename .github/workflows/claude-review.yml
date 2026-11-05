@@ -1,0 +1,62 @@
+name: Claude review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          show_full_output: true
+          claude_args: |
+            --allowedTools "Read,Glob,Grep,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh issue view:*),Bash(gh api:*),mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*)"
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+            OWNER: @${{ github.repository_owner }}
+            HEAD SHA: ${{ github.event.pull_request.head.sha }}
+
+            You review this pull request. You did not write it. Judge the code only against this repository's rules.
+
+            1. Choose the review scope. Read the PR comments with `gh api repos/REPO/issues/PR NUMBER/comments`. Find your newest comment that starts with "Claude review:" and has a line "Reviewed: SHA".
+               - No such comment: do a full review.
+               - Else run `gh api repos/REPO/compare/SHA...HEAD SHA --jq .status`. If the call fails, or the status is not "ahead", do a full review.
+               - Else do an incremental review: review only the commits after SHA.
+            2. Read the diff and the rules.
+               - Full review: read the diff with `gh pr diff`. Read CLAUDE.md. If the description says "Closes #N", read that issue with `gh issue view N --comments` and any OpenSpec change it names under openspec/changes/.
+               - Incremental review: read the diff with `gh api -H "Accept: application/vnd.github.diff" repos/REPO/compare/SHA...HEAD SHA`. Read CLAUDE.md. Read the issue and the OpenSpec change only if this diff changes the behaviour they specify.
+            3. Read your earlier review threads and the author's replies with `gh api repos/REPO/pulls/PR NUMBER/comments`.
+               - The author fixed the point: do not raise it again.
+               - The author answered with a reason that holds: reply "Agreed." in that thread and drop the point.
+               - The reason does not hold: reply in the thread and say why.
+               - A thread holds at most 5 messages, counting your first comment. If your reply would be message 5, write only "Owner decision needed: OWNER" and stop on that point. Never write in a thread that already has 5 messages.
+               Reply in a thread with `gh api repos/REPO/pulls/PR NUMBER/comments/COMMENT_ID/replies -f body=...`.
+            4. Find new problems. Report only real ones:
+               - bugs and wrong behaviour;
+               - breaks of a rule in CLAUDE.md (quote the rule);
+               - code that does more or less than the issue or spec asks;
+               - unused or speculative code.
+               Skip style that Detekt already checks. Skip praise and summaries of the diff.
+            5. Post one inline comment per problem, the most serious first, with `mcp__github_inline_comment__create_inline_comment`. Do not repeat a point that already has a thread.
+            6. Finish with one `gh pr comment` that starts with "Claude review:" and gives the number of new problems and of open threads, or says "No problems found." Put the scope ("full" or "incremental") on the next line. End with the line "Reviewed: HEAD SHA".
+
+            Write in plain English, ASD-STE100 style: short sentences, one idea each.
