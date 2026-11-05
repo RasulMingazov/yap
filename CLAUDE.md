@@ -23,6 +23,19 @@ Gradle monorepo for Yap, an app for English speaking practice.
 - CI (`.github/workflows/build.yml`) runs `build` and a `docker` image build on every non-draft PR
   into `develop` or `main` and on every push to them. Merge only when both checks are green.
 
+## Code review
+
+The `Claude review` workflow (`.github/workflows/claude-review.yml`) reviews every non-draft PR
+and runs again after each push. It needs the repository secret `CLAUDE_CODE_OAUTH_TOKEN`.
+
+When you are the PR author:
+
+- Answer every review thread. Fix the point, or reply in the thread with the reason you keep the code.
+- Push once per review round. Wait for the "Claude review:" summary comment, fix all threads of
+  that round, then make one commit and one push.
+- A thread holds at most 5 messages, review comment included. Do not write message 5: the reviewer
+  writes it as "Owner decision needed". Then wait for the owner.
+
 ## Git
 
 - Branch names start with the kind: `feature/...`, `tech/...` or `test/...`.
