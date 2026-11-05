@@ -20,6 +20,8 @@ Gradle monorepo for Yap, an app for English speaking practice.
 
 - `./gradlew build` — compilation, tests and Detekt. Run it before every push.
 - `./gradlew :admin:run` — opens the admin window.
+- Run `git config core.hooksPath .githooks` once per clone. It enables the `pre-push` hook, which
+  runs Detekt and blocks the push on a violation.
 - CI (`.github/workflows/build.yml`) runs `build` and a `docker` image build on every non-draft PR
   into `develop` or `main` and on every push to them. Merge only when both checks are green.
 
