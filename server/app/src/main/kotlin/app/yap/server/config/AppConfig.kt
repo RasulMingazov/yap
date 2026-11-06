@@ -1,6 +1,6 @@
-package app.yap.server.core.config
+package app.yap.server.config
 
-data class AppConfig(
+internal data class AppConfig(
     val database: DatabaseConfig,
     val environment: AppEnvironment,
     val port: Int,
@@ -8,6 +8,11 @@ data class AppConfig(
 
     init {
         require(port in MIN_PORT..MAX_PORT) { "PORT must be between $MIN_PORT and $MAX_PORT" }
+        if (environment.isDeployed) {
+            require(database.password.isNotBlank() && database.password != DatabaseConfig.LOCAL_PASSWORD) {
+                "DATABASE_PASSWORD must be configured for staging and production"
+            }
+        }
     }
 
     private companion object {

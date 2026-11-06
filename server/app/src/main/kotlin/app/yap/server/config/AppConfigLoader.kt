@@ -1,9 +1,9 @@
-package app.yap.server.core.config
+package app.yap.server.config
 
 import java.nio.file.Files
 import java.nio.file.Path
 
-class AppConfigLoader(
+internal class AppConfigLoader(
     private val dotEnvPath: Path = Path.of(".env"),
     private val systemEnv: (String) -> String? = System::getenv,
 ) {
@@ -18,7 +18,7 @@ class AppConfigLoader(
             resetOnMigrationChange = booleanEnv(name = "DATABASE_RESET_ON_MIGRATION_CHANGE", default = false),
             url = env("DATABASE_URL") ?: "jdbc:postgresql://localhost:5432/yap",
             user = env("DATABASE_USER") ?: "postgres",
-        ).also { config -> config.validateFor(environment) }
+        )
         return AppConfig(
             database = database,
             environment = environment,

@@ -4,5 +4,4 @@ plugins {
 
 dependencies {
     implementation(project(":contract-admin"))
-    implementation(project(":server:core-config"))
 }

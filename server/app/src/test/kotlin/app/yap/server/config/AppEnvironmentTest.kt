@@ -1,4 +1,4 @@
-package app.yap.server.core.config
+package app.yap.server.config
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

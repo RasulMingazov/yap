@@ -1,4 +1,4 @@
-package app.yap.server.core.config
+package app.yap.server.config
 
 import java.nio.file.Files
 import java.nio.file.Path

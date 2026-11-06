@@ -1,6 +1,6 @@
-package app.yap.server.core.config
+package app.yap.server.config
 
-data class DatabaseConfig(
+internal data class DatabaseConfig(
     val password: String,
     val poolSize: Int,
     val resetOnMigrationChange: Boolean,
@@ -13,14 +13,6 @@ data class DatabaseConfig(
         require(user.isNotBlank()) { "DATABASE_USER must not be blank" }
         require(poolSize in MIN_POOL_SIZE..MAX_POOL_SIZE) {
             "DATABASE_POOL_SIZE must be between $MIN_POOL_SIZE and $MAX_POOL_SIZE"
-        }
-    }
-
-    fun validateFor(environment: AppEnvironment) {
-        if (environment.isDeployed) {
-            require(password.isNotBlank() && password != LOCAL_PASSWORD) {
-                "DATABASE_PASSWORD must be configured for staging and production"
-            }
         }
     }
 
