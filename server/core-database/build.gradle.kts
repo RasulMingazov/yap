@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":server:core-config"))
     implementation(libs.exposed.core)
     implementation(libs.exposed.jdbc)
     implementation(libs.flyway.core)

@@ -1,6 +1,6 @@
 package app.yap.server
 
-import app.yap.server.core.config.AppConfigLoader
+import app.yap.server.config.AppConfigLoader
 import app.yap.server.core.database.openDatabase
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application

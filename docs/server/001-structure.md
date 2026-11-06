@@ -5,9 +5,8 @@ shared infrastructure stays feature-independent.
 
 ## Modules
 
-- `app` owns the process lifecycle, shared Ktor plugins, error mapping, `/health`, the admin key
-  check, and manual graph construction.
-- `core-config` owns environment loading and validation.
+- `app` owns the process lifecycle, the settings from environment variables and `.env`, shared
+  Ktor plugins, error mapping, `/health`, the admin key check, and manual graph construction.
 - `core-database` owns the connection, the migration bootstrap, and transactions, not feature tables.
 - `core-llm` owns the model provider interface and its adapters.
 - `feature-*` owns one product slice, such as `feature-characters` or `feature-topics`, and may
@@ -16,7 +15,10 @@ shared infrastructure stays feature-independent.
 Core modules never depend on features. Features never depend on `app`. A feature uses another
 feature only through that feature's use cases, and the dependency has no cycle.
 
-The modules live under `server/`: `server/app`, `server/core-config`, and so on.
+A module that needs settings owns their type, such as `DatabaseConfig` in `core-database`. `app`
+reads the values and builds it at start.
+
+Each module lives under `server/`, for example `server/app`.
 
 ## Feature shape
 
