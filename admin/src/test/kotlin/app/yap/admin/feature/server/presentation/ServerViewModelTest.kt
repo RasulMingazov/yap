@@ -71,6 +71,21 @@ internal class ServerViewModelTest {
         env.connectToServerUseCase.invokeCall.called(times = 1)
     }
 
+    @Test
+    fun `GIVEN a key typed before the saved settings load WHEN they load THEN the typed key stays`() =
+        runTest(dispatcher) {
+            val env = Environment(
+                connection = ServerConnection.Connected(environment = "staging"),
+                savedSettings = StubServerSettings.stubServerSettings(),
+            )
+
+            env.viewModel.onEvent(ServerViewModel.Event.KeyChanged("typed-key"))
+            advanceUntilIdle()
+
+            assertEquals(expected = "typed-key", actual = env.viewModel.uiState.value.key)
+            env.connectToServerUseCase.invokeCall.notCalled()
+        }
+
     private class Environment(
         connection: ServerConnection,
         savedSettings: ServerSettings?,

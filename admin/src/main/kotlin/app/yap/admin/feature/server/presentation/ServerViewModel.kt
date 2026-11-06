@@ -26,30 +26,29 @@ internal class ServerViewModel(
 
     fun onEvent(event: Event) = when (event) {
         is Event.AddressChanged -> dataState.update { state -> state.copy(address = event.address) }
-        is Event.ConnectClicked -> onConnectClicked()
+        is Event.ConnectClicked -> connect()
         is Event.KeyChanged -> dataState.update { state -> state.copy(key = event.key) }
     }
 
     private fun loadSettings() {
         viewModelScope.launch {
             val settings = getServerSettingsUseCase() ?: return@launch
-            dataState.update { state -> state.copy(address = settings.address, isConnecting = true, key = settings.key) }
-            connect(settings)
+            val isEdited = dataState.value != DataState()
+            if (isEdited) return@launch
+            dataState.update { state -> state.copy(address = settings.address, key = settings.key) }
+            connect()
         }
     }
 
-    private fun onConnectClicked() {
+    private fun connect() {
         val state = dataState.value
         if (state.isConnecting) return
         dataState.update { current -> current.copy(isConnecting = true) }
         viewModelScope.launch {
-            connect(ServerSettings(address = state.address.trim(), key = state.key.trim()))
+            val settings = ServerSettings(address = state.address.trim(), key = state.key.trim())
+            val connection = connectToServerUseCase(settings)
+            dataState.update { current -> current.copy(connection = connection, isConnecting = false) }
         }
-    }
-
-    private suspend fun connect(settings: ServerSettings) {
-        val connection = connectToServerUseCase(settings)
-        dataState.update { state -> state.copy(connection = connection, isConnecting = false) }
     }
 
     data class DataState(
