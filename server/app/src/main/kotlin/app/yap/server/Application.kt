@@ -1,7 +1,6 @@
 package app.yap.server
 
 import app.yap.server.admin.ADMIN_AUTHENTICATION
-import app.yap.server.admin.GetServerEnvironmentUseCase
 import app.yap.server.admin.installAdminAuthentication
 import app.yap.server.admin.serverRoutes
 import app.yap.server.config.AppConfig
@@ -42,7 +41,7 @@ internal fun Application.serverModule(config: AppConfig) {
     routing {
         get("/health") { call.respondText("ok") }
         authenticate(ADMIN_AUTHENTICATION) {
-            serverRoutes(getServerEnvironmentUseCase = GetServerEnvironmentUseCase(environment = config.environment))
+            serverRoutes(environment = config.environment)
         }
     }
 }
