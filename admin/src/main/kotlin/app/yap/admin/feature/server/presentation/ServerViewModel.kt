@@ -2,6 +2,7 @@ package app.yap.admin.feature.server.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.yap.admin.core.presentation.Status
 import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.server.domain.ServerConnection
 import app.yap.admin.feature.server.domain.ServerSettings
@@ -64,7 +65,7 @@ internal class ServerViewModel(
         val isConnectEnabled: Boolean,
         val key: String,
         val serverLabel: String,
-        val status: String?,
+        val status: Status?,
     )
 
     sealed interface Event {

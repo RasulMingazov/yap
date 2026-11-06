@@ -1,5 +1,6 @@
 package app.yap.admin.feature.server.presentation
 
+import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.server.domain.ServerConnection
 import app.yap.admin.feature.server.presentation.ServerViewModel.DataState
 import app.yap.admin.feature.server.presentation.ServerViewModel.UiState
@@ -27,9 +28,9 @@ internal object ServerUiStateMapper {
         -> "Сервер: не подключён"
     }
 
-    private fun ServerConnection.status(): String = when (this) {
-        is ServerConnection.Connected -> "Подключено"
-        is ServerConnection.Unauthorized -> "Сервер не принял ключ"
-        is ServerConnection.Unreachable -> "Сервер не отвечает"
+    private fun ServerConnection.status(): Status = when (this) {
+        is ServerConnection.Connected -> Status(text = "Подключено", tone = Status.Tone.SUCCESS)
+        is ServerConnection.Unauthorized -> Status(text = "Сервер не принял ключ", tone = Status.Tone.ERROR)
+        is ServerConnection.Unreachable -> Status(text = "Сервер не отвечает", tone = Status.Tone.ERROR)
     }
 }

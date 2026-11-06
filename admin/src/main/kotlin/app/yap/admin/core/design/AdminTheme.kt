@@ -19,13 +19,17 @@ internal object AdminTheme {
         val line = Color(0xFFECECEE)
         val lineStrong = Color(0xFFD9D9DD)
         val muted = Color(0xFF6B6B72)
+        val ok = Color(0xFF1F7A3F)
         val selected = Color(0xFFEDEDF0)
         val side = Color(0xFFFAFAFA)
     }
 
     object Sizes {
 
+        val border = 1.dp
         val brandGap = 6.dp
+        val buttonHeight = 32.dp
+        val buttonPadding = 14.dp
         val contentBottomPadding = 40.dp
         val contentMaxWidth = 880.dp
         val contentPadding = 32.dp
@@ -33,9 +37,15 @@ internal object AdminTheme {
         val cornerRadius = 6.dp
         val fieldWidth = 360.dp
         val gap = 12.dp
-        val hintPadding = 12.dp
+        val hintHorizontalPadding = 14.dp
+        val hintVerticalPadding = 12.dp
+        val linkUnderlineOffset = 3.dp
+        val loader = 20.dp
+        val loaderStroke = 2.dp
         val rowMinHeight = 48.dp
         val rowPadding = 12.dp
+        val secondaryButtonPadding = 12.dp
+        val sectionGap = 32.dp
         val sideBottomPadding = 16.dp
         val sideGroupGap = 20.dp
         val sideGroupTitlePadding = 6.dp

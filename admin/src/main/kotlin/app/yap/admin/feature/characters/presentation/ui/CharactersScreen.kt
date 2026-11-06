@@ -6,20 +6,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTheme
+import app.yap.admin.core.design.LinkButton
 import app.yap.admin.core.design.LoadError
+import app.yap.admin.core.design.Loader
 import app.yap.admin.core.design.ScreenBody
 import app.yap.admin.core.design.ScreenToolbar
 import app.yap.admin.feature.characters.domain.CharacterId
@@ -75,7 +74,7 @@ internal fun CharactersContent(
                     message = uiState.message,
                     onRetryClick = { onEvent(Event.RetryClicked) },
                 )
-                is UiState.Loading -> CircularProgressIndicator()
+                is UiState.Loading -> Loader()
             }
         }
     }
@@ -119,11 +118,8 @@ private fun CharacterRows(
 
 @Composable
 private fun NewCharacterButton(onClick: () -> Unit) {
-    TextButton(onClick = onClick) {
-        Text(
-            text = "Новый персонаж",
-            color = AdminTheme.Colors.ink,
-            textDecoration = TextDecoration.Underline,
-        )
-    }
+    LinkButton(
+        onClick = onClick,
+        text = "Новый персонаж",
+    )
 }

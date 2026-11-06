@@ -41,6 +41,10 @@ system of the mobile app.
 
 - Keep colors, type, spacing, and radii in one admin theme object. A screen reads them from it.
 - Do not write a literal color or size in a screen. A new value goes into the theme object first.
+- Build a screen from the components of `core/design`: the buttons, the text field, the status,
+  the loader, the toolbar and the body. Do not style a Material component in a screen.
+- A text field keeps its label inside the field. The owner chose this over the label outside the
+  field on the canvas. The canvas changes with the next design work on these screens.
 
 ## Verification
 

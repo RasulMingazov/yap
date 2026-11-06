@@ -1,5 +1,6 @@
 package app.yap.admin.feature.characters.presentation
 
+import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.characters.domain.StubCharacter
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.DataState
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.Load
@@ -43,7 +44,7 @@ internal class CharacterUiStateMapperTest {
                 form = character.profile,
                 hint = null,
                 isSaveEnabled = true,
-                saveStatus = "Сохранено",
+                saveStatus = Status(text = "Сохранено", tone = Status.Tone.SUCCESS),
                 subtitle = "Постоянный герой",
                 title = "Sam",
             ),

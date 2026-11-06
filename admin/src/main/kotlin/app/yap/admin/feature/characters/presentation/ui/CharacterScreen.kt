@@ -1,15 +1,13 @@
 package app.yap.admin.feature.characters.presentation.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -21,10 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.yap.admin.core.design.AdminTextField
 import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.core.design.LoadError
+import app.yap.admin.core.design.Loader
+import app.yap.admin.core.design.PrimaryButton
 import app.yap.admin.core.design.ScreenBody
 import app.yap.admin.core.design.ScreenToolbar
+import app.yap.admin.core.design.StatusText
 import app.yap.admin.core.design.ToolbarBack
 import app.yap.admin.feature.characters.presentation.CharacterViewModel
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.Event
@@ -86,7 +88,7 @@ internal fun CharacterContent(
             is UiState.Loading -> {
                 PlaceholderToolbar(back = back)
                 ScreenBody {
-                    CircularProgressIndicator()
+                    Loader()
                 }
             }
         }
@@ -101,25 +103,18 @@ private fun CharacterForm(
 ) {
     ScreenToolbar(
         actions = {
-            content.saveStatus?.let { status ->
-                Text(
-                    text = status,
-                    color = AdminTheme.Colors.muted,
-                    style = AdminTheme.Type.sub,
-                )
-            }
-            Button(
+            content.saveStatus?.let { status -> StatusText(status = status) }
+            PrimaryButton(
                 enabled = content.isSaveEnabled,
                 onClick = { onEvent(Event.SaveClicked) },
-            ) {
-                Text("Сохранить")
-            }
+                text = "Сохранить",
+            )
         },
         back = back,
         subtitle = content.subtitle,
         title = content.title,
     )
-    ScreenBody {
+    ScreenBody(spacing = AdminTheme.Sizes.sectionGap) {
         content.hint?.let { hint ->
             Text(
                 text = hint,
@@ -131,63 +126,59 @@ private fun CharacterForm(
                         color = AdminTheme.Colors.fill,
                         shape = RoundedCornerShape(AdminTheme.Sizes.cornerRadius),
                     )
-                    .padding(AdminTheme.Sizes.hintPadding),
+                    .padding(
+                        horizontal = AdminTheme.Sizes.hintHorizontalPadding,
+                        vertical = AdminTheme.Sizes.hintVerticalPadding,
+                    ),
             )
         }
-        Text(
-            text = "Кто это",
-            color = AdminTheme.Colors.ink,
-            style = AdminTheme.Type.sub,
-            fontWeight = FontWeight.SemiBold,
-        )
-        ProfileField(
-            label = "Имя — как его называют пользователи",
-            onValueChange = { name -> onEvent(Event.FormChanged(content.form.copy(name = name))) },
-            placeholder = "Например, Mia",
-            value = content.form.name,
-        )
-        ProfileField(
-            label = "История",
-            onValueChange = { history -> onEvent(Event.FormChanged(content.form.copy(history = history))) },
-            placeholder = "Кто он, откуда, чем живёт. Если он будет в разных ролях, объясните почему: " +
-                "например, подрабатывает в разных местах.",
-            value = content.form.history,
-        )
-        ProfileField(
-            label = "Характер",
-            onValueChange = { personality -> onEvent(Event.FormChanged(content.form.copy(personality = personality))) },
-            placeholder = "Какой он в разговоре: тёплый, строгий, ворчливый, любопытный.",
-            value = content.form.personality,
-        )
-        ProfileField(
-            label = "Манера речи",
-            onValueChange = { manner -> onEvent(Event.FormChanged(content.form.copy(manner = manner))) },
-            placeholder = "Британский или американский, длинные или короткие фразы, есть ли сленг.",
-            value = content.form.manner,
-        )
-        Text(
-            text = "Роль в сцене — таксист, врач, сосед — задаётся в теме. " +
-                "Сложность лексики задаётся в «Уровнях» и одна для всех персонажей.",
-            color = AdminTheme.Colors.muted,
-            style = AdminTheme.Type.sub,
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap)) {
+            Text(
+                text = "Кто это",
+                color = AdminTheme.Colors.ink,
+                style = AdminTheme.Type.sub,
+                fontWeight = FontWeight.SemiBold,
+            )
+            AdminTextField(
+                label = "Имя — как его называют пользователи",
+                onValueChange = { name -> onEvent(Event.FormChanged(content.form.copy(name = name))) },
+                value = content.form.name,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = "Например, Mia",
+            )
+            AdminTextField(
+                label = "История",
+                onValueChange = { history -> onEvent(Event.FormChanged(content.form.copy(history = history))) },
+                value = content.form.history,
+                minLines = PROFILE_LINES,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = "Кто он, откуда, чем живёт. Если он будет в разных ролях, объясните почему: " +
+                    "например, подрабатывает в разных местах.",
+            )
+            AdminTextField(
+                label = "Характер",
+                onValueChange = { personality -> onEvent(Event.FormChanged(content.form.copy(personality = personality))) },
+                value = content.form.personality,
+                minLines = PROFILE_LINES,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = "Какой он в разговоре: тёплый, строгий, ворчливый, любопытный.",
+            )
+            AdminTextField(
+                label = "Манера речи",
+                onValueChange = { manner -> onEvent(Event.FormChanged(content.form.copy(manner = manner))) },
+                value = content.form.manner,
+                minLines = PROFILE_LINES,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = "Британский или американский, длинные или короткие фразы, есть ли сленг.",
+            )
+            Text(
+                text = "Роль в сцене — таксист, врач, сосед — задаётся в теме. " +
+                    "Сложность лексики задаётся в «Уровнях» и одна для всех персонажей.",
+                color = AdminTheme.Colors.muted,
+                style = AdminTheme.Type.sub,
+            )
+        }
     }
-}
-
-@Composable
-private fun ProfileField(
-    label: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    value: String,
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
-        modifier = Modifier.fillMaxWidth(),
-    )
 }
 
 @Composable
@@ -197,3 +188,5 @@ private fun PlaceholderToolbar(back: ToolbarBack) {
         title = "Персонаж",
     )
 }
+
+private const val PROFILE_LINES = 2
