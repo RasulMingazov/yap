@@ -18,6 +18,8 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 internal class DeepSeekModelProviderTest {
 
@@ -35,6 +37,44 @@ internal class DeepSeekModelProviderTest {
             actual = request.headers[HttpHeaders.Authorization] to
                 Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
         )
+    }
+
+    @Test
+    fun `GIVEN a request WHEN asking for JSON THEN DeepSeek gets the JSON format`() = runTest {
+        val env = Environment(answer = answer(content = """{"passed":true}"""), scheduler = testScheduler)
+
+        env.provider.json(StubModelRequest.stubModelRequest())
+
+        assertEquals(
+            expected = Json.parseToJsonElement(
+                """
+                {
+                  "messages": [{"content": "Hi", "role": "user"}],
+                  "model": "deepseek-flash",
+                  "response_format": {"type": "json_object"}
+                }
+                """,
+            ),
+            actual = Json.parseToJsonElement(env.engine.requestHistory.single().body.toByteArray().decodeToString()),
+        )
+    }
+
+    @Test
+    fun `GIVEN DeepSeek answers with a JSON object WHEN asking for JSON THEN the object comes back`() = runTest {
+        val env = Environment(answer = answer(content = """{"passed":true}"""), scheduler = testScheduler)
+
+        val reply = env.provider.json(StubModelRequest.stubModelRequest())
+
+        assertEquals(expected = ModelReply.Answered(buildJsonObject { put("passed", true) }), actual = reply)
+    }
+
+    @Test
+    fun `GIVEN DeepSeek answers with plain text WHEN asking for JSON THEN the call fails`() = runTest {
+        val env = Environment(answer = answer(content = "Sure, here it is"), scheduler = testScheduler)
+
+        val reply = env.provider.json(StubModelRequest.stubModelRequest())
+
+        assertEquals(expected = ModelReply.Failed, actual = reply)
     }
 
     @Test

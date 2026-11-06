@@ -17,6 +17,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger(DeepSeekModelProvider::class.java)
@@ -46,10 +48,20 @@ class DeepSeekModelProvider internal constructor(
         }
     }
 
-    override suspend fun text(request: ModelRequest): ModelReply<String> =
-        runSuspendCatching { complete(request.toDto()) }
+    override suspend fun json(request: ModelRequest): ModelReply<JsonObject> = reply(
+        body = request.toDto(responseFormat = ResponseFormatDto(type = JSON_OBJECT)),
+        read = { content -> Json.parseToJsonElement(content).jsonObject },
+    )
+
+    override suspend fun text(request: ModelRequest): ModelReply<String> = reply(
+        body = request.toDto(responseFormat = null),
+        read = { content -> content },
+    )
+
+    private suspend fun <T> reply(body: ChatRequestDto, read: (String) -> T): ModelReply<T> =
+        runSuspendCatching { read(complete(body)) }
             .fold(
-                onSuccess = { text -> ModelReply.Answered(text) },
+                onSuccess = { value -> ModelReply.Answered(value) },
                 onFailure = { cause ->
                     logger.warn("DeepSeek call failed", cause)
                     ModelReply.Failed
@@ -73,3 +85,4 @@ class DeepSeekModelProvider internal constructor(
 
 private const val COMPLETIONS_URL = "https://api.deepseek.com/chat/completions"
 private const val FINISH_REASON_STOP = "stop"
+private const val JSON_OBJECT = "json_object"
