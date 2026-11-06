@@ -68,5 +68,3 @@ When you are the PR author:
 - A PR adds at most 400 lines. When an issue does not fit, do not open a new issue: split the
   work into several PRs for the same issue and number them in the title, for example `[1/3]`,
   `[2/3]`, `[3/3]`.
-- Generated and vendored files do not count toward the 400 lines, for example the `.claude/` files
-  from `openspec init` and the Maven repository in `libs/`. Name them in the PR description.
