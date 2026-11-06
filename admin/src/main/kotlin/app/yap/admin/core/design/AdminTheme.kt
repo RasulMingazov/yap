@@ -10,7 +10,6 @@ internal object AdminTheme {
 
         val background = Color(0xFFFFFFFF)
         val ink = Color(0xFF111113)
-        val line = Color(0xFFECECEE)
         val muted = Color(0xFF6B6B72)
         val side = Color(0xFFFAFAFA)
     }
