@@ -9,7 +9,7 @@
 ## 2. Server admin API
 
 - [ ] 2.1 Add `CharacterDto` and `CharacterProfileDto` to `contract-admin`; verify with `./gradlew :contract-admin:build`
-- [ ] 2.2 Add the list, read, create and update use cases; verify with the use-case tests for the trimmed profile, the rejected profile and the unknown character
+- [x] 2.2 Add the list, read, create and update use cases; verify with the use-case tests for the trimmed profile, the rejected profile and the unknown character
 - [ ] 2.3 Add the routes and mount them in `app` behind the admin key; verify with the route tests for 200, 201, 400, 401 and 404
 
 ## 3. Admin data layer

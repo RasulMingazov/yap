@@ -2,7 +2,7 @@ package app.yap.server.feature.characters.model
 
 import kotlin.uuid.Uuid
 
-internal object StubCharacter {
+object StubCharacter {
 
     const val HISTORY = "Moved to the city five years ago. Drives a taxi and works in a cafe."
     const val MANNER = "Casual American English. Short phrases and contractions."

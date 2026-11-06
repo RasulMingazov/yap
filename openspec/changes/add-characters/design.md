@@ -91,8 +91,8 @@ separate list item type has no use yet.
 
 ### The PRs
 
-The change lands in six PRs for #6: this change; the server persistence; the server API; the admin
-data layer; the sidebar and Characters; the Character form and the archive.
+The change lands in seven PRs for #6: this change; the server persistence; the server use cases;
+the server API; the admin data layer; the sidebar and Characters; the Character form and the archive.
 
 ## Risks / Trade-offs
 
