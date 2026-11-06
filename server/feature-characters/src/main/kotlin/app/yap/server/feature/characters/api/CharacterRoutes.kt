@@ -28,33 +28,49 @@ fun Route.characterRoutes(
     updateCharacterUseCase: UpdateCharacterUseCase,
 ) {
     route("/admin/characters") {
-        get {
-            call.respond(getCharactersUseCase().map { character -> character.toDto() })
+        getCharactersRoute(getCharactersUseCase)
+        createCharacterRoute(createCharacterUseCase)
+        getCharacterRoute(getCharacterUseCase)
+        updateCharacterRoute(updateCharacterUseCase)
+    }
+}
+
+private fun Route.getCharactersRoute(getCharactersUseCase: GetCharactersUseCase) {
+    get {
+        call.respond(getCharactersUseCase().map { character -> character.toDto() })
+    }
+}
+
+private fun Route.createCharacterRoute(createCharacterUseCase: CreateCharacterUseCase) {
+    post {
+        when (val outcome = createCharacterUseCase(call.receive<CharacterProfileDto>().toModel())) {
+            is CreateCharacterOutcome.Created -> call.respond(HttpStatusCode.Created, outcome.character.toDto())
+            is CreateCharacterOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
         }
-        post {
-            when (val outcome = createCharacterUseCase(call.receive<CharacterProfileDto>().toModel())) {
-                is CreateCharacterOutcome.Created -> call.respond(HttpStatusCode.Created, outcome.character.toDto())
-                is CreateCharacterOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
-            }
+    }
+}
+
+private fun Route.getCharacterRoute(getCharacterUseCase: GetCharacterUseCase) {
+    get("/{characterId}") {
+        val character = getCharacterUseCase(call.characterId())
+        if (character == null) {
+            call.respond(HttpStatusCode.NotFound)
+        } else {
+            call.respond(character.toDto())
         }
-        get("/{characterId}") {
-            val character = getCharacterUseCase(call.characterId())
-            if (character == null) {
-                call.respond(HttpStatusCode.NotFound)
-            } else {
-                call.respond(character.toDto())
-            }
-        }
-        put("/{characterId}") {
-            val character = Character(
-                characterId = call.characterId(),
-                profile = call.receive<CharacterProfileDto>().toModel(),
-            )
-            when (val outcome = updateCharacterUseCase(character)) {
-                is UpdateCharacterOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
-                is UpdateCharacterOutcome.NotFound -> call.respond(HttpStatusCode.NotFound)
-                is UpdateCharacterOutcome.Updated -> call.respond(outcome.character.toDto())
-            }
+    }
+}
+
+private fun Route.updateCharacterRoute(updateCharacterUseCase: UpdateCharacterUseCase) {
+    put("/{characterId}") {
+        val character = Character(
+            characterId = call.characterId(),
+            profile = call.receive<CharacterProfileDto>().toModel(),
+        )
+        when (val outcome = updateCharacterUseCase(character)) {
+            is UpdateCharacterOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
+            is UpdateCharacterOutcome.NotFound -> call.respond(HttpStatusCode.NotFound)
+            is UpdateCharacterOutcome.Updated -> call.respond(outcome.character.toDto())
         }
     }
 }
