@@ -20,6 +20,7 @@
 
 - [x] 4.1 Add the shell with the sidebar groups Content and Settings and the start screen rule; verify with the view-model tests for both start screens and a click in the sidebar
 - [x] 4.2 Add `GetCharactersUseCase`, `CharactersViewModel` and the Characters screen; verify with the mapper and view-model tests for the rows, the empty list, the load error and Retry
+- [x] 4.3 Keep one `CharactersViewModel` for the session and update the shown list in the background when the owner returns to Characters; verify with the view-model tests for a return, a failed update and a second open during a load
 
 ## 5. Admin Character form
 

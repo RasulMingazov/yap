@@ -69,8 +69,10 @@ separate list item type has no use yet.
 - A shell composable holds the sidebar and the current screen: Characters, Character with an
   identifier or none for a new character, or Server. The shell picks the start screen from the
   saved server settings.
-- `CharactersViewModel` loads the list. `CharacterViewModel` loads one character, keeps the four
-  fields as the owner types them and saves them.
+- `CharactersViewModel` lives for the whole session. It loads the list each time Characters opens
+  and keeps the shown list while it loads, so a return to Characters shows no loading state.
+  `CharacterViewModel` loads one character, keeps the four fields as the owner types them and
+  saves them.
 - The admin characters repository reads the saved address and key for each call. It maps 400 to
   `Invalid` and every other failure to `Failed`. A 404 is a failure too: characters have no delete,
   and the form shows the same error with Retry for every failed load.

@@ -18,6 +18,7 @@ fun main() {
     val httpClient = adminHttpClient()
     application {
         val navigationViewModel = remember { navigationViewModel() }
+        val charactersViewModel = remember { charactersViewModel(httpClient = httpClient) }
         val serverViewModel = remember { serverViewModel(httpClient = httpClient) }
         Window(
             onCloseRequest = {
@@ -40,7 +41,7 @@ fun main() {
                             httpClient = httpClient,
                         )
                     },
-                    charactersViewModel = { charactersViewModel(httpClient = httpClient) },
+                    charactersViewModel = charactersViewModel,
                     serverViewModel = serverViewModel,
                     viewModel = navigationViewModel,
                 )
