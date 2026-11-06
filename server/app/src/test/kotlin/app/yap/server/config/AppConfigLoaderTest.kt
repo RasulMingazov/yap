@@ -15,6 +15,7 @@ internal class AppConfigLoaderTest {
 
         assertEquals(
             expected = AppConfig(
+                adminApiKey = "local-admin-key",
                 database = DatabaseConfig(
                     password = "postgres",
                     poolSize = 10,
@@ -43,6 +44,13 @@ internal class AppConfigLoaderTest {
     fun `GIVEN staging and the local password WHEN loading THEN startup fails`() {
         assertFailsWith<IllegalArgumentException> {
             load(systemEnv = mapOf("APP_ENV" to "staging"))
+        }
+    }
+
+    @Test
+    fun `GIVEN staging and the local admin key WHEN loading THEN startup fails`() {
+        assertFailsWith<IllegalArgumentException> {
+            load(systemEnv = mapOf("APP_ENV" to "staging", "DATABASE_PASSWORD" to "staging-secret"))
         }
     }
 

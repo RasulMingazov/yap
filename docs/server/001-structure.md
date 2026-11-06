@@ -47,8 +47,10 @@ internal class PublishTopicUseCase(
 ```
 
 - Name it as an action plus `UseCase`: `PublishTopicUseCase`, `GetCharacterUseCase`.
-- Every route calls a use case, also for a plain read or write. A use case that only calls the
-  repository is correct: the scenario grows there later.
+- Every route of a business scenario calls a use case, also for a plain read or write. A use case
+  that only calls the repository is correct: the scenario grows there later.
+- A technical route, such as `/health` or `GET /admin/server`, is not a business scenario. It
+  answers in `app` without a use case.
 - Give it one public `suspend operator fun invoke`. Take dependencies through the constructor.
 - Do not write a `*Service` class that collects several scenarios.
 - Put a rule that two use cases need into `model/`, as a function or a class named after the rule,

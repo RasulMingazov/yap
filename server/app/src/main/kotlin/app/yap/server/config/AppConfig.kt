@@ -3,6 +3,7 @@ package app.yap.server.config
 import app.yap.server.core.database.DatabaseConfig
 
 internal data class AppConfig(
+    val adminApiKey: String,
     val database: DatabaseConfig,
     val environment: AppEnvironment,
     val port: Int,
@@ -10,16 +11,19 @@ internal data class AppConfig(
 
     init {
         require(port in MIN_PORT..MAX_PORT) { "PORT must be between $MIN_PORT and $MAX_PORT" }
+        require(adminApiKey.isNotBlank()) { "ADMIN_API_KEY must not be blank" }
         if (environment.isDeployed) {
+            require(adminApiKey != LOCAL_ADMIN_API_KEY) { "ADMIN_API_KEY must be configured for staging and production" }
             require(database.password.isNotBlank() && database.password != DatabaseConfig.LOCAL_PASSWORD) {
                 "DATABASE_PASSWORD must be configured for staging and production"
             }
         }
     }
 
-    private companion object {
+    companion object {
 
-        const val MAX_PORT = 65535
-        const val MIN_PORT = 1
+        const val LOCAL_ADMIN_API_KEY = "local-admin-key"
+        private const val MAX_PORT = 65535
+        private const val MIN_PORT = 1
     }
 }
