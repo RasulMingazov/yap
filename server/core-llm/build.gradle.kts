@@ -17,4 +17,5 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.ktor.client.mock)
+    testRuntimeOnly(libs.logback.classic)
 }
