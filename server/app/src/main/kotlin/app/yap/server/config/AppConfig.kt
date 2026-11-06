@@ -1,6 +1,8 @@
-package app.yap.server.core.config
+package app.yap.server.config
 
-data class AppConfig(
+import app.yap.server.core.database.DatabaseConfig
+
+internal data class AppConfig(
     val adminApiKey: String,
     val database: DatabaseConfig,
     val environment: AppEnvironment,
@@ -12,6 +14,9 @@ data class AppConfig(
         require(adminApiKey.isNotBlank()) { "ADMIN_API_KEY must not be blank" }
         if (environment.isDeployed) {
             require(adminApiKey != LOCAL_ADMIN_API_KEY) { "ADMIN_API_KEY must be configured for staging and production" }
+            require(database.password.isNotBlank() && database.password != DatabaseConfig.LOCAL_PASSWORD) {
+                "DATABASE_PASSWORD must be configured for staging and production"
+            }
         }
     }
 

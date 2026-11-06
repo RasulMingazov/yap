@@ -1,6 +1,6 @@
-package app.yap.server.core.config
+package app.yap.server.config
 
-enum class AppEnvironment {
+internal enum class AppEnvironment {
     DEVELOPMENT,
     TEST,
     STAGING,

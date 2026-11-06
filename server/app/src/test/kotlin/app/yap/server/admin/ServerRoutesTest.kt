@@ -1,7 +1,7 @@
 package app.yap.server.admin
 
 import app.yap.server.StubAppConfig
-import app.yap.server.core.config.AppEnvironment
+import app.yap.server.config.AppEnvironment
 import app.yap.server.serverModule
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get

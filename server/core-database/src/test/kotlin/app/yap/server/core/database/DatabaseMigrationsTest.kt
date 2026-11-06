@@ -1,6 +1,5 @@
 package app.yap.server.core.database
 
-import app.yap.server.core.config.DatabaseConfig
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlin.test.Test
