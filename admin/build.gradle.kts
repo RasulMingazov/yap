@@ -4,6 +4,8 @@ plugins {
 
 dependencies {
     implementation(project(":contract-admin"))
+
+    testImplementation(libs.stubcall)
 }
 
 compose.desktop {
