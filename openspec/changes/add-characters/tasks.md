@@ -23,7 +23,7 @@
 
 ## 5. Admin Character form
 
-- [ ] 5.1 Add `GetCharacterUseCase`, `SaveCharacterUseCase` and `CharacterViewModel`; verify with the use-case test for create and update, and with the mapper and view-model tests for a new and a saved character, the Saved status, the error for an empty field, the save failure and the load error
+- [x] 5.1 Add `GetCharacterUseCase`, `SaveCharacterUseCase` and `CharacterViewModel`; verify with the use-case test for create and update, and with the mapper and view-model tests for a new and a saved character, the Saved status, the error for an empty field, the save failure and the load error
 - [ ] 5.2 Add the Character form screen; verify with `./gradlew :admin:run`: the form opens from a row and from New character
 - [ ] 5.3 Create and edit a character against a server with a database, then restart the server and open the character again; verify that the profile stays
 
