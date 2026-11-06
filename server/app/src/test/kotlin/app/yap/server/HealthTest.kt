@@ -7,11 +7,11 @@ import io.ktor.server.testing.testApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class HealthTest {
+internal class HealthTest {
 
     @Test
     fun `health answers ok`() = testApplication {
-        application { serverModule() }
+        application { serverModule(StubAppConfig.stubAppConfig()) }
 
         val response = client.get("/health")
 

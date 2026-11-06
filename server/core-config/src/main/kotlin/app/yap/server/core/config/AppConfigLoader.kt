@@ -20,6 +20,7 @@ class AppConfigLoader(
             user = env("DATABASE_USER") ?: "postgres",
         ).also { config -> config.validateFor(environment) }
         return AppConfig(
+            adminApiKey = env("ADMIN_API_KEY") ?: AppConfig.LOCAL_ADMIN_API_KEY,
             database = database,
             environment = environment,
             port = intEnv(name = "PORT", default = 8080),
