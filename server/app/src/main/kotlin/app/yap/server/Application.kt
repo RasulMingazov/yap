@@ -6,6 +6,13 @@ import app.yap.server.admin.serverRoutes
 import app.yap.server.config.AppConfig
 import app.yap.server.config.AppConfigLoader
 import app.yap.server.core.database.openDatabase
+import app.yap.server.feature.characters.api.characterRoutes
+import app.yap.server.feature.characters.persistence.CharacterRepository
+import app.yap.server.feature.characters.persistence.ExposedCharacterRepository
+import app.yap.server.feature.characters.usecase.CreateCharacterUseCase
+import app.yap.server.feature.characters.usecase.GetCharacterUseCase
+import app.yap.server.feature.characters.usecase.GetCharactersUseCase
+import app.yap.server.feature.characters.usecase.UpdateCharacterUseCase
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
@@ -24,7 +31,10 @@ fun main() {
     runCatching {
         embeddedServer(Netty, port = config.port) {
             monitor.subscribe(ApplicationStopped) { database.close() }
-            serverModule(config)
+            serverModule(
+                characterRepository = ExposedCharacterRepository(database),
+                config = config,
+            )
         }
             .start(wait = true)
     }
@@ -32,7 +42,10 @@ fun main() {
         .getOrThrow()
 }
 
-internal fun Application.serverModule(config: AppConfig) {
+internal fun Application.serverModule(
+    characterRepository: CharacterRepository,
+    config: AppConfig,
+) {
     install(ContentNegotiation) {
         json()
     }
@@ -42,6 +55,12 @@ internal fun Application.serverModule(config: AppConfig) {
         get("/health") { call.respondText("ok") }
         authenticate(ADMIN_AUTHENTICATION) {
             serverRoutes(environment = config.environment)
+            characterRoutes(
+                createCharacterUseCase = CreateCharacterUseCase(characterRepository = characterRepository),
+                getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
+                getCharactersUseCase = GetCharactersUseCase(characterRepository = characterRepository),
+                updateCharacterUseCase = UpdateCharacterUseCase(characterRepository = characterRepository),
+            )
         }
     }
 }

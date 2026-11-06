@@ -2,6 +2,7 @@ package app.yap.server.admin
 
 import app.yap.server.StubAppConfig
 import app.yap.server.config.AppEnvironment
+import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import app.yap.server.serverModule
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -15,7 +16,12 @@ internal class ServerRoutesTest {
 
     @Test
     fun `GIVEN no admin key WHEN asking for the server THEN the call is unauthorized`() = testApplication {
-        application { serverModule(StubAppConfig.stubAppConfig()) }
+        application {
+            serverModule(
+                characterRepository = StubCharacterRepository(),
+                config = StubAppConfig.stubAppConfig(),
+            )
+        }
 
         val response = client.get("/admin/server")
 
@@ -24,7 +30,12 @@ internal class ServerRoutesTest {
 
     @Test
     fun `GIVEN a wrong admin key WHEN asking for the server THEN the call is unauthorized`() = testApplication {
-        application { serverModule(StubAppConfig.stubAppConfig()) }
+        application {
+            serverModule(
+                characterRepository = StubCharacterRepository(),
+                config = StubAppConfig.stubAppConfig(),
+            )
+        }
 
         val response = client.get("/admin/server") { bearerAuth("wrong-key") }
 
@@ -33,7 +44,12 @@ internal class ServerRoutesTest {
 
     @Test
     fun `GIVEN the admin key WHEN asking for the server THEN it answers with its environment`() = testApplication {
-        application { serverModule(StubAppConfig.stubAppConfig(environment = AppEnvironment.STAGING)) }
+        application {
+            serverModule(
+                characterRepository = StubCharacterRepository(),
+                config = StubAppConfig.stubAppConfig(environment = AppEnvironment.STAGING),
+            )
+        }
 
         val response = client.get("/admin/server") { bearerAuth(StubAppConfig.ADMIN_API_KEY) }
 
