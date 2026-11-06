@@ -8,7 +8,6 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.serialization.json)
-    implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel)
 
     testImplementation(libs.kotlinx.coroutines.test)
