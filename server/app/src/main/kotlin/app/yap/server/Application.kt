@@ -8,7 +8,7 @@ import app.yap.server.config.AppConfigLoader
 import app.yap.server.core.database.openDatabase
 import app.yap.server.feature.characters.api.characterRoutes
 import app.yap.server.feature.characters.persistence.CharacterRepository
-import app.yap.server.feature.characters.persistence.ExposedCharacterRepository
+import app.yap.server.feature.characters.persistence.DatabaseCharacterRepository
 import app.yap.server.feature.characters.usecase.CreateCharacterUseCase
 import app.yap.server.feature.characters.usecase.GetCharacterUseCase
 import app.yap.server.feature.characters.usecase.GetCharactersUseCase
@@ -32,7 +32,7 @@ fun main() {
         embeddedServer(Netty, port = config.port) {
             monitor.subscribe(ApplicationStopped) { database.close() }
             serverModule(
-                characterRepository = ExposedCharacterRepository(database),
+                characterRepository = DatabaseCharacterRepository(database),
                 config = config,
             )
         }
