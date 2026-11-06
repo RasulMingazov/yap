@@ -18,7 +18,10 @@ class ExposedCharacterRepository(
 ) : CharacterRepository {
 
     override suspend fun create(profile: CharacterProfile): Character {
-        val character = Character(characterId = CharacterId(Uuid.random()), profile = profile)
+        val character = Character(
+            characterId = CharacterId(Uuid.random()),
+            profile = profile,
+        )
         database.transaction {
             CharactersTable.insert { statement ->
                 statement[CharactersTable.characterId] = character.characterId.value

@@ -18,7 +18,10 @@ class Database internal constructor(
     private val exposedDatabase = ExposedDatabase.connect(source)
 
     suspend fun <T> transaction(statement: suspend JdbcTransaction.() -> T): T = withContext(Dispatchers.IO) {
-        suspendTransaction(db = exposedDatabase, statement = statement)
+        suspendTransaction(
+            db = exposedDatabase,
+            statement = statement,
+        )
     }
 
     override fun close() {
