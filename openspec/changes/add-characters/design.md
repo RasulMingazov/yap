@@ -72,7 +72,8 @@ separate list item type has no use yet.
 - `CharactersViewModel` loads the list. `CharacterViewModel` loads one character, keeps the four
   fields as the owner types them and saves them.
 - The admin characters repository reads the saved address and key for each call. It maps 400 to
-  `Invalid`, 404 to `NotFound`, and every other failure to `Failed`.
+  `Invalid` and every other failure to `Failed`. A 404 is a failure too: characters have no delete,
+  and the form shows the same error with Retry for every failed load.
 - The error that asks to fill in every field stays in the UI state until the next save. The failure
   of Save is a snackbar, because the owner can only try again.
 - The Russian copy comes from the admin page of the design canvas. The copy that the design does

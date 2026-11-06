@@ -52,7 +52,10 @@ internal class RemoteCharacterRepository(
     override suspend fun list(): LoadResult<List<Character>> = request(
         failed = LoadResult.Failed,
         read = { response ->
-            response.toLoadResult { body<List<CharacterDto>>().map { character -> character.toDomain() } }
+            response.toLoadResult {
+                body<List<CharacterDto>>()
+                    .map { character -> character.toDomain() }
+            }
         },
         send = { settings -> httpClient.get(settings.url(CHARACTERS_PATH)) { bearerAuth(settings.key) } },
     )
@@ -75,7 +78,8 @@ internal class RemoteCharacterRepository(
         send: suspend (ServerSettings) -> HttpResponse,
     ): T {
         val settings = serverSettingsRepository.get() ?: return failed
-        return runSuspendCatching { read(send(settings)) }.getOrElse { failed }
+        return runSuspendCatching { read(send(settings)) }
+            .getOrElse { failed }
     }
 
     private suspend fun HttpResponse.toSaveResult(): SaveCharacterResult = when (status) {
