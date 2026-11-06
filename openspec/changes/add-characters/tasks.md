@@ -14,18 +14,18 @@
 
 ## 3. Admin data layer
 
-- [ ] 3.1 Add the admin characters repository that reads the saved server settings for each call; verify with mock engine tests for 200, 400, 404 and a failed call
-- [ ] 3.2 Add the admin use cases for the list, one character and the save; verify with `./gradlew :admin:build`
+- [x] 3.1 Add the admin characters repository that reads the saved server settings for each call; verify with mock engine tests for 200, 201, 400, a call without saved settings and a failed call
 
 ## 4. Admin sidebar and Characters
 
 - [ ] 4.1 Add the shell with the sidebar groups Content and Settings and the start screen rule; verify with `./gradlew :admin:run`: the app opens Server without saved settings and Characters with them
-- [ ] 4.2 Add `CharactersViewModel` and the Characters screen; verify with the mapper and view-model tests for the rows, the empty list, the load error and Retry
+- [ ] 4.2 Add `GetCharactersUseCase`, `CharactersViewModel` and the Characters screen; verify with the mapper and view-model tests for the rows, the empty list, the load error and Retry
 
 ## 5. Admin Character form
 
-- [ ] 5.1 Add `CharacterViewModel` and the Character form; verify with the mapper and view-model tests for a new and a saved character, the Saved status, the error for an empty field, the save failure and the load error
-- [ ] 5.2 Create and edit a character against a local server, then restart the server and open the character again; verify that the profile stays
+- [ ] 5.1 Add `GetCharacterUseCase`, `SaveCharacterUseCase` and `CharacterViewModel`; verify with the use-case test for create and update, and with the mapper and view-model tests for a new and a saved character, the Saved status, the error for an empty field, the save failure and the load error
+- [ ] 5.2 Add the Character form screen; verify with `./gradlew :admin:run`: the form opens from a row and from New character
+- [ ] 5.3 Create and edit a character against a server with a database, then restart the server and open the character again; verify that the profile stays
 
 ## Workflow follow-up
 
