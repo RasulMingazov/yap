@@ -1,9 +1,7 @@
 package app.yap.server.core.database
 
-import app.yap.server.core.config.DatabaseConfig
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.jetbrains.exposed.sql.Database
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("app.yap.server.core.database")
@@ -16,7 +14,6 @@ fun openDatabase(config: DatabaseConfig): AutoCloseable {
             resetOnMigrationChange = config.resetOnMigrationChange,
             source = source,
         )
-        Database.connect(source)
     }
         .onFailure { source.close() }
         .getOrThrow()

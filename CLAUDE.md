@@ -4,8 +4,7 @@ Gradle monorepo for Yap, an app for English speaking practice.
 
 | Module | What it is |
 | --- | --- |
-| `server/app` | Ktor server. Holds scenarios, prompts and model keys. Deployed to Timeweb. |
-| `server/core-config` | Server settings from environment variables and `.env`. |
+| `server/app` | Ktor server. Holds scenarios, prompts and model keys. Reads its settings from environment variables and `.env`. Deployed to Timeweb. |
 | `server/core-database` | PostgreSQL connection and Flyway migrations. |
 | `admin` | Compose Desktop app for the owner. Talks only to the server; holds no keys. |
 | `contract-admin` | DTOs of the admin API, shared by `server` and `admin`. Data only, no logic. |
