@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import app.yap.admin.core.network.adminHttpClient
+import app.yap.admin.feature.characters.di.characterViewModel
 import app.yap.admin.feature.characters.di.charactersViewModel
 import app.yap.admin.feature.server.di.serverViewModel
 import app.yap.admin.navigation.di.navigationViewModel
@@ -24,6 +25,12 @@ fun main() {
         ) {
             MaterialTheme {
                 AdminShell(
+                    characterViewModel = { characterId ->
+                        characterViewModel(
+                            characterId = characterId,
+                            httpClient = httpClient,
+                        )
+                    },
                     charactersViewModel = { charactersViewModel(httpClient = httpClient) },
                     serverViewModel = serverViewModel,
                     viewModel = navigationViewModel,

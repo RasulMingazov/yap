@@ -92,10 +92,10 @@ separate list item type has no use yet.
 
 ### The PRs
 
-The change lands in ten PRs for #6: this change; the server persistence; the server use cases; the
-server API; the admin data layer; the view model of Characters; the Characters screen; the shell
-with the sidebar; the view model of the Character form; the Character form screen and the archive.
-An admin use case lands with its first view model.
+The change lands in twelve PRs for #6: this change; the server persistence; the server use cases;
+the server API; the admin data layer; the view model of Characters; the Characters screen; the shell
+with the sidebar; the use cases of the Character form; its view model; its screen; the archive. An
+admin use case lands with its first consumer.
 
 ## Risks / Trade-offs
 
