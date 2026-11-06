@@ -24,11 +24,11 @@ Name a thing by what it is, not by where it shows or how it is built.
 
 ## `when` on subtypes
 
-When a `when` dispatches on subtypes, use `is` for every branch — including singletons. Do not mix a value branch with type branches in the same dispatch.
+When a `when` dispatches on subtypes, use `is` for every branch — including singletons: `is LoginResult.Cancelled`, not `LoginResult.Cancelled`. Do not mix a value branch with type branches in the same dispatch.
 
 ```kotlin
 when (result) {
-    is LoginResult.Cancelled -> onCancelled()   // not `LoginResult.Cancelled ->`
+    is LoginResult.Cancelled -> onCancelled()
     is LoginResult.Failure -> onFailure(result)
 }
 ```
@@ -53,10 +53,10 @@ Alphabetize required and defaulted parameters within their own groups. Do not al
 
 Read a class top to bottom without jumping. Public API comes first, then private helpers in the
 order the code above them calls, depth first: a helper sits below its only caller, and a helper
-called from two places sits below the later one.
+called from two places sits below the later one. Here `login` calls `requestLogin`, then `outcomeOf`.
 
 ```kotlin
-override suspend fun login(): LoginOutcome = ...   // calls requestLogin, then outcomeOf
+override suspend fun login(): LoginOutcome = ...
 
 private suspend fun requestLogin(nonce: String): ApiResult<LoginDto> = ...
 
