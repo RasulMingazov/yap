@@ -1,6 +1,8 @@
 # Wire Contracts
 
 `contract-admin` holds the wire contracts of the admin API. The server and the admin app share them.
+The first mobile feature adds `contract-mobile` for the mobile API, shared by the server and
+`mobile/shared`. These rules will apply to it.
 
 ## Naming
 
