@@ -1,6 +1,7 @@
 # Persistence
 
 Each feature owns its persisted data, and shared database infrastructure stays feature-independent.
+The database, Exposed, Flyway, and the reset flag arrive with the first database change (#3).
 
 - A feature owns the repositories for its persisted aggregates, its tables, and its Flyway
   migrations.
