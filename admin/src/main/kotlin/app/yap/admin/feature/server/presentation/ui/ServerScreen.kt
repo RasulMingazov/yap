@@ -26,7 +26,7 @@ internal fun ServerScreen(viewModel: ServerViewModel) {
 }
 
 @Composable
-private fun ServerContent(
+internal fun ServerContent(
     onEvent: (Event) -> Unit,
     uiState: UiState,
 ) {

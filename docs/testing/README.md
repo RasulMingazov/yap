@@ -12,5 +12,6 @@ documentation, build-only changes, generated code, or behavior the project does 
 | [Test structure](001-structure.md) | scenarios, naming, assertions, or repeated setup |
 | [Test stubs](002-stubs.md) | value builders, `stubcall`, or behavioral collaborators |
 | [Backend integration](003-backend-integration.md) | PostgreSQL behavior, Testcontainers, concurrency, constraints, or migrations |
+| [Screen capture](004-screen-capture.md) | a screen, its states, or the capture of an app |
 
 New and changed tests follow these rules. Existing tests migrate when their behavior or setup changes.

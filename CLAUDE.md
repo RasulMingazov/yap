@@ -55,6 +55,11 @@ A change in progress is a folder under `openspec/changes/`.
 The `Claude review` workflow (`.github/workflows/claude-review.yml`) reviews every non-draft PR
 and runs again after each push. It needs the repository secret `CLAUDE_CODE_OAUTH_TOKEN`.
 
+Two agents in `.claude/agents/` review the UI of any app. Run `ux-review` before a screen is built
+from the design and after a UI change: it checks every state, the way out of each state, errors,
+feedback and copy. Run `ui-review` after a UI change: it captures the screens as
+`docs/testing/004-screen-capture.md` says and compares them with the design canvas.
+
 When you are the PR author:
 
 - Answer every review thread. Fix the point, or reply in the thread with the reason you keep the code.

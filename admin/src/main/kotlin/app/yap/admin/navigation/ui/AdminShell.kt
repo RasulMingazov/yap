@@ -1,15 +1,9 @@
 package app.yap.admin.navigation.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.presentation.CharacterViewModel
 import app.yap.admin.feature.characters.presentation.CharactersViewModel
@@ -33,25 +27,18 @@ internal fun AdminShell(
     val serverUiState by serverViewModel.uiState.collectAsStateWithLifecycle()
     val onScreenClick: (Screen) -> Unit = { screen -> viewModel.onEvent(Event.ScreenClicked(screen)) }
     when (val state = uiState) {
-        is UiState.Content -> Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(AdminTheme.Colors.background),
+        is UiState.Content -> AdminFrame(
+            current = state.section,
+            onScreenClick = onScreenClick,
+            serverLabel = serverUiState.serverLabel,
         ) {
-            Sidebar(
-                current = state.section,
+            ScreenContent(
+                characterViewModel = characterViewModel,
+                charactersViewModel = charactersViewModel,
                 onScreenClick = onScreenClick,
-                serverLabel = serverUiState.serverLabel,
+                screen = state.screen,
+                serverViewModel = serverViewModel,
             )
-            Box(modifier = Modifier.weight(1f)) {
-                ScreenContent(
-                    characterViewModel = characterViewModel,
-                    charactersViewModel = charactersViewModel,
-                    onScreenClick = onScreenClick,
-                    screen = state.screen,
-                    serverViewModel = serverViewModel,
-                )
-            }
         }
         is UiState.Loading -> Unit
     }
