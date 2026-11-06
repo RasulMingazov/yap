@@ -18,7 +18,7 @@
 
 ## 4. Admin sidebar and Characters
 
-- [ ] 4.1 Add the shell with the sidebar groups Content and Settings and the start screen rule; verify with `./gradlew :admin:run`: the app opens Server without saved settings and Characters with them
+- [x] 4.1 Add the shell with the sidebar groups Content and Settings and the start screen rule; verify with `./gradlew :admin:run`: the app opens Server without saved settings and Characters with them
 - [x] 4.2 Add `GetCharactersUseCase`, `CharactersViewModel` and the Characters screen; verify with the mapper and view-model tests for the rows, the empty list, the load error and Retry
 
 ## 5. Admin Character form

@@ -12,6 +12,7 @@ internal object AdminTheme {
         val ink = Color(0xFF111113)
         val line = Color(0xFFECECEE)
         val muted = Color(0xFF6B6B72)
+        val selected = Color(0xFFEDEDF0)
         val side = Color(0xFFFAFAFA)
     }
 
@@ -23,6 +24,8 @@ internal object AdminTheme {
         val listMaxWidth = 880.dp
         val rowMinHeight = 48.dp
         val rowPadding = 12.dp
+        val sideItemPadding = 8.dp
+        val sideItemRadius = 6.dp
         val sidePadding = 22.dp
         val sideWidth = 220.dp
         val toolbarHeight = 64.dp

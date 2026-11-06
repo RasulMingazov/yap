@@ -5,13 +5,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import app.yap.admin.core.network.adminHttpClient
+import app.yap.admin.feature.characters.di.charactersViewModel
 import app.yap.admin.feature.server.di.serverViewModel
-import app.yap.admin.feature.server.presentation.ui.ServerScreen
+import app.yap.admin.navigation.di.navigationViewModel
+import app.yap.admin.navigation.ui.AdminShell
 
 fun main() {
     val httpClient = adminHttpClient()
     application {
-        val viewModel = remember { serverViewModel(httpClient = httpClient) }
+        val navigationViewModel = remember { navigationViewModel() }
+        val serverViewModel = remember { serverViewModel(httpClient = httpClient) }
         Window(
             onCloseRequest = {
                 httpClient.close()
@@ -20,7 +23,11 @@ fun main() {
             title = "Yap Admin",
         ) {
             MaterialTheme {
-                ServerScreen(viewModel = viewModel)
+                AdminShell(
+                    charactersViewModel = { charactersViewModel(httpClient = httpClient) },
+                    serverViewModel = serverViewModel,
+                    viewModel = navigationViewModel,
+                )
             }
         }
     }
