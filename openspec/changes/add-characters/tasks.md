@@ -2,9 +2,9 @@
 
 ## 1. Server persistence
 
-- [ ] 1.1 Connect Exposed 1.6.0 in `core-database` and give features a suspending transaction; verify with `./gradlew :server:core-database:build`
-- [ ] 1.2 Add `server/feature-characters` with the character model and the profile rule; verify with the model tests for trimmed and empty fields
-- [ ] 1.3 Add the `characters` table, `V1__characters.sql` and the Exposed repository; verify with the PostgreSQL tests for create, read, update, the name order and the clean bootstrap (CI runs them)
+- [x] 1.1 Connect Exposed 1.6.0 in `core-database` and give features a suspending transaction; verify with `./gradlew :server:core-database:build`
+- [x] 1.2 Add `server/feature-characters` with the character model and the profile rule; verify with the model tests for trimmed and empty fields
+- [x] 1.3 Add the `characters` table, `V1__characters.sql` and the Exposed repository; verify with the PostgreSQL tests for create, read, update, the name order and the clean bootstrap (CI runs them)
 
 ## 2. Server admin API
 
