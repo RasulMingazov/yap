@@ -13,14 +13,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 internal fun ScreenToolbar(
-    subtitle: String,
     title: String,
     actions: @Composable RowScope.() -> Unit = {},
     back: ToolbarBack? = null,
+    subtitle: String? = null,
 ) {
     Row(
         modifier = Modifier
@@ -37,24 +38,35 @@ internal fun ScreenToolbar(
             Row(horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.toolbarTitleGap)) {
                 back?.let { toolbarBack ->
                     Text(
-                        text = "${toolbarBack.label} /",
+                        text = toolbarBack.label,
                         color = AdminTheme.Colors.muted,
-                        fontSize = AdminTheme.Type.title,
-                        modifier = Modifier.clickable(onClick = toolbarBack.onClick),
+                        style = AdminTheme.Type.title,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.clickable(
+                            role = Role.Button,
+                            onClick = toolbarBack.onClick,
+                        ),
+                    )
+                    Text(
+                        text = "/",
+                        color = AdminTheme.Colors.muted,
+                        style = AdminTheme.Type.title,
                     )
                 }
                 Text(
                     text = title,
                     color = AdminTheme.Colors.ink,
-                    fontSize = AdminTheme.Type.title,
+                    style = AdminTheme.Type.title,
                     fontWeight = FontWeight.SemiBold,
                 )
             }
-            Text(
-                text = subtitle,
-                color = AdminTheme.Colors.muted,
-                fontSize = AdminTheme.Type.sub,
-            )
+            subtitle?.let { text ->
+                Text(
+                    text = text,
+                    color = AdminTheme.Colors.muted,
+                    style = AdminTheme.Type.sub,
+                )
+            }
         }
         actions()
     }

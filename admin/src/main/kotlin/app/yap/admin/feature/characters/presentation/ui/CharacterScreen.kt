@@ -105,7 +105,7 @@ private fun CharacterForm(
                 Text(
                     text = status,
                     color = AdminTheme.Colors.muted,
-                    fontSize = AdminTheme.Type.sub,
+                    style = AdminTheme.Type.sub,
                 )
             }
             Button(
@@ -124,7 +124,7 @@ private fun CharacterForm(
             Text(
                 text = hint,
                 color = AdminTheme.Colors.ink,
-                fontSize = AdminTheme.Type.body,
+                style = AdminTheme.Type.body,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
@@ -137,7 +137,7 @@ private fun CharacterForm(
         Text(
             text = "Кто это",
             color = AdminTheme.Colors.ink,
-            fontSize = AdminTheme.Type.sub,
+            style = AdminTheme.Type.sub,
             fontWeight = FontWeight.SemiBold,
         )
         ProfileField(
@@ -169,7 +169,7 @@ private fun CharacterForm(
             text = "Роль в сцене — таксист, врач, сосед — задаётся в теме. " +
                 "Сложность лексики задаётся в «Уровнях» и одна для всех персонажей.",
             color = AdminTheme.Colors.muted,
-            fontSize = AdminTheme.Type.sub,
+            style = AdminTheme.Type.sub,
         )
     }
 }
@@ -194,7 +194,6 @@ private fun ProfileField(
 private fun PlaceholderToolbar(back: ToolbarBack) {
     ScreenToolbar(
         back = back,
-        subtitle = "",
         title = "Персонаж",
     )
 }

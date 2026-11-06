@@ -15,7 +15,7 @@ internal fun LoadError(
         Text(
             text = message,
             color = AdminTheme.Colors.ink,
-            fontSize = AdminTheme.Type.body,
+            style = AdminTheme.Type.body,
         )
         OutlinedButton(onClick = onRetryClick) {
             Text("Повторить")

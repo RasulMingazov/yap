@@ -1,9 +1,12 @@
 package app.yap.admin
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+import app.yap.admin.core.design.AdminMaterialTheme
+import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.core.network.adminHttpClient
 import app.yap.admin.feature.characters.di.characterViewModel
 import app.yap.admin.feature.characters.di.charactersViewModel
@@ -21,9 +24,15 @@ fun main() {
                 httpClient.close()
                 exitApplication()
             },
+            state = rememberWindowState(
+                size = DpSize(
+                    width = AdminTheme.Sizes.windowWidth,
+                    height = AdminTheme.Sizes.windowHeight,
+                ),
+            ),
             title = "Yap Admin",
         ) {
-            MaterialTheme {
+            AdminMaterialTheme {
                 AdminShell(
                     characterViewModel = { characterId ->
                         characterViewModel(

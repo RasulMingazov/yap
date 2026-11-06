@@ -1,9 +1,10 @@
 package app.yap.admin
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.unit.Density
+import app.yap.admin.core.design.AdminMaterialTheme
+import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.core.design.ToolbarBack
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.LoadResult
@@ -115,11 +116,11 @@ internal class ScreenCaptureTest {
         content: @Composable () -> Unit,
     ): File {
         val scene = ImageComposeScene(
-            width = WIDTH,
-            height = HEIGHT,
+            width = AdminTheme.Sizes.windowWidth.value.toInt(),
+            height = AdminTheme.Sizes.windowHeight.value.toInt(),
             density = Density(1f),
         ) {
-            MaterialTheme {
+            AdminMaterialTheme {
                 AdminFrame(
                     current = current,
                     onScreenClick = {},
@@ -142,9 +143,7 @@ internal class ScreenCaptureTest {
 
     private companion object {
 
-        const val HEIGHT = 800
         const val LONG_ADDRESS = "https://staging.yap-admin.example.com"
-        const val WIDTH = 1280
         val CHARACTER_ID = CharacterId(StubCharacter.CHARACTER_ID)
         val CAST = listOf(
             StubCharacter.stubCharacter(),
