@@ -25,8 +25,8 @@ private val logger = LoggerFactory.getLogger(DeepSeekModelProvider::class.java)
 
 class DeepSeekModelProvider internal constructor(
     private val config: DeepSeekConfig,
-    engine: HttpClientEngine,
-) : ModelProvider {
+    private val engine: HttpClientEngine,
+) : ModelProvider, AutoCloseable {
 
     constructor(config: DeepSeekConfig) : this(
         config = config,
@@ -67,6 +67,11 @@ class DeepSeekModelProvider internal constructor(
                     ModelReply.Failed
                 },
             )
+
+    override fun close() {
+        httpClient.close()
+        engine.close()
+    }
 
     private suspend fun complete(body: ChatRequestDto): String {
         val choice = httpClient
