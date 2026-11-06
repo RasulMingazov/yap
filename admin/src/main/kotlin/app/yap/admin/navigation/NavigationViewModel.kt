@@ -3,6 +3,7 @@ package app.yap.admin.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.yap.admin.core.presentation.mapState
+import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.server.domain.usecase.GetServerSettingsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,12 +38,17 @@ internal class NavigationViewModel(
 
     sealed interface UiState {
 
-        data class Content(val screen: Screen) : UiState
+        data class Content(
+            val screen: Screen,
+            val section: Screen,
+        ) : UiState
 
         data object Loading : UiState
     }
 
     sealed interface Screen {
+
+        data class Character(val characterId: CharacterId?) : Screen
 
         data object Characters : Screen
 

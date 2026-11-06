@@ -10,7 +10,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTheme
+import app.yap.admin.feature.characters.domain.CharacterId
+import app.yap.admin.feature.characters.presentation.CharacterViewModel
 import app.yap.admin.feature.characters.presentation.CharactersViewModel
+import app.yap.admin.feature.characters.presentation.ui.CharacterScreen
 import app.yap.admin.feature.characters.presentation.ui.CharactersScreen
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ui.ServerScreen
@@ -21,6 +24,7 @@ import app.yap.admin.navigation.NavigationViewModel.UiState
 
 @Composable
 internal fun AdminShell(
+    characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: () -> CharactersViewModel,
     serverViewModel: ServerViewModel,
     viewModel: NavigationViewModel,
@@ -34,13 +38,15 @@ internal fun AdminShell(
                 .background(AdminTheme.Colors.background),
         ) {
             Sidebar(
-                current = state.screen,
+                current = state.section,
                 onScreenClick = { screen -> viewModel.onEvent(Event.ScreenClicked(screen)) },
                 serverLabel = serverUiState.serverLabel,
             )
             Box(modifier = Modifier.weight(1f)) {
                 ScreenContent(
+                    characterViewModel = characterViewModel,
                     charactersViewModel = charactersViewModel,
+                    onScreenClick = { screen -> viewModel.onEvent(Event.ScreenClicked(screen)) },
                     screen = state.screen,
                     serverViewModel = serverViewModel,
                 )
@@ -52,14 +58,20 @@ internal fun AdminShell(
 
 @Composable
 private fun ScreenContent(
+    characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: () -> CharactersViewModel,
+    onScreenClick: (Screen) -> Unit,
     screen: Screen,
     serverViewModel: ServerViewModel,
 ) {
     when (screen) {
+        is Screen.Character -> CharacterScreen(
+            onBackClick = { onScreenClick(Screen.Characters) },
+            viewModel = remember(screen) { characterViewModel(screen.characterId) },
+        )
         is Screen.Characters -> CharactersScreen(
-            onCharacterClick = {},
-            onNewCharacterClick = {},
+            onCharacterClick = { characterId -> onScreenClick(Screen.Character(characterId)) },
+            onNewCharacterClick = { onScreenClick(Screen.Character(characterId = null)) },
             viewModel = remember { charactersViewModel() },
         )
         is Screen.Server -> ServerScreen(viewModel = serverViewModel)
