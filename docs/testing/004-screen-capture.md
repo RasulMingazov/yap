@@ -28,3 +28,5 @@ The build runs it too, so a state that does not render fails the build.
 ## Mobile
 
 The mobile app has no capture method yet. Add it to this guide together with its first screen.
+Give `ui-check` the tools of that method in the same change, and say in the method how it
+restores the device settings that it changes.
