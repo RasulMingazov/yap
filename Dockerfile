@@ -18,5 +18,6 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /src/server/app/build/install/app /app
 ENV PORT=8080
+ENV DATABASE_RESET_ON_MIGRATION_CHANGE=true
 EXPOSE 8080
 CMD ["/app/bin/app"]
