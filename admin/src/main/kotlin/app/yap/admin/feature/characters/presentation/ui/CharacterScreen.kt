@@ -46,16 +46,14 @@ internal fun CharacterScreen(
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
-        Column {
-            CharacterContent(
-                back = ToolbarBack(
-                    label = "Персонажи",
-                    onClick = onBackClick,
-                ),
-                onEvent = viewModel::onEvent,
-                uiState = uiState,
-            )
-        }
+        CharacterContent(
+            back = ToolbarBack(
+                label = "Персонажи",
+                onClick = onBackClick,
+            ),
+            onEvent = viewModel::onEvent,
+            uiState = uiState,
+        )
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
@@ -64,30 +62,32 @@ internal fun CharacterScreen(
 }
 
 @Composable
-private fun CharacterContent(
+internal fun CharacterContent(
     back: ToolbarBack,
     onEvent: (Event) -> Unit,
     uiState: UiState,
 ) {
-    when (uiState) {
-        is UiState.Content -> CharacterForm(
-            back = back,
-            content = uiState,
-            onEvent = onEvent,
-        )
-        is UiState.Error -> {
-            PlaceholderToolbar(back = back)
-            ScreenBody {
-                LoadError(
-                    message = uiState.message,
-                    onRetryClick = { onEvent(Event.RetryClicked) },
-                )
+    Column {
+        when (uiState) {
+            is UiState.Content -> CharacterForm(
+                back = back,
+                content = uiState,
+                onEvent = onEvent,
+            )
+            is UiState.Error -> {
+                PlaceholderToolbar(back = back)
+                ScreenBody {
+                    LoadError(
+                        message = uiState.message,
+                        onRetryClick = { onEvent(Event.RetryClicked) },
+                    )
+                }
             }
-        }
-        is UiState.Loading -> {
-            PlaceholderToolbar(back = back)
-            ScreenBody {
-                CircularProgressIndicator()
+            is UiState.Loading -> {
+                PlaceholderToolbar(back = back)
+                ScreenBody {
+                    CircularProgressIndicator()
+                }
             }
         }
     }

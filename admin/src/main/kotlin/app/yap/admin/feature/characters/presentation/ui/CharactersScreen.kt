@@ -43,7 +43,7 @@ internal fun CharactersScreen(
 }
 
 @Composable
-private fun CharactersContent(
+internal fun CharactersContent(
     onCharacterClick: (CharacterId) -> Unit,
     onEvent: (Event) -> Unit,
     onNewCharacterClick: () -> Unit,

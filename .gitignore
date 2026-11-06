@@ -15,5 +15,6 @@
 local.properties
 .claude/*
 !.claude/settings.json
+!.claude/agents/
 !.claude/commands/
 !.claude/skills/
