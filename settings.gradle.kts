@@ -27,3 +27,4 @@ rootProject.name = "yap"
 include(":admin")
 include(":contract-admin")
 include(":server:app")
+include(":server:core-database")

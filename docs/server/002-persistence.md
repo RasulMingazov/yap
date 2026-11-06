@@ -1,7 +1,6 @@
 # Persistence
 
 Each feature owns its persisted data, and shared database infrastructure stays feature-independent.
-The database, Exposed, Flyway, and the reset flag arrive with the first database change (#3).
 
 - A feature owns the repositories for its persisted aggregates, its tables, and its Flyway
   migrations.
@@ -14,8 +13,8 @@ The database, Exposed, Flyway, and the reset flag arrive with the first database
   free `V<n>` across every feature.
 - Until the app has real users, edit the existing migration in place. With
   `DATABASE_RESET_ON_MIGRATION_CHANGE=true`, the server clears the database and migrates from
-  scratch when an applied migration changed, so a deploy needs no manual step. Before launch, turn
-  the flag off and make migrations forward-only.
+  scratch when an applied migration changed, so a deploy needs no manual step. The server image
+  (`Dockerfile`) turns the flag on. Before launch, remove it there and make migrations forward-only.
 - Translate persistence-specific failures at the persistence boundary.
 
 PostgreSQL-specific behavior follows [Backend Integration](../testing/003-backend-integration.md).

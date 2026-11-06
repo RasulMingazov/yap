@@ -1,5 +1,7 @@
 package app.yap.server.config
 
+import app.yap.server.core.database.DatabaseConfig
+
 internal data class AppConfig(
     val database: DatabaseConfig,
     val environment: AppEnvironment,

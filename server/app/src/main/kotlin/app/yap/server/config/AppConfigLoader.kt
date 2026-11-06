@@ -1,5 +1,6 @@
 package app.yap.server.config
 
+import app.yap.server.core.database.DatabaseConfig
 import java.nio.file.Files
 import java.nio.file.Path
 

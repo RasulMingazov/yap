@@ -15,6 +15,9 @@ shared infrastructure stays feature-independent.
 Core modules never depend on features. Features never depend on `app`. A feature uses another
 feature only through that feature's use cases, and the dependency has no cycle.
 
+A module that needs settings owns their type, such as `DatabaseConfig` in `core-database`. `app`
+reads the values and builds it at start.
+
 Each module lives under `server/`, for example `server/app`.
 
 ## Feature shape

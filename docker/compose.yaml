@@ -1,0 +1,16 @@
+# Local PostgreSQL for development. Start with `docker compose -f docker/compose.yaml up -d`.
+# The major version matches production and the Testcontainers image in the tests.
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: yap
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - yap-postgres:/var/lib/postgresql
+
+volumes:
+  yap-postgres:

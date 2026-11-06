@@ -20,5 +20,6 @@ COPY --from=build /src/server/app/build/install/app /app
 # A container runs as production unless the platform sets APP_ENV, so the deployed checks always run.
 ENV APP_ENV=production
 ENV PORT=8080
+ENV DATABASE_RESET_ON_MIGRATION_CHANGE=true
 EXPOSE 8080
 CMD ["/app/bin/app"]

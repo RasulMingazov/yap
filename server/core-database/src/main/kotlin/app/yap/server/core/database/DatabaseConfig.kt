@@ -1,6 +1,6 @@
-package app.yap.server.config
+package app.yap.server.core.database
 
-internal data class DatabaseConfig(
+data class DatabaseConfig(
     val password: String,
     val poolSize: Int,
     val resetOnMigrationChange: Boolean,

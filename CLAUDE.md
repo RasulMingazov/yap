@@ -5,6 +5,7 @@ Gradle monorepo for Yap, an app for English speaking practice.
 | Module | What it is |
 | --- | --- |
 | `server/app` | Ktor server. Holds scenarios, prompts and model keys. Reads its settings from environment variables and `.env`. Deployed to Timeweb. |
+| `server/core-database` | PostgreSQL connection and Flyway migrations. |
 | `admin` | Compose Desktop app for the owner. Talks only to the server; holds no keys. |
 | `contract-admin` | DTOs of the admin API, shared by `server` and `admin`. Data only, no logic. |
 
@@ -21,6 +22,8 @@ Gradle monorepo for Yap, an app for English speaking practice.
 
 - `./gradlew build` — compilation, tests and Detekt. Run it before every push.
 - `./gradlew :admin:run` — opens the admin window.
+- `docker compose -f docker/compose.yaml up -d` — starts the local PostgreSQL that
+  `./gradlew :server:app:run` needs. The PostgreSQL tests use Testcontainers and need Docker running.
 - Run `git config core.hooksPath .githooks` once per clone. It enables the `pre-push` hook, which
   runs Detekt and blocks the push on a violation.
 - CI (`.github/workflows/build.yml`) runs `build` and a `docker` image build on every non-draft PR
