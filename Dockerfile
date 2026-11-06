@@ -12,11 +12,13 @@ COPY . .
 RUN gradle --no-daemon --no-configuration-cache --console=plain \
       --init-script docker/mirrors.init.gradle.kts \
       -Dorg.gradle.jvmargs="-Xmx2g -Dfile.encoding=UTF-8" \
-      :server:installDist
+      :server:app:installDist
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-COPY --from=build /src/server/build/install/server /app
+COPY --from=build /src/server/app/build/install/app /app
+# A container runs as production unless the platform sets APP_ENV, so the deployed checks always run.
+ENV APP_ENV=production
 ENV PORT=8080
 EXPOSE 8080
-CMD ["/app/bin/server"]
+CMD ["/app/bin/app"]

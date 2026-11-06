@@ -11,6 +11,7 @@
 *.swp
 .env
 .env.*
+!.env.example
 local.properties
 .claude/*
 !.claude/settings.json
