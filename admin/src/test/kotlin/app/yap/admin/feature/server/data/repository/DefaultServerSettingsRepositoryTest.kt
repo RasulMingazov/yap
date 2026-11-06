@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 
-internal class PreferencesServerSettingsRepositoryTest {
+internal class DefaultServerSettingsRepositoryTest {
 
     private val preferences = Preferences.userRoot().node("app/yap/admin-test/${UUID.randomUUID()}")
 
@@ -21,17 +21,17 @@ internal class PreferencesServerSettingsRepositoryTest {
     @Test
     fun `GIVEN saved settings WHEN reading THEN the same settings come back`() = runTest {
         val settings = StubServerSettings.stubServerSettings()
-        val repository = PreferencesServerSettingsRepository(preferences = preferences)
+        val repository = DefaultServerSettingsRepository(preferences = preferences)
         repository.save(settings)
 
-        val saved = PreferencesServerSettingsRepository(preferences = preferences).get()
+        val saved = DefaultServerSettingsRepository(preferences = preferences).get()
 
         assertEquals(expected = settings, actual = saved)
     }
 
     @Test
     fun `GIVEN nothing saved WHEN reading THEN there are no settings`() = runTest {
-        val saved = PreferencesServerSettingsRepository(preferences = preferences).get()
+        val saved = DefaultServerSettingsRepository(preferences = preferences).get()
 
         assertNull(saved)
     }

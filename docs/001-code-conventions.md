@@ -7,6 +7,7 @@ Project-wide additions to the official Kotlin coding conventions. Everything the
 Name a thing by what it is, not by where it shows or how it is built.
 
 - `UpNext`, not `Home`; `fetched`, not `remote`, for a stored row; `topicId`, not `id`.
+- Name the one implementation of a repository or a use case `Default` plus its interface: `DefaultCharacterRepository`, not `RemoteCharacterRepository` or `ExposedCharacterRepository`.
 - Name lambda parameters after the entity: `topics ->`, not `it` or `list ->`.
 - Remove words that no longer match the model, such as `catalog` or `episode`: the product calls it a topic, so the code says `topic`.
 

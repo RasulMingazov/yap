@@ -24,7 +24,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 
-internal class RemoteCharacterRepository(
+internal class DefaultCharacterRepository(
     private val httpClient: HttpClient,
     private val serverSettingsRepository: ServerSettingsRepository,
 ) : CharacterRepository {

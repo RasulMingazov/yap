@@ -13,7 +13,7 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 
-internal class RemoteServerRepository(
+internal class DefaultServerRepository(
     private val httpClient: HttpClient,
 ) : ServerRepository {
 

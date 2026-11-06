@@ -13,7 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 
-internal class RemoteServerRepositoryTest {
+internal class DefaultServerRepositoryTest {
 
     @Test
     fun `GIVEN the server accepts the key WHEN connecting THEN it is connected to the server environment`() = runTest {
@@ -26,7 +26,7 @@ internal class RemoteServerRepositoryTest {
             )
         }
 
-        val connection = RemoteServerRepository(adminHttpClient(engine)).connect(StubServerSettings.stubServerSettings())
+        val connection = DefaultServerRepository(adminHttpClient(engine)).connect(StubServerSettings.stubServerSettings())
 
         assertEquals(
             expected = ServerConnection.Connected(environment = "staging") to "Bearer ${StubServerSettings.KEY}",
@@ -38,7 +38,7 @@ internal class RemoteServerRepositoryTest {
     fun `GIVEN the server rejects the key WHEN connecting THEN it is unauthorized`() = runTest {
         val engine = MockEngine { respond(content = "", status = HttpStatusCode.Unauthorized) }
 
-        val connection = RemoteServerRepository(adminHttpClient(engine)).connect(StubServerSettings.stubServerSettings())
+        val connection = DefaultServerRepository(adminHttpClient(engine)).connect(StubServerSettings.stubServerSettings())
 
         assertEquals(expected = ServerConnection.Unauthorized, actual = connection)
     }
@@ -47,7 +47,7 @@ internal class RemoteServerRepositoryTest {
     fun `GIVEN the server cannot be reached WHEN connecting THEN it is unreachable`() = runTest {
         val engine = MockEngine { throw IOException("Connection refused") }
 
-        val connection = RemoteServerRepository(adminHttpClient(engine)).connect(StubServerSettings.stubServerSettings())
+        val connection = DefaultServerRepository(adminHttpClient(engine)).connect(StubServerSettings.stubServerSettings())
 
         assertEquals(expected = ServerConnection.Unreachable, actual = connection)
     }

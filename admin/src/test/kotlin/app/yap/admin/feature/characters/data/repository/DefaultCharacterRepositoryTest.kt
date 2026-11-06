@@ -21,7 +21,7 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 
-internal class RemoteCharacterRepositoryTest {
+internal class DefaultCharacterRepositoryTest {
 
     @Test
     fun `GIVEN the server lists characters WHEN loading them THEN they are loaded`() = runTest {
@@ -103,7 +103,7 @@ internal class RemoteCharacterRepositoryTest {
     ) {
 
         val engine = MockEngine(answer)
-        val repository = RemoteCharacterRepository(
+        val repository = DefaultCharacterRepository(
             httpClient = adminHttpClient(engine),
             serverSettingsRepository = StubServerSettingsRepository(settings = settings),
         )

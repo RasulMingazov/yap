@@ -13,7 +13,7 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.update
 
-class ExposedCharacterRepository(
+class DefaultCharacterRepository(
     private val database: Database,
 ) : CharacterRepository {
 

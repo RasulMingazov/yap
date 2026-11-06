@@ -6,12 +6,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 
-internal class ExposedCharacterRepositoryTest {
+internal class DefaultCharacterRepositoryTest {
 
     @Test
     fun `GIVEN a created character WHEN reading it THEN it has the same profile`() = withTestDatabase { database ->
         runTest {
-            val repository = ExposedCharacterRepository(database)
+            val repository = DefaultCharacterRepository(database)
             val character = repository.create(StubCharacter.stubProfile())
 
             val found = repository.find(character.characterId)
@@ -23,7 +23,7 @@ internal class ExposedCharacterRepositoryTest {
     @Test
     fun `GIVEN characters WHEN listing them THEN they come in the order of their names`() = withTestDatabase { database ->
         runTest {
-            val repository = ExposedCharacterRepository(database)
+            val repository = DefaultCharacterRepository(database)
             repository.create(StubCharacter.stubProfile(name = "Sam"))
             repository.create(StubCharacter.stubProfile(name = "dan"))
             repository.create(StubCharacter.stubProfile(name = "Mia"))
@@ -38,7 +38,7 @@ internal class ExposedCharacterRepositoryTest {
     fun `GIVEN a saved character WHEN updating its profile THEN reading it returns the new profile`() =
         withTestDatabase { database ->
             runTest {
-                val repository = ExposedCharacterRepository(database)
+                val repository = DefaultCharacterRepository(database)
                 val character = repository.create(StubCharacter.stubProfile())
                 val changed = character.copy(profile = StubCharacter.stubProfile(name = "Samuel"))
 
@@ -51,7 +51,7 @@ internal class ExposedCharacterRepositoryTest {
     @Test
     fun `GIVEN an unknown character WHEN updating it THEN nothing is stored`() = withTestDatabase { database ->
         runTest {
-            val repository = ExposedCharacterRepository(database)
+            val repository = DefaultCharacterRepository(database)
 
             val updated = repository.update(StubCharacter.stubCharacter())
 
