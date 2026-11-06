@@ -1,8 +1,8 @@
 # Screen Capture
 
 A capture renders each screen of an app, in each of its states, to an image. A person or the
-`ui-check` agent compares the images with the design canvas. Each app has one capture method, and
-this guide lists it.
+`ui-review` agent compares the images with the design canvas. Each app has one capture method,
+and this guide lists it.
 
 ## Rules
 
@@ -28,5 +28,5 @@ The build runs it too, so a state that does not render fails the build.
 ## Mobile
 
 The mobile app has no capture method yet. Add it to this guide together with its first screen.
-Give `ui-check` the tools of that method in the same change, and say in the method how it
+Give `ui-review` the tools of that method in the same change, and say in the method how it
 restores the device settings that it changes.

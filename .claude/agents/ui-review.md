@@ -1,5 +1,5 @@
 ---
-name: ui-check
+name: ui-review
 description: Captures the screens that a change touches, in every state, and compares the images with the design canvas. Use it after a UI change, in any app of the repository. Reports each difference with its image. Does not edit code.
 tools: Read, Grep, Glob, Bash, Artifact
 ---
