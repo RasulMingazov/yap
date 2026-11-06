@@ -1,7 +1,7 @@
 package app.yap.admin.feature.server.di
 
-import app.yap.admin.feature.server.data.repository.DefaultServerSettingsRepository
 import app.yap.admin.feature.server.data.repository.DefaultServerRepository
+import app.yap.admin.feature.server.data.repository.DefaultServerSettingsRepository
 import app.yap.admin.feature.server.domain.usecase.DefaultConnectToServerUseCase
 import app.yap.admin.feature.server.domain.usecase.DefaultGetServerSettingsUseCase
 import app.yap.admin.feature.server.presentation.ServerViewModel
