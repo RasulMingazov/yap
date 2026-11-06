@@ -1,19 +1,13 @@
 package app.yap.admin.feature.characters.presentation.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,6 +19,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTheme
+import app.yap.admin.core.design.LoadError
+import app.yap.admin.core.design.ScreenBody
 import app.yap.admin.core.design.ScreenToolbar
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.presentation.CharactersViewModel
@@ -53,22 +49,12 @@ private fun CharactersContent(
     onNewCharacterClick: () -> Unit,
     uiState: UiState,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AdminTheme.Colors.background),
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
         ScreenToolbar(
             subtitle = "Постоянные герои, как в ситкоме",
             title = "Персонажи",
         )
-        Column(
-            modifier = Modifier
-                .widthIn(max = AdminTheme.Sizes.listMaxWidth)
-                .verticalScroll(rememberScrollState())
-                .padding(AdminTheme.Sizes.contentPadding),
-            verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
-        ) {
+        ScreenBody {
             when (uiState) {
                 is UiState.Content -> {
                     CharacterRows(
@@ -85,16 +71,10 @@ private fun CharactersContent(
                     )
                     NewCharacterButton(onClick = onNewCharacterClick)
                 }
-                is UiState.Error -> {
-                    Text(
-                        text = uiState.message,
-                        color = AdminTheme.Colors.ink,
-                        fontSize = AdminTheme.Type.body,
-                    )
-                    OutlinedButton(onClick = { onEvent(Event.RetryClicked) }) {
-                        Text("Повторить")
-                    }
-                }
+                is UiState.Error -> LoadError(
+                    message = uiState.message,
+                    onRetryClick = { onEvent(Event.RetryClicked) },
+                )
                 is UiState.Loading -> CircularProgressIndicator()
             }
         }

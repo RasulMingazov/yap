@@ -2,7 +2,7 @@ package app.yap.admin.feature.characters.presentation
 
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.DataState
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.Load
-import app.yap.admin.feature.characters.presentation.CharacterViewModel.SaveNote
+import app.yap.admin.feature.characters.presentation.CharacterViewModel.SaveStatus
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.UiState
 
 internal object CharacterUiStateMapper {
@@ -17,16 +17,16 @@ internal object CharacterUiStateMapper {
         form = form,
         hint = hint(),
         isSaveEnabled = !isSaving,
-        saveNote = saveNote?.text(),
+        saveStatus = saveStatus?.text(),
         subtitle = subtitle(),
         title = savedName ?: "Новый персонаж",
     )
 
     private fun DataState.hint(): String? = if (savedName == null) "Заполните поля и нажмите «Сохранить»." else null
 
-    private fun SaveNote.text(): String = when (this) {
-        SaveNote.EMPTY_FIELD -> "Заполните все поля"
-        SaveNote.SAVED -> "Сохранено"
+    private fun SaveStatus.text(): String = when (this) {
+        SaveStatus.EMPTY_FIELD -> "Заполните все поля"
+        SaveStatus.SAVED -> "Сохранено"
     }
 
     private fun DataState.subtitle(): String = if (savedName == null) "Ещё не сохранён" else "Постоянный герой"

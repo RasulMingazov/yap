@@ -76,7 +76,7 @@ internal class CharacterViewModelTest {
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
-        assertEquals(expected = "Sam" to "Сохранено", actual = env.content().title to env.content().saveNote)
+        assertEquals(expected = "Sam" to "Сохранено", actual = env.content().title to env.content().saveStatus)
     }
 
     @Test
@@ -87,7 +87,7 @@ internal class CharacterViewModelTest {
             env.viewModel.onEvent(Event.SaveClicked)
             advanceUntilIdle()
 
-            assertEquals(expected = "Заполните все поля", actual = env.content().saveNote)
+            assertEquals(expected = "Заполните все поля", actual = env.content().saveStatus)
         }
 
     @Test

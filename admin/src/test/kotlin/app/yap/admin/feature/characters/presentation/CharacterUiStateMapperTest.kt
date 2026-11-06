@@ -3,7 +3,7 @@ package app.yap.admin.feature.characters.presentation
 import app.yap.admin.feature.characters.domain.StubCharacter
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.DataState
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.Load
-import app.yap.admin.feature.characters.presentation.CharacterViewModel.SaveNote
+import app.yap.admin.feature.characters.presentation.CharacterViewModel.SaveStatus
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.UiState
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,7 +21,7 @@ internal class CharacterUiStateMapperTest {
                 form = StubCharacter.stubProfile(history = "", manner = "", name = "", personality = ""),
                 hint = "Заполните поля и нажмите «Сохранить».",
                 isSaveEnabled = true,
-                saveNote = null,
+                saveStatus = null,
                 subtitle = "Ещё не сохранён",
                 title = "Новый персонаж",
             ),
@@ -30,11 +30,11 @@ internal class CharacterUiStateMapperTest {
     }
 
     @Test
-    fun `GIVEN a saved character WHEN mapping THEN its name is the title and the note says it is saved`() {
+    fun `GIVEN a saved character WHEN mapping THEN its name is the title and the status says it is saved`() {
         val character = StubCharacter.stubCharacter()
         val state = DataState(characterId = character.characterId)
             .saved(character.profile)
-            .copy(saveNote = SaveNote.SAVED)
+            .copy(saveStatus = SaveStatus.SAVED)
 
         val uiState = CharacterUiStateMapper.map(state)
 
@@ -43,7 +43,7 @@ internal class CharacterUiStateMapperTest {
                 form = character.profile,
                 hint = null,
                 isSaveEnabled = true,
-                saveNote = "Сохранено",
+                saveStatus = "Сохранено",
                 subtitle = "Постоянный герой",
                 title = "Sam",
             ),

@@ -37,7 +37,7 @@ internal class CharacterViewModel(
         is Event.FormChanged -> dataState.update { state ->
             state.copy(
                 form = event.form,
-                saveNote = null,
+                saveStatus = null,
             )
         }
         is Event.RetryClicked -> onRetryClicked()
@@ -72,7 +72,7 @@ internal class CharacterViewModel(
         dataState.update { current ->
             current.copy(
                 isSaving = true,
-                saveNote = null,
+                saveStatus = null,
             )
         }
         viewModelScope.launch {
@@ -81,7 +81,7 @@ internal class CharacterViewModel(
                 is SaveCharacterResult.Invalid -> dataState.update { current ->
                     current.copy(
                         isSaving = false,
-                        saveNote = SaveNote.EMPTY_FIELD,
+                        saveStatus = SaveStatus.EMPTY_FIELD,
                     )
                 }
                 is SaveCharacterResult.Saved -> dataState.update { current ->
@@ -89,7 +89,7 @@ internal class CharacterViewModel(
                         .saved(result.character.profile)
                         .copy(
                             characterId = result.character.characterId,
-                            saveNote = SaveNote.SAVED,
+                            saveStatus = SaveStatus.SAVED,
                         )
                 }
             }
@@ -106,7 +106,7 @@ internal class CharacterViewModel(
         val form: CharacterProfile = EMPTY_PROFILE,
         val isSaving: Boolean = false,
         val load: Load = if (characterId == null) Load.LOADED else Load.LOADING,
-        val saveNote: SaveNote? = null,
+        val saveStatus: SaveStatus? = null,
         val savedName: String? = null,
     ) {
 
@@ -124,7 +124,7 @@ internal class CharacterViewModel(
         LOADING,
     }
 
-    enum class SaveNote {
+    enum class SaveStatus {
         EMPTY_FIELD,
         SAVED,
     }
@@ -135,7 +135,7 @@ internal class CharacterViewModel(
             val form: CharacterProfile,
             val hint: String?,
             val isSaveEnabled: Boolean,
-            val saveNote: String?,
+            val saveStatus: String?,
             val subtitle: String,
             val title: String,
         ) : UiState

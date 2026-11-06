@@ -34,7 +34,7 @@ internal fun ScreenToolbar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.sideItemPadding)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.toolbarTitleGap)) {
                 back?.let { toolbarBack ->
                     Text(
                         text = "${toolbarBack.label} /",
