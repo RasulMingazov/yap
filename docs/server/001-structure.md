@@ -63,7 +63,12 @@ internal class PublishTopicUseCase(
 - Routes validate and translate HTTP only, then call a use case.
 - Use [shared DTOs](../shared/README.md) for admin payloads. Keep server-only HTTP contracts beside
   their routes.
-- Translate expected failures through shared status handling in `app`.
+- The route answers each outcome of its use case with a status, in a `when` over the outcome:
+  `is UpdateCharacterOutcome.NotFound -> call.respond(HttpStatusCode.NotFound)`. Do not turn an
+  outcome into an exception.
+- A request that does not parse ends in a Ktor exception: `BadRequestException` for a body that is
+  not the DTO, and `NotFoundException` for a path identifier that is not a UUID. `app` maps these
+  exceptions to statuses in one place.
 - `app` mounts admin routes behind the admin key check. A route never checks the key itself.
 - Do not expose provider exceptions, rows, or framework types as feature models.
 - Keep provider-specific configuration in `core-llm`.
