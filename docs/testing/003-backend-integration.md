@@ -38,8 +38,8 @@ Follow [Test Structure](001-structure.md) for naming and scenario shape.
   using multiple connections.
 - Verify a clean bootstrap from all current migrations.
 - Pin the same PostgreSQL major in deployment and Testcontainers configuration; never use `latest`.
-- If the container runtime is unavailable locally, the suite is skipped with an assumption. Report
-  that the integration suite was not run. Do not silently substitute a fake or claim database
-  verification.
-- In CI (`CI=true`), a missing container runtime fails the suite instead of skipping it, so a green
-  build always includes the PostgreSQL tests.
+- The first integration test sets up how a missing container runtime is handled:
+  - locally, the suite is skipped with an assumption. Report that the integration suite was not
+    run. Do not silently substitute a fake or claim database verification;
+  - in CI (`CI=true`), the suite fails instead of skipping, so a green build always includes the
+    PostgreSQL tests.
