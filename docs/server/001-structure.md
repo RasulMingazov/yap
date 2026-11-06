@@ -16,8 +16,7 @@ shared infrastructure stays feature-independent.
 Core modules never depend on features. Features never depend on `app`. A feature uses another
 feature only through that feature's use cases, and the dependency has no cycle.
 
-Today the server is the single module `server`. It becomes `server/app` when the first core or
-feature module appears.
+The modules live under `server/`: `server/app`, `server/core-config`, and so on.
 
 ## Feature shape
 

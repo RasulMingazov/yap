@@ -1,5 +1,6 @@
 package app.yap.server
 
+import app.yap.server.core.config.AppConfigLoader
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -10,11 +11,9 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 
-private const val DEFAULT_PORT = 8080
-
 fun main() {
-    val port = System.getenv("PORT")?.toIntOrNull() ?: DEFAULT_PORT
-    embeddedServer(Netty, port = port) { serverModule() }
+    val config = AppConfigLoader().load()
+    embeddedServer(Netty, port = config.port) { serverModule() }
         .start(wait = true)
 }
 
