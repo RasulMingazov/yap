@@ -17,14 +17,14 @@
 - [ ] 3.1 Add the admin characters repository that reads the saved server settings for each call; verify with mock engine tests for 200, 400, 404 and a failed call
 - [ ] 3.2 Add the admin use cases for the list, one character and the save; verify with `./gradlew :admin:build`
 
-## 4. Admin sidebar and «Персонажи»
+## 4. Admin sidebar and Characters
 
-- [ ] 4.1 Add the shell with the sidebar groups «Контент» and «Настройки» and the start screen rule; verify with `./gradlew :admin:run`: the app opens «Сервер» without saved settings and «Персонажи» with them
-- [ ] 4.2 Add `CharactersViewModel` and the «Персонажи» screen; verify with the mapper and view-model tests for the rows, the empty list, the load error and «Повторить»
+- [ ] 4.1 Add the shell with the sidebar groups Content and Settings and the start screen rule; verify with `./gradlew :admin:run`: the app opens Server without saved settings and Characters with them
+- [ ] 4.2 Add `CharactersViewModel` and the Characters screen; verify with the mapper and view-model tests for the rows, the empty list, the load error and Retry
 
-## 5. Admin «Персонаж»
+## 5. Admin Character form
 
-- [ ] 5.1 Add `CharacterViewModel` and the «Персонаж» form; verify with the mapper and view-model tests for a new and a saved character, «Сохранено», «Заполните все поля», the save failure and the load error
+- [ ] 5.1 Add `CharacterViewModel` and the Character form; verify with the mapper and view-model tests for a new and a saved character, the Saved status, the error for an empty field, the save failure and the load error
 - [ ] 5.2 Create and edit a character against a local server, then restart the server and open the character again; verify that the profile stays
 
 ## Workflow follow-up

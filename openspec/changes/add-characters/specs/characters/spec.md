@@ -68,83 +68,85 @@ Behind the admin key, the server SHALL:
 
 ### Requirement: The sidebar opens the characters
 
-The sidebar of the admin app SHALL show «Персонажи» in the group «Контент» and «Сервер» in the
-group «Настройки». The admin app SHALL open on «Персонажи» when it has saved server settings, and on
-«Сервер» when it has none.
+The sidebar of the admin app SHALL show Characters in the group Content and Server in the group
+Settings. The admin app SHALL open on Characters when it has saved server settings, and on Server
+when it has none.
 
 #### Scenario: The first start
 
 - **WHEN** the owner starts the admin app for the first time
-- **THEN** the admin app opens «Сервер»
+- **THEN** the admin app opens Server
 
 #### Scenario: A later start
 
 - **WHEN** the owner starts the admin app after a connection to a server
-- **THEN** the admin app opens «Персонажи»
+- **THEN** the admin app opens Characters
 
-### Requirement: The «Персонажи» list
+### Requirement: The Characters list
 
-«Персонажи» SHALL show the subtitle «Постоянные герои, как в ситкоме» and one row for each
+Characters SHALL show a subtitle that calls the characters the recurring cast, and one row for each
 character, in the order of the server. A row SHALL show the name and, below it, the personality in
-one line. A click on a row SHALL open the «Персонаж» form of the character. «Новый персонаж» SHALL
-be below the list.
+one line. A click on a row SHALL open the Character form of the character. New character SHALL be
+below the list.
 
 #### Scenario: The list
 
-- **WHEN** the owner opens «Персонажи»
+- **WHEN** the owner opens Characters
 - **THEN** the admin app shows a row for each character from the server
 
 #### Scenario: No characters yet
 
 - **WHEN** the server has no characters
-- **THEN** «Персонажи» shows «Персонажей пока нет» and «Новый персонаж»
+- **THEN** Characters shows a message that there are no characters yet, and New character
 
 #### Scenario: The list does not load
 
 - **WHEN** the admin app cannot load the characters
-- **THEN** «Персонажи» shows «Не удалось загрузить персонажей» and «Повторить»
+- **THEN** Characters shows an error that the characters did not load, and Retry
 
-### Requirement: The «Персонаж» form
+### Requirement: The Character form
 
-The «Персонаж» form SHALL have the section «Кто это» with the fields «Имя — как его называют
-пользователи», «История», «Характер» and «Манера речи». Below the fields SHALL be the note «Роль в
-сцене — таксист, врач, сосед — задаётся в теме. Сложность лексики задаётся в «Уровнях» и одна для
-всех персонажей.» The toolbar SHALL have «Персонажи» to go back, and «Сохранить».
+The Character form SHALL have one section with the fields Name, History, Personality and Manner of
+speech. The Name field SHALL say that this is the name the users see. Below the fields SHALL be a
+note: the topic sets the role in a scene, and the levels set the lexicon difficulty for all
+characters. The toolbar SHALL have Characters to go back, and Save.
 
 #### Scenario: A saved character
 
 - **WHEN** the owner opens a saved character
-- **THEN** the title is its name, the subtitle is «Постоянный герой» and the fields hold its profile
+- **THEN** the title is its name, the subtitle says that it is a recurring character, and the
+  fields hold its profile
 
 #### Scenario: A new character
 
-- **WHEN** the owner clicks «Новый персонаж»
-- **THEN** the title is «Новый персонаж», the subtitle is «Ещё не сохранён», the fields are empty,
-  and the form shows «Заполните поля и нажмите «Сохранить».»
+- **WHEN** the owner clicks New character
+- **THEN** the title is New character, the subtitle says that it is not saved yet, the fields are
+  empty, and a hint asks to fill in the fields and click Save
 
 #### Scenario: The character does not load
 
 - **WHEN** the admin app cannot load the character
-- **THEN** the form shows «Не удалось загрузить персонажа» and «Повторить»
+- **THEN** the form shows an error that the character did not load, and Retry
 
 ### Requirement: Saving a character
 
-«Сохранить» SHALL send the profile to the server. When the server accepts it, the admin app SHALL
-show the profile that the server returns and «Сохранено» beside «Сохранить». A new character SHALL
-then become a saved character.
+Save SHALL send the profile to the server. When the server accepts it, the admin app SHALL show the
+profile that the server returns, and a Saved status beside Save. A new character SHALL then become
+a saved character.
 
 #### Scenario: The save succeeds
 
-- **WHEN** the owner fills every field of a new character and clicks «Сохранить»
-- **THEN** the title becomes the name, the subtitle becomes «Постоянный герой», and «Сохранено» shows
-  beside «Сохранить»
+- **WHEN** the owner fills every field of a new character and clicks Save
+- **THEN** the title becomes the name, the subtitle says that it is a recurring character, and the
+  Saved status shows beside Save
 
 #### Scenario: An empty field
 
-- **WHEN** the owner clicks «Сохранить» with an empty field
-- **THEN** the admin app shows «Заполните все поля» beside «Сохранить» and keeps the form as it is
+- **WHEN** the owner clicks Save with an empty field
+- **THEN** the admin app shows an error beside Save that asks to fill in every field, and keeps the
+  form as it is
 
 #### Scenario: The server does not answer
 
-- **WHEN** the admin app cannot reach the server on «Сохранить»
-- **THEN** it keeps the form as it is and shows «Не удалось сохранить. Попробуйте ещё раз.»
+- **WHEN** the admin app cannot reach the server on Save
+- **THEN** it keeps the form as it is and shows a snackbar that the save failed

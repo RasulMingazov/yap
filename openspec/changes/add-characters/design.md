@@ -3,7 +3,7 @@
 ## Context
 
 The server has `app` and `core-database`: a HikariCP pool and Flyway migrations, with no feature
-tables and no Exposed. The admin app has one screen, «Сервер», which saves the server address and
+tables and no Exposed. The admin app has one screen, Server, which saves the server address and
 the admin key. `docs/server/001-structure.md` and `docs/server/002-persistence.md` set the module
 and persistence rules this change follows.
 
@@ -61,20 +61,22 @@ create and the update use cases both call it and return `Invalid` for no profile
 
 `CharacterProfileDto(name, history, personality, manner)` is the body of the create and the update
 calls. `CharacterDto(characterId, profile)` is what the server returns. The list is a JSON array of
-`CharacterDto`. The «Персонажи» row needs the name and the personality, and the list is short, so a
+`CharacterDto`. A row of Characters needs the name and the personality, and the list is short, so a
 separate list item type has no use yet.
 
 ### The admin app
 
-- A shell composable holds the sidebar and the current screen: «Персонажи», «Персонаж» with an
-  identifier or none for a new character, or «Сервер». The shell picks the start screen from the
+- A shell composable holds the sidebar and the current screen: Characters, Character with an
+  identifier or none for a new character, or Server. The shell picks the start screen from the
   saved server settings.
 - `CharactersViewModel` loads the list. `CharacterViewModel` loads one character, keeps the four
   fields as the owner types them and saves them.
 - The admin characters repository reads the saved address and key for each call. It maps 400 to
   `Invalid`, 404 to `NotFound`, and every other failure to `Failed`.
-- «Заполните все поля» stays in the UI state until the next save. The failure on «Сохранить» is a
-  snackbar, because the owner can only try again.
+- The error that asks to fill in every field stays in the UI state until the next save. The failure
+  of Save is a snackbar, because the owner can only try again.
+- The Russian copy comes from the admin page of the design canvas. The copy that the design does
+  not show, such as the errors and the empty list, is chosen in the code.
 
 ### Tests
 
@@ -90,7 +92,7 @@ separate list item type has no use yet.
 ### The PRs
 
 The change lands in six PRs for #6: this change; the server persistence; the server API; the admin
-data layer; the sidebar and «Персонажи»; «Персонаж» and the archive.
+data layer; the sidebar and Characters; the Character form and the archive.
 
 ## Risks / Trade-offs
 

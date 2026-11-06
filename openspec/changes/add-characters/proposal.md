@@ -10,15 +10,14 @@ appears in many topics and sounds the same in each of them (#6).
 - The server stores characters: the name, the history, the personality and the manner of speech.
   A character stays after a server restart.
 - The admin API lists, reads, creates and updates characters behind the admin key.
-- The admin app gets the «Персонажи» list and the «Персонаж» form with «Новый персонаж» and
-  «Сохранить».
-- The admin app gets a sidebar. It moves between «Персонажи» and the server settings.
+- The admin app gets the Characters list and the Character form with New character and Save.
+- The admin app gets a sidebar. It moves between Characters and the server settings.
 
 Out of scope:
 
-- The number of topics in each row of «Персонажи». Topics do not exist yet: the change for #7 adds
+- The number of topics in each row of Characters. Topics do not exist yet: the change for #7 adds
   the number together with the topics.
-- «Поговорить» on the «Персонаж» form: #16.
+- Talk on the Character form: #16.
 - Delete: the issue leaves it out.
 - The role in a scene, such as a taxi driver: the topic owns it, #7.
 
