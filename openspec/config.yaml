@@ -27,4 +27,5 @@ rules:
   proposal:
     - Name what is out of scope and the later change or issue that owns it.
   specs:
-    - Quote user-facing copy in Russian, exactly as the app shows it.
+    - Name screens, sections, fields and buttons in English. Do not quote the Russian copy: it lives
+      in the code and in the design canvas.

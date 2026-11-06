@@ -33,7 +33,7 @@ The design system «Yap» owns every visual value. The iOS app keeps them as Swi
 - Read colors, type, spacing, radii, and motion from the tokens.
 - Do not write a literal color, size, or duration in a screen. A new value goes into the design
   system first, then into the tokens.
-- Screens follow the design canvas «Yap App Design», page «Figma · приложение».
+- Screens follow the app page of the design canvas `Yap App Design`.
 
 ## Verification
 

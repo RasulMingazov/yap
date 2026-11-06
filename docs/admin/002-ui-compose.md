@@ -36,7 +36,7 @@ focused state and callbacks down; a child receives state and lambdas, never the 
 
 ## Look
 
-The admin app has its own neutral look from the design canvas page «Админка», not the Yap design
+The admin app has its own neutral look from the admin page of the design canvas, not the Yap design
 system of the mobile app.
 
 - Keep colors, type, spacing, and radii in one admin theme object. A screen reads them from it.

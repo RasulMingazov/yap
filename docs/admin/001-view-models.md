@@ -69,7 +69,7 @@ A view model owns loading, retry, screen errors, and saving. Compose owns colors
 focus, scrolling, and animation.
 
 Start with one view model per screen. Extract a second one only when a section has an independent
-lifecycle or a reusable interaction, such as the «Попробовать» panel.
+lifecycle or a reusable interaction, such as the Try panel.
 
 ## Verification
 
