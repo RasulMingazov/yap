@@ -49,6 +49,7 @@ internal fun Application.serverModule(
     install(ContentNegotiation) {
         json()
     }
+    installStatusHandling()
     installAdminAuthentication(adminApiKey = config.adminApiKey)
 
     routing {

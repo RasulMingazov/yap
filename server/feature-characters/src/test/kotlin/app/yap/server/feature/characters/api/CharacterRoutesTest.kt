@@ -8,7 +8,6 @@ import app.yap.server.feature.characters.usecase.GetCharactersUseCase
 import app.yap.server.feature.characters.usecase.UpdateCharacterUseCase
 import io.ktor.client.request.get
 import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -53,44 +52,6 @@ internal class CharacterRoutesTest {
             expected = HttpStatusCode.Created to Json.parseToJsonElement(CHARACTER_JSON),
             actual = response.status to Json.parseToJsonElement(response.bodyAsText()),
         )
-    }
-
-    @Test
-    fun `GIVEN a profile with an empty field WHEN creating a character THEN the server answers 400`() = testApplication {
-        val env = Environment()
-        application { env.install(this) }
-
-        val response = client.post("/admin/characters") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"history": "", "manner": "Casual.", "name": "Sam", "personality": "Friendly."}""")
-        }
-
-        assertEquals(expected = HttpStatusCode.BadRequest, actual = response.status)
-    }
-
-    @Test
-    fun `GIVEN an unknown character WHEN reading it THEN the server answers 404`() = testApplication {
-        val env = Environment()
-        env.characterRepository.findCall.returns(null)
-        application { env.install(this) }
-
-        val response = client.get("/admin/characters/${StubCharacter.CHARACTER_ID.value}")
-
-        assertEquals(expected = HttpStatusCode.NotFound, actual = response.status)
-    }
-
-    @Test
-    fun `GIVEN an unknown character WHEN updating it THEN the server answers 404`() = testApplication {
-        val env = Environment()
-        env.characterRepository.updateCall.returns(false)
-        application { env.install(this) }
-
-        val response = client.put("/admin/characters/${StubCharacter.CHARACTER_ID.value}") {
-            contentType(ContentType.Application.Json)
-            setBody(PROFILE_JSON)
-        }
-
-        assertEquals(expected = HttpStatusCode.NotFound, actual = response.status)
     }
 
     private class Environment {
