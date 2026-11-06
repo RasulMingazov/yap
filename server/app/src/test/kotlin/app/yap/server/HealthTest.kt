@@ -1,5 +1,6 @@
 package app.yap.server
 
+import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -11,7 +12,12 @@ internal class HealthTest {
 
     @Test
     fun `health answers ok`() = testApplication {
-        application { serverModule(StubAppConfig.stubAppConfig()) }
+        application {
+            serverModule(
+                characterRepository = StubCharacterRepository(),
+                config = StubAppConfig.stubAppConfig(),
+            )
+        }
 
         val response = client.get("/health")
 
