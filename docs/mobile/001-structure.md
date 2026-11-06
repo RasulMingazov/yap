@@ -23,7 +23,8 @@ mobile/ios/              Xcode project, SwiftUI screens
 ## Feature boundaries
 
 - A feature imports another feature's `api` only, never its `impl`. `internal` cannot enforce this
-  inside one module, so an ast-grep rule fails CI on such an import.
+  inside one module. The first mobile code adds an ast-grep rule that fails CI on such an import;
+  until then the review checks it.
 - `api` holds only use-case contracts that another feature calls, and the entities in their
   signatures. A use case that only its own feature calls stays in `impl`. A feature that nobody
   calls has no `api` package.

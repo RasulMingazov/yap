@@ -15,4 +15,8 @@ Android may come later on the same `shared`. All Kotlin in this area also follow
 | [View models](presentation/001-view-models.md) | screen contracts, `UiState`, `News`, or events |
 | [SwiftUI](presentation/002-swiftui.md) | what a SwiftUI screen does and what stays in Kotlin |
 
+The repository has no `mobile/` code yet. The guides name the helpers the first feature adds:
+`ApiClient`, `coreNetworkModule`, `runSuspendCatching`, `mapState`, `UserDataCleaner`, Room, and the
+ast-grep boundary rule. See the note in [Documentation](../README.md).
+
 Test rules live in [Testing](../testing/README.md).
