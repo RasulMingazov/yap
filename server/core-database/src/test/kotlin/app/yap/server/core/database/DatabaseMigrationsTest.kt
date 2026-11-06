@@ -6,8 +6,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import org.flywaydb.core.api.exception.FlywayValidateException
-import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.testcontainers.DockerClientFactory
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 
@@ -55,24 +53,11 @@ internal class DatabaseMigrationsTest {
 
     @Test
     fun `GIVEN an empty database WHEN the server opens it THEN the server migrations apply`() {
-        assumeDocker()
-
-        PostgreSQLContainer(DockerImageName.parse(IMAGE)).use { container ->
-            container.start()
-            val config = DatabaseConfig(
-                password = container.password,
-                poolSize = 2,
-                resetOnMigrationChange = false,
-                url = container.jdbcUrl,
-                user = container.username,
-            )
-
-            openDatabase(config).close()
-        }
+        withTestDatabase { }
     }
 
     private fun withDatabase(block: (HikariDataSource) -> Unit) {
-        PostgreSQLContainer(DockerImageName.parse(IMAGE)).use { container ->
+        PostgreSQLContainer(DockerImageName.parse(POSTGRES_IMAGE)).use { container ->
             container.start()
             HikariDataSource(
                 HikariConfig().apply {
@@ -98,17 +83,10 @@ internal class DatabaseMigrationsTest {
         }
     }
 
-    private fun assumeDocker() {
-        val available = runCatching { DockerClientFactory.instance().isDockerAvailable }.getOrDefault(false)
-        check(available || System.getenv("CI") != "true") { "Docker is not available in CI: the PostgreSQL suite must run" }
-        assumeTrue(available, "Docker is not available: the PostgreSQL suite did not run")
-    }
-
     private companion object {
 
         const val ADDED = "classpath:db/reset-added"
         const val CHANGED = "classpath:db/reset-changed"
-        const val IMAGE = "postgres:18-alpine"
         const val ORIGINAL = "classpath:db/reset-original"
     }
 }

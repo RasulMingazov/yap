@@ -2,11 +2,31 @@ package app.yap.server.core.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
+import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import org.slf4j.LoggerFactory
+import org.jetbrains.exposed.v1.jdbc.Database as ExposedDatabase
 
 private val logger = LoggerFactory.getLogger("app.yap.server.core.database")
 
-fun openDatabase(config: DatabaseConfig): AutoCloseable {
+class Database internal constructor(
+    private val source: HikariDataSource,
+) : AutoCloseable {
+
+    private val exposedDatabase = ExposedDatabase.connect(source)
+
+    suspend fun <T> transaction(statement: suspend JdbcTransaction.() -> T): T = withContext(Dispatchers.IO) {
+        suspendTransaction(db = exposedDatabase, statement = statement)
+    }
+
+    override fun close() {
+        source.close()
+    }
+}
+
+fun openDatabase(config: DatabaseConfig): Database {
     logger.info("Connecting to PostgreSQL at {}", config.url.substringAfter("//").substringBefore('?'))
     val source = HikariDataSource(config.toHikariConfig())
     runCatching {
@@ -17,7 +37,7 @@ fun openDatabase(config: DatabaseConfig): AutoCloseable {
     }
         .onFailure { source.close() }
         .getOrThrow()
-    return source
+    return Database(source)
 }
 
 private fun DatabaseConfig.toHikariConfig(): HikariConfig = HikariConfig().apply {
