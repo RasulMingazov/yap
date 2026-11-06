@@ -40,13 +40,8 @@ internal object StubCharacter {
 
 ## Behavioral stubs
 
-Use `stubcall` for behavioral collaborators. The repository does not have it yet. The first
-behavioral stub adds it:
-
-- copy the file-based Maven repository `libs/` from `RasulMingazov/yap-app`; it holds the
-  published `stubcall` artifacts and nothing else;
-- declare that directory as a Maven repository in `settings.gradle.kts`;
-- add the coordinates and the version to `gradle/libs.versions.toml`, the same as in yap-app.
+Use `stubcall` for behavioral collaborators. It is resolved from the file-based Maven repository
+committed in `libs/`; `libs/README.md` says where the artifacts come from.
 
 Do not `includeBuild` a sibling `stub-call` checkout: the committed repository keeps the build
 independent from files outside this project.
