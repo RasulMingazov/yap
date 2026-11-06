@@ -1,19 +1,14 @@
 package app.yap.admin.feature.characters.presentation.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -27,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTheme
+import app.yap.admin.core.design.LoadError
+import app.yap.admin.core.design.ScreenBody
 import app.yap.admin.core.design.ScreenToolbar
 import app.yap.admin.core.design.ToolbarBack
 import app.yap.admin.feature.characters.presentation.CharacterViewModel
@@ -48,11 +45,7 @@ internal fun CharacterScreen(
             }
         }
     }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AdminTheme.Colors.background),
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column {
             CharacterContent(
                 back = ToolbarBack(
@@ -83,32 +76,19 @@ private fun CharacterContent(
             onEvent = onEvent,
         )
         is UiState.Error -> {
-            ScreenToolbar(
-                back = back,
-                subtitle = "",
-                title = "Персонаж",
-            )
-            Column(
-                modifier = Modifier.padding(AdminTheme.Sizes.contentPadding),
-                verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
-            ) {
-                Text(
-                    text = uiState.message,
-                    color = AdminTheme.Colors.ink,
-                    fontSize = AdminTheme.Type.body,
+            PlaceholderToolbar(back = back)
+            ScreenBody {
+                LoadError(
+                    message = uiState.message,
+                    onRetryClick = { onEvent(Event.RetryClicked) },
                 )
-                OutlinedButton(onClick = { onEvent(Event.RetryClicked) }) {
-                    Text("Повторить")
-                }
             }
         }
         is UiState.Loading -> {
-            ScreenToolbar(
-                back = back,
-                subtitle = "",
-                title = "Персонаж",
-            )
-            CircularProgressIndicator(modifier = Modifier.padding(AdminTheme.Sizes.contentPadding))
+            PlaceholderToolbar(back = back)
+            ScreenBody {
+                CircularProgressIndicator()
+            }
         }
     }
 }
@@ -121,9 +101,9 @@ private fun CharacterForm(
 ) {
     ScreenToolbar(
         actions = {
-            content.saveNote?.let { note ->
+            content.saveStatus?.let { status ->
                 Text(
-                    text = note,
+                    text = status,
                     color = AdminTheme.Colors.muted,
                     fontSize = AdminTheme.Type.sub,
                 )
@@ -139,13 +119,7 @@ private fun CharacterForm(
         subtitle = content.subtitle,
         title = content.title,
     )
-    Column(
-        modifier = Modifier
-            .widthIn(max = AdminTheme.Sizes.listMaxWidth)
-            .verticalScroll(rememberScrollState())
-            .padding(AdminTheme.Sizes.contentPadding),
-        verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
-    ) {
+    ScreenBody {
         content.hint?.let { hint ->
             Text(
                 text = hint,
@@ -155,9 +129,9 @@ private fun CharacterForm(
                     .fillMaxWidth()
                     .background(
                         color = AdminTheme.Colors.fill,
-                        shape = RoundedCornerShape(AdminTheme.Sizes.sideItemRadius),
+                        shape = RoundedCornerShape(AdminTheme.Sizes.cornerRadius),
                     )
-                    .padding(AdminTheme.Sizes.rowPadding),
+                    .padding(AdminTheme.Sizes.hintPadding),
             )
         }
         Text(
@@ -213,5 +187,14 @@ private fun ProfileField(
         label = { Text(label) },
         placeholder = { Text(placeholder) },
         modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun PlaceholderToolbar(back: ToolbarBack) {
+    ScreenToolbar(
+        back = back,
+        subtitle = "",
+        title = "Персонаж",
     )
 }

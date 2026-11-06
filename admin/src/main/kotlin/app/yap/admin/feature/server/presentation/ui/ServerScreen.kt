@@ -1,8 +1,5 @@
 package app.yap.admin.feature.server.presentation.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -14,6 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTheme
+import app.yap.admin.core.design.ScreenBody
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ServerViewModel.Event
 import app.yap.admin.feature.server.presentation.ServerViewModel.UiState
@@ -32,10 +30,7 @@ private fun ServerContent(
     onEvent: (Event) -> Unit,
     uiState: UiState,
 ) {
-    Column(
-        modifier = Modifier.padding(AdminTheme.Sizes.contentPadding),
-        verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
-    ) {
+    ScreenBody {
         Text(
             text = "Сервер",
             color = AdminTheme.Colors.ink,

@@ -93,7 +93,7 @@ private fun SidebarItem(
         fontWeight = FontWeight.Medium,
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(AdminTheme.Sizes.sideItemRadius))
+            .clip(RoundedCornerShape(AdminTheme.Sizes.cornerRadius))
             .background(if (isCurrent) AdminTheme.Colors.selected else Color.Transparent)
             .clickable { onScreenClick(screen) }
             .padding(AdminTheme.Sizes.sideItemPadding),

@@ -19,17 +19,19 @@ internal object AdminTheme {
 
     object Sizes {
 
+        val contentMaxWidth = 880.dp
         val contentPadding = 32.dp
+        val cornerRadius = 6.dp
         val fieldWidth = 360.dp
         val gap = 12.dp
-        val listMaxWidth = 880.dp
+        val hintPadding = 12.dp
         val rowMinHeight = 48.dp
         val rowPadding = 12.dp
         val sideItemPadding = 8.dp
-        val sideItemRadius = 6.dp
         val sidePadding = 22.dp
         val sideWidth = 220.dp
         val toolbarHeight = 64.dp
+        val toolbarTitleGap = 8.dp
     }
 
     object Type {

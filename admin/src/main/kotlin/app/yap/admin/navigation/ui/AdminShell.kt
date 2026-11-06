@@ -31,6 +31,7 @@ internal fun AdminShell(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val serverUiState by serverViewModel.uiState.collectAsStateWithLifecycle()
+    val onScreenClick: (Screen) -> Unit = { screen -> viewModel.onEvent(Event.ScreenClicked(screen)) }
     when (val state = uiState) {
         is UiState.Content -> Row(
             modifier = Modifier
@@ -39,14 +40,14 @@ internal fun AdminShell(
         ) {
             Sidebar(
                 current = state.section,
-                onScreenClick = { screen -> viewModel.onEvent(Event.ScreenClicked(screen)) },
+                onScreenClick = onScreenClick,
                 serverLabel = serverUiState.serverLabel,
             )
             Box(modifier = Modifier.weight(1f)) {
                 ScreenContent(
                     characterViewModel = characterViewModel,
                     charactersViewModel = charactersViewModel,
-                    onScreenClick = { screen -> viewModel.onEvent(Event.ScreenClicked(screen)) },
+                    onScreenClick = onScreenClick,
                     screen = state.screen,
                     serverViewModel = serverViewModel,
                 )
