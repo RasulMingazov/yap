@@ -14,13 +14,11 @@ internal class DeepSeekModelProviderLiveTest {
     fun `GIVEN a DeepSeek key WHEN asking DeepSeek for text THEN it answers`() = runTest(timeout = 2.minutes) {
         val apiKey = System.getenv("DEEPSEEK_API_KEY").orEmpty()
         assumeTrue(apiKey.isNotBlank(), "DEEPSEEK_API_KEY is not set: the live DeepSeek test did not run")
-        val provider = DeepSeekModelProvider(DeepSeekConfig(apiKey = apiKey))
-
-        val reply = provider.text(
-            StubModelRequest.stubModelRequest(
-                messages = listOf(StubModelRequest.stubModelMessage(text = "Say hello in one word.")),
-            ),
+        val request = StubModelRequest.stubModelRequest(
+            messages = listOf(StubModelRequest.stubModelMessage(text = "Say hello in one word.")),
         )
+
+        val reply = DeepSeekModelProvider(DeepSeekConfig(apiKey = apiKey)).use { provider -> provider.text(request) }
 
         assertIs<ModelReply.Answered<*>>(reply)
     }
