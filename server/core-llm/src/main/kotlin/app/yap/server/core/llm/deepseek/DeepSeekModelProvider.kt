@@ -58,6 +58,11 @@ class DeepSeekModelProvider internal constructor(
         read = { content -> content },
     )
 
+    override fun close() {
+        httpClient.close()
+        engine.close()
+    }
+
     private suspend fun <T> reply(body: ChatRequestDto, read: (String) -> T): ModelReply<T> =
         runSuspendCatching { read(complete(body)) }
             .fold(
@@ -67,11 +72,6 @@ class DeepSeekModelProvider internal constructor(
                     ModelReply.Failed
                 },
             )
-
-    override fun close() {
-        httpClient.close()
-        engine.close()
-    }
 
     private suspend fun complete(body: ChatRequestDto): String {
         val choice = httpClient
