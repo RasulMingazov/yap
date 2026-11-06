@@ -10,7 +10,6 @@ import app.yap.server.feature.characters.usecase.GetCharacterUseCase
 import app.yap.server.feature.characters.usecase.GetCharactersUseCase
 import app.yap.server.feature.characters.usecase.UpdateCharacterUseCase
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -33,37 +32,34 @@ fun Route.characterRoutes(
             call.respond(getCharactersUseCase().map { character -> character.toDto() })
         }
         post {
-            val created = createCharacterUseCase(call.receive<CharacterProfileDto>().toModel()).createdCharacter()
-            call.respond(HttpStatusCode.Created, created.toDto())
+            when (val outcome = createCharacterUseCase(call.receive<CharacterProfileDto>().toModel())) {
+                is CreateCharacterOutcome.Created -> call.respond(HttpStatusCode.Created, outcome.character.toDto())
+                is CreateCharacterOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
+            }
         }
         get("/{characterId}") {
-            val character = getCharacterUseCase(call.characterId()) ?: throw NotFoundException()
-            call.respond(character.toDto())
+            val character = getCharacterUseCase(call.characterId())
+            if (character == null) {
+                call.respond(HttpStatusCode.NotFound)
+            } else {
+                call.respond(character.toDto())
+            }
         }
         put("/{characterId}") {
             val character = Character(
                 characterId = call.characterId(),
                 profile = call.receive<CharacterProfileDto>().toModel(),
             )
-            call.respond(updateCharacterUseCase(character).updatedCharacter().toDto())
+            when (val outcome = updateCharacterUseCase(character)) {
+                is UpdateCharacterOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
+                is UpdateCharacterOutcome.NotFound -> call.respond(HttpStatusCode.NotFound)
+                is UpdateCharacterOutcome.Updated -> call.respond(outcome.character.toDto())
+            }
         }
     }
-}
-
-private fun CreateCharacterOutcome.createdCharacter(): Character = when (this) {
-    is CreateCharacterOutcome.Created -> character
-    is CreateCharacterOutcome.Invalid -> throw BadRequestException(EMPTY_FIELD)
 }
 
 private fun RoutingCall.characterId(): CharacterId = parameters["characterId"]
     ?.let { value -> Uuid.parseOrNull(value) }
     ?.let(::CharacterId)
     ?: throw NotFoundException()
-
-private fun UpdateCharacterOutcome.updatedCharacter(): Character = when (this) {
-    is UpdateCharacterOutcome.Invalid -> throw BadRequestException(EMPTY_FIELD)
-    is UpdateCharacterOutcome.NotFound -> throw NotFoundException()
-    is UpdateCharacterOutcome.Updated -> character
-}
-
-private const val EMPTY_FIELD = "Every field of the profile must be filled"
