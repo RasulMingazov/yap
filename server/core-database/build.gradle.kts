@@ -3,8 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.jdbc)
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
     implementation(libs.hikaricp)

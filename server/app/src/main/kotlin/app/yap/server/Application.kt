@@ -16,11 +16,15 @@ import io.ktor.server.routing.routing
 fun main() {
     val config = AppConfigLoader().load()
     val database = openDatabase(config.database)
-    embeddedServer(Netty, port = config.port) {
-        monitor.subscribe(ApplicationStopped) { database.close() }
-        serverModule()
+    runCatching {
+        embeddedServer(Netty, port = config.port) {
+            monitor.subscribe(ApplicationStopped) { database.close() }
+            serverModule()
+        }
+            .start(wait = true)
     }
-        .start(wait = true)
+        .onFailure { database.close() }
+        .getOrThrow()
 }
 
 internal fun Application.serverModule() {
