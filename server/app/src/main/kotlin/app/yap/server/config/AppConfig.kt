@@ -14,7 +14,7 @@ internal data class AppConfig(
         require(adminApiKey.isNotBlank()) { "ADMIN_API_KEY must not be blank" }
         if (environment.isDeployed) {
             require(adminApiKey != LOCAL_ADMIN_API_KEY) { "ADMIN_API_KEY must be configured for staging and production" }
-            require(database.password.isNotBlank() && database.password != DatabaseConfig.LOCAL_PASSWORD) {
+            require(database.password.isNotBlank() && database.password != LOCAL_DATABASE_PASSWORD) {
                 "DATABASE_PASSWORD must be configured for staging and production"
             }
         }
@@ -23,6 +23,7 @@ internal data class AppConfig(
     companion object {
 
         const val LOCAL_ADMIN_API_KEY = "local-admin-key"
+        const val LOCAL_DATABASE_PASSWORD = "postgres"
         private const val MAX_PORT = 65535
         private const val MIN_PORT = 1
     }

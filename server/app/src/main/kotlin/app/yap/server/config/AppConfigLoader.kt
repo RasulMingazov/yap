@@ -14,7 +14,7 @@ internal class AppConfigLoader(
     fun load(): AppConfig {
         val environment = AppEnvironment.from(env("APP_ENV") ?: "development")
         val database = DatabaseConfig(
-            password = env("DATABASE_PASSWORD") ?: DatabaseConfig.LOCAL_PASSWORD,
+            password = env("DATABASE_PASSWORD") ?: AppConfig.LOCAL_DATABASE_PASSWORD,
             poolSize = intEnv(name = "DATABASE_POOL_SIZE", default = 10),
             resetOnMigrationChange = booleanEnv(name = "DATABASE_RESET_ON_MIGRATION_CHANGE", default = false),
             url = env("DATABASE_URL") ?: "jdbc:postgresql://localhost:5432/yap",
