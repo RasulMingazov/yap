@@ -61,10 +61,17 @@ When you are the PR author:
 
 ## Git
 
-- Branch names start with the kind: `feature/...`, `tech/...` or `test/...`.
+- Branch names start with the kind: `feature/...`, `tech/...` or `test/...`. A branch for an issue
+  puts the issue number after the kind, for example `feature/6-characters`.
 - Start every branch from `develop` and open every PR into `develop`. A release is a PR from
   `develop` into `main`.
+- The title of a PR for an issue starts with `Issue #<number>:`, for example
+  `Issue #6: Add the character list to the admin app`. The word `Issue` shows that the number
+  is an issue number, not a PR number.
+- The description of a PR for an issue starts with `Closes #<number>`, so GitHub closes the issue
+  at the merge.
 - Keep PR descriptions short: what changed and why, then what was verified.
 - A PR adds at most 400 lines. When an issue does not fit, do not open a new issue: split the
-  work into several PRs for the same issue and number them in the title, for example `[1/3]`,
-  `[2/3]`, `[3/3]`.
+  work into several PRs for the same issue. Put the part number after the issue number, for
+  example `Issue #6 [1/3]: Add the character list to the admin app`. Only the last part closes
+  the issue: the other parts start their description with `Part of #<number>`.
