@@ -12,6 +12,7 @@ Gradle monorepo for Yap, an app for English speaking practice.
 
 ## Rules
 
+- Code guides live in `docs/`. Start at `docs/README.md` and read the guides for the area you change.
 - No secrets in the repository. Keys and prompts live on the server and in its database.
 - A DTO module holds only wire data. The server maps DTOs to its own models.
 - Add a rule to this file only when code it applies to exists.
