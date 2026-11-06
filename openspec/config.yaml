@@ -1,0 +1,30 @@
+schema: spec-driven
+
+# Constraints an agent cannot read from the code. CLAUDE.md and docs/ say how the code is built.
+context: |
+  Yap is an app for English speaking practice.
+
+  - After onboarding, the learner gets one topic a day.
+  - The learner passes the topic as a dialog with a character. An LLM writes the character's replies.
+  - The owner keeps a cast of recurring characters. Topics use them in their dialogs.
+  - At the end, the learner gets a review: mistakes, recommendations and a score. The score feeds the rating.
+  - Each rating level has its own LLM settings. The prompts set the lexicon difficulty. The content is the same for all levels.
+  - The owner sets the daily topics, the characters, the prompts and the models in the admin app.
+  - DeepSeek is the main model provider. Other providers can be added.
+
+  Modules:
+
+  - `server/*`: the Ktor server. It holds the scenarios, the prompts and the model keys.
+  - `admin`: the Compose Desktop app for the owner. It talks only to the server.
+  - `contract-admin`: the DTOs of the admin API.
+  - The mobile app comes later.
+
+  The server derives every product rule. The clients only show what the server sends.
+
+  Write all artifacts in English.
+
+rules:
+  proposal:
+    - Name what is out of scope and the later change or issue that owns it.
+  specs:
+    - Quote user-facing copy in Russian, exactly as the app shows it.

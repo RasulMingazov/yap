@@ -18,6 +18,23 @@ Gradle monorepo for Yap, an app for English speaking practice.
 - A DTO module holds only wire data. The server maps DTOs to its own models.
 - Add a rule to this file only when code it applies to exists.
 
+## Specs
+
+OpenSpec specifies product behaviour. `openspec/specs/<capability>/spec.md` is the current truth.
+A change in progress is a folder under `openspec/changes/`.
+
+- Specs say what the product does. `CLAUDE.md`, `docs/` and the code say how it is built.
+- Start a change with `/opsx:propose`. Build it with `/opsx:apply`.
+- Run `/opsx:archive` as the last commit of the PR, so the specs update when it merges.
+- A fix that changes no specified behaviour needs no change folder.
+
+| Question | Source |
+| --- | --- |
+| What the business wants and what to do next | GitHub issues |
+| Exact product behaviour | `openspec/specs/` |
+| How the product works now | the code |
+| How new work looks | the [design canvas](https://claude.ai/artifact/B4bBUESuzCQw6v3N6Nj8FB) |
+
 ## Verification
 
 - `./gradlew build` — compilation, tests and Detekt. Run it before every push.
