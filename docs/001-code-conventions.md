@@ -8,7 +8,7 @@ Name a thing by what it is, not by where it shows or how it is built.
 
 - `UpNext`, not `Home`; `fetched`, not `remote`, for a stored row; `topicId`, not `id`.
 - Name lambda parameters after the entity: `topics ->`, not `it` or `list ->`.
-- Remove words that no longer match the model, such as `catalog` or `episode`: the product says «тема», the code says `topic`.
+- Remove words that no longer match the model, such as `catalog` or `episode`: the product calls it a topic, so the code says `topic`.
 
 ## Remove what has no use now
 

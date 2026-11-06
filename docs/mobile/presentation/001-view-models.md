@@ -46,7 +46,7 @@ class TopicOfDayViewModel internal constructor(
 - Put every text, order, and visibility in `UiState`. Copy is Russian; count-dependent copy picks
   its one/few/many form in the mapper.
 - `News` is one-shot output. Navigation that follows an outcome, such as opening the dialog after
-  «Начать», is a `News` that the Swift screen turns into a route.
+  Start, is a `News` that the Swift screen turns into a route.
 - Depend on use cases only; never inject a repository or a data source.
 - Set busy flags before launching guarded work and clear stale errors on retry.
 - Do not switch dispatchers. `viewModelScope` is enough.
