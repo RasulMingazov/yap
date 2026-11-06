@@ -14,7 +14,7 @@ internal object StubAppConfig {
     ): AppConfig = AppConfig(
         adminApiKey = adminApiKey,
         database = DatabaseConfig(
-            password = "postgres",
+            password = "test-password",
             poolSize = 1,
             resetOnMigrationChange = false,
             url = "jdbc:postgresql://localhost:5432/yap",
