@@ -9,5 +9,6 @@ dependencies {
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.status.pages)
 
+    testImplementation(testFixtures(project(":server:core-database")))
     testImplementation(testFixtures(project(":server:feature-characters")))
 }

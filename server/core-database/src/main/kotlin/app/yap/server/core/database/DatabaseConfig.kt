@@ -18,7 +18,6 @@ data class DatabaseConfig(
 
     companion object {
 
-        const val LOCAL_PASSWORD = "postgres"
         private const val MAX_POOL_SIZE = 100
         private const val MIN_POOL_SIZE = 1
     }

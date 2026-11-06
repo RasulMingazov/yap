@@ -5,27 +5,31 @@ import org.testcontainers.DockerClientFactory
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 
-const val POSTGRES_IMAGE = "postgres:18-alpine"
+fun <T> withTestDatabase(block: (Database) -> T): T = withPostgres { container ->
+    openDatabase(
+        DatabaseConfig(
+            password = container.password,
+            poolSize = 2,
+            resetOnMigrationChange = false,
+            url = container.jdbcUrl,
+            user = container.username,
+        ),
+    )
+        .use(block)
+}
 
-fun assumeDocker() {
+fun <T> withPostgres(block: (PostgreSQLContainer<*>) -> T): T {
+    assumeDocker()
+    return PostgreSQLContainer(DockerImageName.parse(POSTGRES_IMAGE)).use { container ->
+        container.start()
+        block(container)
+    }
+}
+
+private fun assumeDocker() {
     val available = runCatching { DockerClientFactory.instance().isDockerAvailable }.getOrDefault(false)
     check(available || System.getenv("CI") != "true") { "Docker is not available in CI: the PostgreSQL suite must run" }
     assumeTrue(available, "Docker is not available: the PostgreSQL suite did not run")
 }
 
-fun <T> withTestDatabase(block: (Database) -> T): T {
-    assumeDocker()
-    return PostgreSQLContainer(DockerImageName.parse(POSTGRES_IMAGE)).use { container ->
-        container.start()
-        openDatabase(
-            DatabaseConfig(
-                password = container.password,
-                poolSize = 2,
-                resetOnMigrationChange = false,
-                url = container.jdbcUrl,
-                user = container.username,
-            ),
-        )
-            .use(block)
-    }
-}
+private const val POSTGRES_IMAGE = "postgres:18-alpine"

@@ -7,7 +7,7 @@ data class CharacterProfile(
     val personality: String,
 )
 
-fun CharacterProfile.trimmedIfFilled(): CharacterProfile? {
+internal fun CharacterProfile.trimmedIfFilled(): CharacterProfile? {
     val trimmed = CharacterProfile(
         history = history.trim(),
         manner = manner.trim(),

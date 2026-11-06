@@ -1,10 +1,12 @@
 package app.yap.server
 
+import app.yap.server.core.database.withTestDatabase
 import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -14,6 +16,16 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class ApplicationTest {
+
+    @Test
+    fun `GIVEN the server WHEN asking for its health THEN it answers ok`() = testApplication {
+        val env = Environment()
+        application { env.install(this) }
+
+        val response = client.get("/health")
+
+        assertEquals(expected = HttpStatusCode.OK to "ok", actual = response.status to response.bodyAsText())
+    }
 
     @Test
     fun `GIVEN no admin key WHEN listing the characters THEN the call is unauthorized`() = testApplication {
@@ -49,6 +61,11 @@ internal class ApplicationTest {
         }
 
         assertEquals(expected = HttpStatusCode.NotFound, actual = response.status)
+    }
+
+    @Test
+    fun `GIVEN an empty database WHEN the server opens it THEN the migrations of every feature apply`() {
+        withTestDatabase { }
     }
 
     private class Environment {

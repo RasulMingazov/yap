@@ -6,15 +6,11 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import org.flywaydb.core.api.exception.FlywayValidateException
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.utility.DockerImageName
 
 internal class DatabaseMigrationsTest {
 
     @Test
     fun `GIVEN a changed applied migration and the reset on WHEN migrations run THEN the database is rebuilt`() {
-        assumeDocker()
-
         withDatabase { source ->
             DatabaseMigrations.migrate(location = ORIGINAL, resetOnMigrationChange = true, source = source)
 
@@ -26,8 +22,6 @@ internal class DatabaseMigrationsTest {
 
     @Test
     fun `GIVEN a changed applied migration and the reset off WHEN migrations run THEN they fail and the data stays`() {
-        assumeDocker()
-
         withDatabase { source ->
             DatabaseMigrations.migrate(location = ORIGINAL, resetOnMigrationChange = false, source = source)
 
@@ -40,8 +34,6 @@ internal class DatabaseMigrationsTest {
 
     @Test
     fun `GIVEN a new migration and the reset on WHEN migrations run THEN it is applied without clearing the data`() {
-        assumeDocker()
-
         withDatabase { source ->
             DatabaseMigrations.migrate(location = ORIGINAL, resetOnMigrationChange = true, source = source)
 
@@ -51,14 +43,8 @@ internal class DatabaseMigrationsTest {
         }
     }
 
-    @Test
-    fun `GIVEN an empty database WHEN the server opens it THEN the server migrations apply`() {
-        withTestDatabase { }
-    }
-
     private fun withDatabase(block: (HikariDataSource) -> Unit) {
-        PostgreSQLContainer(DockerImageName.parse(POSTGRES_IMAGE)).use { container ->
-            container.start()
+        withPostgres { container ->
             HikariDataSource(
                 HikariConfig().apply {
                     jdbcUrl = container.jdbcUrl
