@@ -4,7 +4,12 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.exposed.java.time)
+    implementation(project(":server:core-database"))
     implementation(project(":server:feature-characters"))
 
     testFixturesImplementation(testFixtures(project(":server:feature-characters")))
+
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(testFixtures(project(":server:core-database")))
 }
