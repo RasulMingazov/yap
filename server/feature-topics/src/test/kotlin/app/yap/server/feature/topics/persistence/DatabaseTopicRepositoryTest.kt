@@ -28,17 +28,18 @@ internal class DatabaseTopicRepositoryTest {
     }
 
     @Test
-    fun `GIVEN a created topic WHEN reading it THEN it has the same content`() = withTestDatabase { database ->
-        runTest {
-            val repository = DatabaseTopicRepository(database)
-            val content = stubContent(interlocutor = database.createCast())
-            val topic = repository.create(content)
+    fun `GIVEN a created topic with steps WHEN reading it THEN it has the same content and step order`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseTopicRepository(database)
+                val content = stubContent(interlocutor = database.createCast(), steps = stubSteps("c", "a", "d", "b"))
+                val topic = repository.create(content)
 
-            val found = repository.find(topic.topicId)
+                val found = repository.find(topic.topicId)
 
-            assertEquals(expected = topic, actual = found)
+                assertEquals(expected = topic, actual = found)
+            }
         }
-    }
 
     @Test
     fun `GIVEN an unknown topic WHEN reading it THEN there is no topic`() = withTestDatabase { database ->
@@ -52,31 +53,12 @@ internal class DatabaseTopicRepositoryTest {
     }
 
     @Test
-    fun `GIVEN a topic with steps WHEN reading it THEN the steps keep their order`() = withTestDatabase { database ->
-        runTest {
-            val repository = DatabaseTopicRepository(database)
-            val steps = listOf("c", "a", "d", "b").map { task -> StubTopic.stubStep(task = task) }
-            val topic = repository.create(stubContent(steps = steps))
-
-            val found = repository.find(topic.topicId)
-
-            assertEquals(expected = steps, actual = found?.content?.steps)
-        }
-    }
-
-    @Test
     fun `GIVEN a topic with three steps WHEN updating it with one step THEN reading it returns one step`() =
         withTestDatabase { database ->
             runTest {
                 val repository = DatabaseTopicRepository(database)
-                val steps = listOf("a", "b", "c").map { task -> StubTopic.stubStep(task = task) }
-                val topic = repository.create(stubContent(steps = steps))
-                val changed = topic.copy(
-                    content = topic.content.copy(
-                        steps = listOf(StubTopic.stubStep(task = "z")),
-                        title = "Changed",
-                    ),
-                )
+                val topic = repository.create(stubContent(steps = stubSteps("a", "b", "c")))
+                val changed = topic.copy(content = topic.content.copy(steps = stubSteps("z"), title = "Changed"))
 
                 val updated = repository.update(changed)
 
@@ -96,43 +78,19 @@ internal class DatabaseTopicRepositoryTest {
     }
 
     @Test
-    fun `GIVEN topics WHEN listing them THEN they come by date and then by title without case`() =
+    fun `GIVEN topics with steps WHEN listing them THEN they come by date and title, each with its own steps`() =
         withTestDatabase { database ->
             runTest {
                 val repository = DatabaseTopicRepository(database)
                 val earlier = StubTopic.RELEASE_DATE.minusDays(1)
-                repository.create(stubContent(title = "Sam"))
-                repository.create(stubContent(title = "dan"))
-                repository.create(stubContent(releaseDate = earlier, title = "Zed"))
-                repository.create(stubContent(title = "Mia"))
-
-                val titles = repository.list().map { topic -> topic.content.title }
-
-                assertEquals(expected = listOf("Zed", "dan", "Mia", "Sam"), actual = titles)
-            }
-        }
-
-    @Test
-    fun `GIVEN topics with steps WHEN listing them THEN each topic has its own steps in order`() =
-        withTestDatabase { database ->
-            runTest {
-                val repository = DatabaseTopicRepository(database)
-                val first = repository.create(
-                    stubContent(
-                        steps = listOf("b", "a").map { task -> StubTopic.stubStep(task = task) },
-                        title = "A",
-                    ),
-                )
-                val second = repository.create(
-                    stubContent(
-                        steps = listOf("d", "c").map { task -> StubTopic.stubStep(task = task) },
-                        title = "B",
-                    ),
-                )
+                val sam = repository.create(stubContent(steps = stubSteps("b", "a"), title = "Sam"))
+                val dan = repository.create(stubContent(steps = stubSteps("d", "c"), title = "dan"))
+                val zed = repository.create(stubContent(releaseDate = earlier, title = "Zed"))
+                val mia = repository.create(stubContent(steps = stubSteps("f", "e"), title = "Mia"))
 
                 val topics = repository.list()
 
-                assertEquals(expected = listOf(first, second), actual = topics)
+                assertEquals(expected = listOf(zed, dan, mia, sam), actual = topics)
             }
         }
 
@@ -164,11 +122,11 @@ internal class DatabaseTopicRepositoryTest {
         }
 
     @Test
-    fun `GIVEN a topic with no interlocutor and no duration WHEN reading it THEN both stay empty`() =
+    fun `GIVEN an empty draft with only a title and a date WHEN reading it THEN it has no steps and no extras`() =
         withTestDatabase { database ->
             runTest {
                 val repository = DatabaseTopicRepository(database)
-                val topic = repository.create(stubContent(durationMinutes = null, interlocutor = null))
+                val topic = repository.create(stubContent(durationMinutes = null, steps = emptyList()))
 
                 val found = repository.find(topic.topicId)
 
@@ -188,6 +146,8 @@ private suspend fun Database.createCast(): Interlocutor.Cast {
     )
     return Interlocutor.Cast(characterId = character.characterId)
 }
+
+private fun stubSteps(vararg tasks: String): List<Step> = tasks.map { task -> StubTopic.stubStep(task = task) }
 
 private fun stubContent(
     durationMinutes: Int? = StubTopic.DURATION_MINUTES,

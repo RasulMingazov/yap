@@ -82,16 +82,6 @@ private fun JdbcTransaction.readSteps(topicId: Uuid): List<Step> = TopicStepsTab
     .orderBy(TopicStepsTable.position)
     .map { row -> row.toStep() }
 
-private fun JdbcTransaction.insertSteps(topic: Topic) {
-    TopicStepsTable.batchInsert(topic.content.steps.withIndex()) { (position, step) ->
-        this[TopicStepsTable.outcome] = step.outcome
-        this[TopicStepsTable.passWhen] = step.passWhen
-        this[TopicStepsTable.position] = position
-        this[TopicStepsTable.task] = step.task
-        this[TopicStepsTable.topicId] = topic.topicId.value
-    }
-}
-
 private fun ResultRow.toTopic(steps: List<Step>): Topic = Topic(
     content = TopicContent(
         description = this[TopicsTable.description],
@@ -137,4 +127,14 @@ private fun UpdateBuilder<*>.write(content: TopicContent) {
     this[TopicsTable.role] = content.role
     this[TopicsTable.setting] = content.setting
     this[TopicsTable.title] = content.title
+}
+
+private fun JdbcTransaction.insertSteps(topic: Topic) {
+    TopicStepsTable.batchInsert(topic.content.steps.withIndex()) { (position, step) ->
+        this[TopicStepsTable.outcome] = step.outcome
+        this[TopicStepsTable.passWhen] = step.passWhen
+        this[TopicStepsTable.position] = position
+        this[TopicStepsTable.task] = step.task
+        this[TopicStepsTable.topicId] = topic.topicId.value
+    }
 }
