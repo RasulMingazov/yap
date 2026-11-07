@@ -59,7 +59,7 @@ internal class TopicDtoMapperTest {
     @Test
     fun `GIVEN a character WHEN mapping the content THEN the interlocutor is that character of the cast`() {
         val dto = StubTopicDto.stubContentDto(
-            interlocutor = InterlocutorDto.CharacterDto(characterId = StubTopicDto.CHARACTER_ID),
+            interlocutor = InterlocutorDto.CastDto(characterId = StubTopicDto.CHARACTER_ID),
         )
 
         val content = dto.toModel()
@@ -100,7 +100,7 @@ internal class TopicDtoMapperTest {
     @Test
     fun `GIVEN a character that is not an identifier WHEN mapping the content THEN it fails with a bad request`() {
         val dto = StubTopicDto.stubContentDto(
-            interlocutor = InterlocutorDto.CharacterDto(characterId = "sam"),
+            interlocutor = InterlocutorDto.CastDto(characterId = "sam"),
         )
 
         assertFailsWith<BadRequestException> { dto.toModel() }

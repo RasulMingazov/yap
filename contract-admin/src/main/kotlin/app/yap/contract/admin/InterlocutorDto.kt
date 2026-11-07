@@ -8,7 +8,7 @@ sealed interface InterlocutorDto {
 
     @Serializable
     @SerialName("character")
-    data class CharacterDto(val characterId: String) : InterlocutorDto
+    data class CastDto(val characterId: String) : InterlocutorDto
 
     @Serializable
     @SerialName("guest")

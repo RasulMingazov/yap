@@ -24,7 +24,7 @@ internal object StubTopicDto {
     fun stubContentDto(
         description: String = StubTopic.DESCRIPTION,
         durationMinutes: Int? = StubTopic.DURATION_MINUTES,
-        interlocutor: InterlocutorDto? = InterlocutorDto.CharacterDto(characterId = CHARACTER_ID),
+        interlocutor: InterlocutorDto? = InterlocutorDto.CastDto(characterId = CHARACTER_ID),
         openingLine: OpeningLineDto = stubOpeningLineDto(),
         releaseDate: String? = RELEASE_DATE,
         role: String = StubTopic.ROLE,

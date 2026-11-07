@@ -34,7 +34,7 @@ private fun TopicContent.toDto(): TopicContentDto = TopicContentDto(
 )
 
 private fun Interlocutor.toDto(): InterlocutorDto = when (this) {
-    is Interlocutor.Cast -> InterlocutorDto.CharacterDto(characterId = characterId.value.toString())
+    is Interlocutor.Cast -> InterlocutorDto.CastDto(characterId = characterId.value.toString())
     is Interlocutor.Guest -> InterlocutorDto.GuestDto(description = description)
 }
 
@@ -64,7 +64,7 @@ internal fun TopicContentDto.toModel(): TopicContent = TopicContent(
 )
 
 private fun InterlocutorDto.toModel(): Interlocutor = when (this) {
-    is InterlocutorDto.CharacterDto -> Interlocutor.Cast(characterId = characterId.toCharacterId())
+    is InterlocutorDto.CastDto -> Interlocutor.Cast(characterId = characterId.toCharacterId())
     is InterlocutorDto.GuestDto -> Interlocutor.Guest(description = description.trim())
 }
 
