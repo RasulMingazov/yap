@@ -19,7 +19,7 @@ import app.yap.admin.navigation.NavigationViewModel.UiState
 @Composable
 internal fun AdminShell(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
-    charactersViewModel: () -> CharactersViewModel,
+    charactersViewModel: CharactersViewModel,
     serverViewModel: ServerViewModel,
     viewModel: NavigationViewModel,
 ) {
@@ -47,7 +47,7 @@ internal fun AdminShell(
 @Composable
 private fun ScreenContent(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
-    charactersViewModel: () -> CharactersViewModel,
+    charactersViewModel: CharactersViewModel,
     onScreenClick: (Screen) -> Unit,
     screen: Screen,
     serverViewModel: ServerViewModel,
@@ -60,7 +60,7 @@ private fun ScreenContent(
         is Screen.Characters -> CharactersScreen(
             onCharacterClick = { characterId -> onScreenClick(Screen.Character(characterId)) },
             onNewCharacterClick = { onScreenClick(Screen.Character(characterId = null)) },
-            viewModel = remember { charactersViewModel() },
+            viewModel = charactersViewModel,
         )
         is Screen.Server -> ServerScreen(viewModel = serverViewModel)
     }

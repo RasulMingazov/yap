@@ -19,12 +19,18 @@ internal class CharactersViewModel(
     private val dataState = MutableStateFlow(DataState())
     val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, CharactersUiStateMapper::map)
 
-    init {
-        load()
+    fun onEvent(event: Event) = when (event) {
+        is Event.Opened -> onOpened()
+        is Event.RetryClicked -> onRetryClicked()
     }
 
-    fun onEvent(event: Event) = when (event) {
-        is Event.RetryClicked -> onRetryClicked()
+    private fun onOpened() {
+        val state = dataState.value
+        if (state.isLoading) return
+        if (state.characters !is LoadResult.Loaded) {
+            dataState.update { current -> current.copy(characters = null) }
+        }
+        load()
     }
 
     private fun onRetryClicked() {
@@ -34,15 +40,23 @@ internal class CharactersViewModel(
     }
 
     private fun load() {
+        dataState.update { state -> state.copy(isLoading = true) }
         viewModelScope.launch {
             val characters = getCharactersUseCase()
-            dataState.update { state -> state.copy(characters = characters) }
+            dataState.update { state -> state.loaded(characters) }
         }
     }
 
     data class DataState(
         val characters: LoadResult<List<Character>>? = null,
-    )
+        val isLoading: Boolean = false,
+    ) {
+
+        fun loaded(result: LoadResult<List<Character>>): DataState = copy(
+            characters = if (result is LoadResult.Failed && characters is LoadResult.Loaded) characters else result,
+            isLoading = false,
+        )
+    }
 
     sealed interface UiState {
 
@@ -63,6 +77,8 @@ internal class CharactersViewModel(
     }
 
     sealed interface Event {
+
+        data object Opened : Event
 
         data object RetryClicked : Event
     }

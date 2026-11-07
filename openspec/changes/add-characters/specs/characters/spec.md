@@ -99,9 +99,20 @@ below the list.
 - **WHEN** the server has no characters
 - **THEN** Characters shows a message that there are no characters yet, and New character
 
+#### Scenario: A return to Characters
+
+- **WHEN** the owner returns to Characters from another screen
+- **THEN** the admin app shows the list that it has at once, and replaces it with the list from the
+  server when the server answers
+
+#### Scenario: The list does not update
+
+- **WHEN** the admin app shows a list and cannot load the characters again
+- **THEN** it keeps the list
+
 #### Scenario: The list does not load
 
-- **WHEN** the admin app cannot load the characters
+- **WHEN** the admin app has no list yet and cannot load the characters
 - **THEN** Characters shows an error that the characters did not load, and Retry
 
 ### Requirement: The Character form
@@ -109,7 +120,8 @@ below the list.
 The Character form SHALL have one section with the fields Name, History, Personality and Manner of
 speech. The Name field SHALL say that this is the name the users see. Below the fields SHALL be a
 note: the topic sets the role in a scene, and the levels set the lexicon difficulty for all
-characters. The toolbar SHALL have Characters to go back, and Save.
+characters. The toolbar SHALL have a back arrow that opens Characters. Save SHALL be below the
+fields, with the save status beside it.
 
 #### Scenario: A saved character
 

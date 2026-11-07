@@ -26,6 +26,9 @@ internal object AdminTheme {
 
     object Sizes {
 
+        val backArrow = 20.dp
+        val backButton = 32.dp
+        val backPull = 8.dp
         val border = 1.dp
         val brandGap = 6.dp
         val buttonHeight = 32.dp
@@ -55,7 +58,7 @@ internal object AdminTheme {
         val sidePadding = 12.dp
         val sideWidth = 200.dp
         val toolbarHeight = 64.dp
-        val toolbarTitleGap = 6.dp
+        val toolbarTitleGap = 8.dp
         val windowHeight = 800.dp
         val windowWidth = 1280.dp
     }
