@@ -61,6 +61,8 @@ internal class PublishTopicUseCase(
 ## Routes and adapters
 
 - Routes validate and translate HTTP only, then call a use case.
+- The DTO mapper normalizes text input, such as trimming spaces, so the model and the use cases
+  get clean values. The model holds no `trimmed()` functions.
 - Use [shared DTOs](../shared/README.md) for admin payloads. Keep server-only HTTP contracts beside
   their routes.
 - The route answers each outcome of its use case with a status, in a `when` over the outcome:
