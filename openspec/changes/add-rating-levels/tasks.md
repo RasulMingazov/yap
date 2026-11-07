@@ -14,14 +14,15 @@ Needs: the `V2` part of #7 is merged.
 Files: `settings.gradle.kts` (hot), `server/feature-levels/build.gradle.kts`,
 `server/feature-levels/` `model/` and `persistence/`,
 `server/feature-levels/src/main/resources/db/migration/V3__levels.sql` (hot),
-`server/feature-levels/src/testFixtures/` (stub repository), and their tests.
+`server/feature-levels/src/testFixtures/` (`StubLevel`), and their tests.
 
-- [ ] 2.1 Add `server/feature-levels` with the level model, the table rule and the ranges; verify with the model tests for a missing level, a level twice, an empty or blank text, zero words, a rating from on No rating, a missing rating from, a rating from that does not grow, and the ranges
-- [ ] 2.2 Add `V3__levels.sql` and the Exposed repository that saves with an upsert by `code`; verify with the PostgreSQL tests for an empty read, a save, a second save and the clean bootstrap (CI runs them)
+- [x] 2.1 Add `server/feature-levels` with the level model, the table rule and the ranges; verify with the model tests for a missing level, a level twice, an empty or blank text, zero words, a rating from on No rating, a missing rating from, a rating from that does not grow, and the ranges
+- [x] 2.2 Add `V3__levels.sql` and the Exposed repository that saves with an upsert by `code`; verify with the PostgreSQL tests for an empty read, a save, a second save and the clean bootstrap (CI runs them)
 
 ## 3. [3/7] Server admin API
 
 Files: `server/feature-levels/` `usecase/` and `api/`, `contract-admin/` level DTOs (hot),
+`server/feature-levels/src/testFixtures/` `StubLevelRepository` (moved from [2/7], its first consumer),
 `server/app/build.gradle.kts`, `server/app/.../Application.kt` (hot),
 `server/app/src/test/.../ApplicationTest.kt` and `server/app/src/test/.../admin/ServerRoutesTest.kt`
 (the new `serverModule` parameter), and their tests.
