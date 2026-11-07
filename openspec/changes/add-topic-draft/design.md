@@ -92,9 +92,9 @@ list orders by `release_date`, then by `lower(title)`. The migration is `V2__top
 - `TopicsViewModel` lives for the session and keeps the shown list on a return, as
   `CharactersViewModel` does.
 - `TopicViewModel` loads the topic and the cast together. Either failure shows the load error. The
-  form keeps the date and the duration as the owner types them. Save draft reads the date as
-  `ДД.ММ.ГГГГ` and the duration as digits. A field that does not read gives an inline error and no
-  call. A 400 gives the error that asks for the title and the date.
+  form keeps the date and the duration as the owner types them. Save draft reads the date as day,
+  month and year, such as `24.10.2026`, and the duration as digits. A field that does not read
+  gives an inline error and no call. A 400 gives the error that asks for the title and the date.
 - The interlocutor choice lists the cast in the order of the server, then Guest. The admin feature
   calls the characters `GetCharactersUseCase`.
 - `ScreenToolbar` gets an actions slot for Save draft and for New topic, as the canvas shows them.

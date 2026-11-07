@@ -114,7 +114,12 @@ Behind the admin key, the server SHALL:
 
 #### Scenario: A rejected topic
 
-- **WHEN** the admin app creates or updates a topic without a title
+- **WHEN** the admin app creates or updates a topic without a title, or with an unknown character
+- **THEN** the server answers 400
+
+#### Scenario: A date that does not parse
+
+- **WHEN** the admin app sends a release date that is not a date
 - **THEN** the server answers 400
 
 ### Requirement: The Topics list
