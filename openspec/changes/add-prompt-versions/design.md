@@ -78,8 +78,8 @@ Restore updates the current row only when the version exists. The migration is `
   key until a save or a restore of that prompt.
 - The editor uses the mono style for the text and a chip for each variable. `core/design` gets
   `Chip`. The mono style comes with #9 or with this change, whichever lands first.
-- A version shows `v<n>`, its time as `7 нояб., 14:30` in the local zone, and `у пользователей` for
-  the current one or Restore for an older one.
+- A version shows `v<n>`, its day, month and time in the local zone, and a label that it is live
+  for the users for the current one, or Restore for an older one.
 
 ### Tests
 
