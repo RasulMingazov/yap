@@ -42,8 +42,9 @@ The caller gives one job:
 
 ## Review round
 
-Read the findings file and the threads (`gh api repos/{owner}/{repo}/pulls/<n>/comments`). Sort
-each point:
+Run `git pull --no-rebase` first: the remote branch can have new commits, such as a merge of the
+base. Read the findings file and the threads (`gh api repos/{owner}/{repo}/pulls/<n>/comments`).
+Sort each point:
 
 - inside your part: fix it;
 - outside your part: reply in the thread with the reason, and put it in «Follow-ups»;
@@ -54,7 +55,7 @@ Follow the thread rules of `CLAUDE.md`. Then make one commit and one push.
 
 ## Archive
 
-Run the `/opsx:archive` workflow as the last commit of the PR. Push it.
+Run `git pull --no-rebase`, then the `/opsx:archive` workflow as the last commit of the PR. Push it.
 
 ## Code
 
