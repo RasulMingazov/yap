@@ -15,7 +15,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 3. [3/16] The topic model · ~190 · `settings.gradle.kts`, `server/feature-topics/build.gradle.kts`, `S/model/`
 
-- [ ] 3.1 Add the module, the model and the draft rule; verify with the model tests for the trim, the empty step, no title, no date, a zero duration and an empty guest
+- [x] 3.1 Add the module, the model and the draft rule; verify with the model tests for the trim, the empty step, no title, no date, a zero duration and an empty guest
 
 ## 4. [4/16] The persistence · ~330 · `gradle/libs.versions.toml`, `server/feature-topics/src/main/resources/db/migration/V2__topics.sql`, `server/feature-topics/build.gradle.kts`, `S/persistence/`, `S/.../StubTopicRepository.kt` · `V2` merges before `V3` of #9; #10 reuses `exposed-java-time`
 
