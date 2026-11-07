@@ -27,7 +27,7 @@ internal class NavigationViewModel(
 
     private fun openStartScreen() {
         viewModelScope.launch {
-            val start = if (getServerSettingsUseCase() == null) Screen.Server else Screen.Characters
+            val start = if (getServerSettingsUseCase() == null) Screen.Server else Screen.Topics
             dataState.update { state -> state.copy(screen = state.screen ?: start) }
         }
     }
@@ -53,6 +53,8 @@ internal class NavigationViewModel(
         data object Characters : Screen
 
         data object Server : Screen
+
+        data object Topics : Screen
     }
 
     sealed interface Event {

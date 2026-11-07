@@ -11,6 +11,8 @@ import app.yap.admin.feature.characters.presentation.ui.CharacterScreen
 import app.yap.admin.feature.characters.presentation.ui.CharactersScreen
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ui.ServerScreen
+import app.yap.admin.feature.topics.presentation.TopicsViewModel
+import app.yap.admin.feature.topics.presentation.ui.TopicsScreen
 import app.yap.admin.navigation.NavigationViewModel
 import app.yap.admin.navigation.NavigationViewModel.Event
 import app.yap.admin.navigation.NavigationViewModel.Screen
@@ -21,6 +23,7 @@ internal fun AdminShell(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: CharactersViewModel,
     serverViewModel: ServerViewModel,
+    topicsViewModel: TopicsViewModel,
     viewModel: NavigationViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -38,6 +41,7 @@ internal fun AdminShell(
                 onScreenClick = onScreenClick,
                 screen = state.screen,
                 serverViewModel = serverViewModel,
+                topicsViewModel = topicsViewModel,
             )
         }
         is UiState.Loading -> Unit
@@ -51,6 +55,7 @@ private fun ScreenContent(
     onScreenClick: (Screen) -> Unit,
     screen: Screen,
     serverViewModel: ServerViewModel,
+    topicsViewModel: TopicsViewModel,
 ) {
     when (screen) {
         is Screen.Character -> CharacterScreen(
@@ -63,5 +68,6 @@ private fun ScreenContent(
             viewModel = charactersViewModel,
         )
         is Screen.Server -> ServerScreen(viewModel = serverViewModel)
+        is Screen.Topics -> TopicsScreen(viewModel = topicsViewModel)
     }
 }
