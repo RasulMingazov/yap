@@ -43,7 +43,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 10. [10/16] The Topics view model · ~280 · `T/domain/usecase/GetTopicsUseCase.kt`, `T/presentation/Topics*.kt`, `T/presentation/ReleaseDateFormat.kt`, `T/di/`
 
-- [ ] 10.1 Add the use case, the view model, the mapper and the Russian date format; verify with the tests for the rows, the short date, the empty list, the load error, Retry and a return
+- [x] 10.1 Add the use case, the view model, the mapper and the Russian date format; verify with the tests for the rows, the short date, the empty list, the load error, Retry and a return
 
 ## 11. [11/16] Topics and the sidebar · ~280 · `A/Main.kt`, `A/navigation/`, `A/ScreenCaptureTest.kt`, `T/presentation/ui/TopicsScreen.kt`
 
