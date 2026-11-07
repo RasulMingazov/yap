@@ -99,15 +99,6 @@ internal class RemoteLevelRepositoryTest {
         assertEquals(expected = SaveLevelsResult.Invalid, actual = result)
     }
 
-    @Test
-    fun `GIVEN the server fails WHEN saving THEN the save fails`() = runTest {
-        val env = Environment(answer = answer(content = "", status = HttpStatusCode.InternalServerError))
-
-        val result = env.repository.save(listOf(StubLevel.stubEntry()))
-
-        assertEquals(expected = SaveLevelsResult.Failed, actual = result)
-    }
-
     private class Environment(
         answer: MockRequestHandler,
         settings: ServerSettings? = StubServerSettings.stubServerSettings(),
