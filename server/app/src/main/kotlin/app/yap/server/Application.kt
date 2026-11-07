@@ -6,6 +6,7 @@ import app.yap.server.admin.serverRoutes
 import app.yap.server.config.AppConfig
 import app.yap.server.config.AppConfigLoader
 import app.yap.server.feature.characters.api.characterRoutes
+import app.yap.server.feature.levels.api.levelRoutes
 import app.yap.server.feature.topics.api.topicRoutes
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
@@ -55,6 +56,10 @@ internal fun Application.serverModule(
                 getCharacterUseCase = koin.get(),
                 getCharactersUseCase = koin.get(),
                 updateCharacterUseCase = koin.get(),
+            )
+            levelRoutes(
+                getLevelsUseCase = koin.get(),
+                saveLevelsUseCase = koin.get(),
             )
             topicRoutes(
                 createTopicUseCase = koin.get(),

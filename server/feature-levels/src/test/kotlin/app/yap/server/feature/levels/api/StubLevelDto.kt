@@ -14,6 +14,16 @@ internal object StubLevelDto {
         settings = settings,
     )
 
+    fun stubInputDtos(): List<LevelInputDto> = listOf(
+        stubInputDto(code = "A1", settings = stubSettingsDto(ratingFrom = 600)),
+        stubInputDto(code = "A2", settings = stubSettingsDto(ratingFrom = 900)),
+        stubInputDto(code = "B1"),
+        stubInputDto(code = "B2", settings = stubSettingsDto(ratingFrom = 1200)),
+        stubInputDto(code = "C1", settings = stubSettingsDto(ratingFrom = 1350)),
+        stubInputDto(code = "C2", settings = stubSettingsDto(ratingFrom = 1500)),
+        stubInputDto(code = "NO_RATING", settings = stubSettingsDto(ratingFrom = null)),
+    )
+
     fun stubSettingsDto(
         block: String = StubLevel.BLOCK,
         idioms: String = "RARELY",
