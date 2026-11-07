@@ -23,7 +23,8 @@ the images to `admin/build/screens/`:
 ./gradlew :admin:test --tests 'app.yap.admin.ScreenCaptureTest'
 ```
 
-The build runs it too, so a state that does not render fails the build.
+The build runs it too, so a state that does not render fails the build. The test task declares the
+folder as an output, so a test result from the build cache brings the images back too.
 
 ## Mobile
 

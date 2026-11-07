@@ -16,6 +16,10 @@ dependencies {
     testImplementation(libs.stubcall)
 }
 
+tasks.named<Test>("test") {
+    outputs.dir(layout.buildDirectory.dir("screens"))
+}
+
 compose.desktop {
     application {
         mainClass = "app.yap.admin.MainKt"

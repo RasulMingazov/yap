@@ -67,7 +67,7 @@ internal fun CharactersContent(
                     Text(
                         text = uiState.message,
                         color = AdminTheme.Colors.muted,
-                        fontSize = AdminTheme.Type.body,
+                        style = AdminTheme.Type.body,
                     )
                     NewCharacterButton(onClick = onNewCharacterClick)
                 }
@@ -100,13 +100,13 @@ private fun CharacterRows(
                     Text(
                         text = row.name,
                         color = AdminTheme.Colors.ink,
-                        fontSize = AdminTheme.Type.body,
+                        style = AdminTheme.Type.body,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
                         text = row.personality,
                         color = AdminTheme.Colors.muted,
-                        fontSize = AdminTheme.Type.sub,
+                        style = AdminTheme.Type.sub,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )

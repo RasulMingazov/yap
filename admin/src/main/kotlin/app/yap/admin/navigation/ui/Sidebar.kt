@@ -4,14 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,14 +34,13 @@ internal fun Sidebar(
             .width(AdminTheme.Sizes.sideWidth)
             .fillMaxHeight()
             .background(AdminTheme.Colors.side)
-            .padding(AdminTheme.Sizes.sidePadding),
-        verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
+            .padding(
+                start = AdminTheme.Sizes.sidePadding,
+                end = AdminTheme.Sizes.sidePadding,
+                bottom = AdminTheme.Sizes.sideBottomPadding,
+            ),
     ) {
-        Text(
-            text = "Yap admin",
-            color = AdminTheme.Colors.ink,
-            fontWeight = FontWeight.SemiBold,
-        )
+        Brand()
         SidebarGroup(title = "Контент") {
             SidebarItem(
                 current = current,
@@ -58,7 +61,31 @@ internal fun Sidebar(
         Text(
             text = serverLabel,
             color = AdminTheme.Colors.muted,
-            fontSize = AdminTheme.Type.small,
+            style = AdminTheme.Type.small,
+            modifier = Modifier.padding(horizontal = AdminTheme.Sizes.sideItemPadding),
+        )
+    }
+}
+
+@Composable
+private fun Brand() {
+    Row(
+        modifier = Modifier
+            .height(AdminTheme.Sizes.toolbarHeight)
+            .padding(horizontal = AdminTheme.Sizes.sideItemPadding),
+        horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.brandGap),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "Yap",
+            color = AdminTheme.Colors.ink,
+            style = AdminTheme.Type.brand,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = "admin",
+            color = AdminTheme.Colors.muted,
+            style = AdminTheme.Type.brand,
         )
     }
 }
@@ -68,13 +95,20 @@ private fun SidebarGroup(
     title: String,
     items: @Composable () -> Unit,
 ) {
-    Column {
+    Column(modifier = Modifier.padding(bottom = AdminTheme.Sizes.sideGroupGap)) {
         Text(
             text = title,
             color = AdminTheme.Colors.muted,
-            fontSize = AdminTheme.Type.small,
+            style = AdminTheme.Type.small,
+            modifier = Modifier.padding(
+                start = AdminTheme.Sizes.sideItemPadding,
+                end = AdminTheme.Sizes.sideItemPadding,
+                bottom = AdminTheme.Sizes.sideGroupTitlePadding,
+            ),
         )
-        items()
+        Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.sideItemGap)) {
+            items()
+        }
     }
 }
 
@@ -89,13 +123,15 @@ private fun SidebarItem(
     Text(
         text = label,
         color = if (isCurrent) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
-        fontSize = AdminTheme.Type.body,
+        style = AdminTheme.Type.body,
         fontWeight = FontWeight.Medium,
         modifier = Modifier
             .fillMaxWidth()
+            .height(AdminTheme.Sizes.sideItemHeight)
             .clip(RoundedCornerShape(AdminTheme.Sizes.cornerRadius))
             .background(if (isCurrent) AdminTheme.Colors.selected else Color.Transparent)
             .clickable { onScreenClick(screen) }
-            .padding(AdminTheme.Sizes.sideItemPadding),
+            .padding(horizontal = AdminTheme.Sizes.sideItemPadding)
+            .wrapContentHeight(Alignment.CenterVertically),
     )
 }

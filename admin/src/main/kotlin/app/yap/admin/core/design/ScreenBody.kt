@@ -16,7 +16,12 @@ internal fun ScreenBody(content: @Composable ColumnScope.() -> Unit) {
         modifier = Modifier
             .widthIn(max = AdminTheme.Sizes.contentMaxWidth)
             .verticalScroll(rememberScrollState())
-            .padding(AdminTheme.Sizes.contentPadding),
+            .padding(
+                start = AdminTheme.Sizes.contentPadding,
+                top = AdminTheme.Sizes.contentTopPadding,
+                end = AdminTheme.Sizes.contentPadding,
+                bottom = AdminTheme.Sizes.contentBottomPadding,
+            ),
         verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
         content = content,
     )
