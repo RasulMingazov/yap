@@ -80,6 +80,14 @@ val news: Flow<News> = newsChannel.receiveAsFlow()
 
 A blank line separates one pair from the next, never the two halves of a pair.
 
+## Extension functions
+
+- Write an extension for a type you do not own, such as `Modifier.pullStart()`, or for a mapping
+  that belongs to another layer, such as `CharacterDto.toDomain()`.
+- Put the behavior of your own type into the type as a member, such as `val isDraftReady`.
+- Give a function one job. Cleaning input and checking a rule are two functions.
+- Return a typed outcome, not `null`, when the caller must know why the input fails.
+
 ## Early returns
 
 Prefer guard clauses when they remove nesting and make preconditions visible before the happy path. Do not split a short, already-clear expression into several returns, do not use labeled or non-local returns that obscure control flow, and preserve exhaustive `when` expressions when every outcome must be handled.

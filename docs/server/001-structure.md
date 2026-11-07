@@ -13,7 +13,8 @@ shared infrastructure stays feature-independent.
   depend on `core-*`.
 
 Core modules never depend on features. Features never depend on `app`. A feature uses another
-feature only through that feature's use cases, and the dependency has no cycle.
+feature only through that feature's use cases and the model types in their signatures, and the
+dependency has no cycle.
 
 A module that needs settings owns their type, such as `DatabaseConfig` in `core-database`. `app`
 reads the values and builds it at start.
@@ -61,6 +62,8 @@ internal class PublishTopicUseCase(
 ## Routes and adapters
 
 - Routes validate and translate HTTP only, then call a use case.
+- The DTO mapper normalizes text input, such as trimming spaces, so the model and the use cases
+  get clean values. The model holds no `trimmed()` functions.
 - Use [shared DTOs](../shared/README.md) for admin payloads. Keep server-only HTTP contracts beside
   their routes.
 - The route answers each outcome of its use case with a status, in a `when` over the outcome:
