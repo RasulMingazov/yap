@@ -6,6 +6,7 @@ plugins {
 dependencies {
     api(libs.exposed.core)
     api(libs.exposed.jdbc)
+    api(libs.koin.core)
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
     implementation(libs.hikaricp)

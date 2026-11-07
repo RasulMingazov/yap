@@ -7,3 +7,4 @@ All Kotlin in this area also follows [Code conventions](../001-code-conventions.
 | --- | --- |
 | [Structure](001-structure.md) | modules, app composition, routes, use cases, adapters, or visibility |
 | [Persistence](002-persistence.md) | repositories, tables, migrations, transactions, or persistence failures |
+| [Dependency injection](003-dependency-injection.md) | Koin modules, bindings, the composition root in `app`, or tests that start the app |

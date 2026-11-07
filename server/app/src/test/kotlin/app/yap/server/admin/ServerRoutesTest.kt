@@ -1,8 +1,8 @@
 package app.yap.server.admin
 
 import app.yap.server.StubAppConfig
+import app.yap.server.StubAppModules
 import app.yap.server.config.AppEnvironment
-import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import app.yap.server.serverModule
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -56,8 +56,8 @@ internal class ServerRoutesTest {
 
         fun install(application: Application) {
             application.serverModule(
-                characterRepository = StubCharacterRepository(),
                 config = config,
+                modules = StubAppModules.stubAppModules(),
             )
         }
     }

@@ -1,7 +1,6 @@
 package app.yap.server
 
 import app.yap.server.core.database.withTestDatabase
-import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -70,12 +69,10 @@ internal class ApplicationTest {
 
     private class Environment {
 
-        val characterRepository = StubCharacterRepository()
-
         fun install(application: Application) {
             application.serverModule(
-                characterRepository = characterRepository,
                 config = StubAppConfig.stubAppConfig(),
+                modules = StubAppModules.stubAppModules(),
             )
         }
     }
