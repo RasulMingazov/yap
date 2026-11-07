@@ -42,8 +42,8 @@ jobs:
                - Else run `gh api repos/REPO/compare/SHA...HEAD SHA --jq .status`. If the call fails, or the status is not "ahead", do a full review.
                - Else do an incremental review: review only the commits after SHA.
             2. Read the diff and the rules.
-               - Full review: read the diff with `gh pr diff`. Read CLAUDE.md. If the description says "Closes #N", read that issue with `gh issue view N --comments` and any OpenSpec change it names under openspec/changes/.
-               - Incremental review: read the diff with `gh api -H "Accept: application/vnd.github.diff" repos/REPO/compare/SHA...HEAD SHA`. Read CLAUDE.md. Read the issue and the OpenSpec change only if this diff changes the behaviour they specify.
+               - Full review: read the diff with `gh pr diff`. Read CLAUDE.md, docs/README.md and every guide in docs/ for the areas the diff touches. If the description says "Closes #N", read that issue with `gh issue view N --comments` and any OpenSpec change it names under openspec/changes/.
+               - Incremental review: read the diff with `gh api -H "Accept: application/vnd.github.diff" repos/REPO/compare/SHA...HEAD SHA`. Read CLAUDE.md and the guides in docs/ for the areas this diff touches. Read the issue and the OpenSpec change only if this diff changes the behaviour they specify.
             3. Read your earlier review threads and the author's replies with `gh api repos/REPO/pulls/PR NUMBER/comments`.
                - The author fixed the point: do not raise it again.
                - The author answered with a reason that holds: reply "Agreed." in that thread and drop the point.
@@ -52,7 +52,7 @@ jobs:
                Reply in a thread with `gh api repos/REPO/pulls/PR NUMBER/comments/COMMENT_ID/replies -f body=...`.
             4. Find new problems. Report only real ones:
                - bugs and wrong behaviour;
-               - breaks of a rule in CLAUDE.md (quote the rule);
+               - breaks of a rule in CLAUDE.md or a guide in docs/ (quote the rule);
                - code that does more or less than the issue or spec asks;
                - unused or speculative code.
                Skip style that Detekt already checks. Skip praise and summaries of the diff.
