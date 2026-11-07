@@ -36,8 +36,9 @@ Append a section with the date to the critique file:
 
 - **Guidance now**: what the caller must do differently from now on.
 - **Rule changes**: exact changes to a command or an agent file, with the reason.
-- **New issues**: a title and two lines each.
+- **Proposed issues**: a title and two lines each, only for a problem that will come back. The owner
+  decides whether to open them.
 - **Owner**: only what needs the owner: a hard rule broken, money or user data at risk, the product
   drifting from the design.
 
-Return the «Guidance now», «New issues» and «Owner» parts.
+Return the «Guidance now», «Proposed issues» and «Owner» parts.
