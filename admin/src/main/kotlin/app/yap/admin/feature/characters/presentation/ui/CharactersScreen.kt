@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTheme
+import app.yap.admin.core.design.EmptyMessage
 import app.yap.admin.core.design.LinkButton
 import app.yap.admin.core.design.LoadError
 import app.yap.admin.core.design.Loader
@@ -67,11 +68,7 @@ internal fun CharactersContent(
                     NewCharacterButton(onClick = onNewCharacterClick)
                 }
                 is UiState.Empty -> {
-                    Text(
-                        text = uiState.message,
-                        color = AdminTheme.Colors.muted,
-                        style = AdminTheme.Type.body,
-                    )
+                    EmptyMessage(text = uiState.message)
                     NewCharacterButton(onClick = onNewCharacterClick)
                 }
                 is UiState.Error -> LoadError(

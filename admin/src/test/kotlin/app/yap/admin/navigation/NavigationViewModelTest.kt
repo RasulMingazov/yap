@@ -41,16 +41,16 @@ internal class NavigationViewModelTest {
     }
 
     @Test
-    fun `GIVEN saved server settings WHEN the app starts THEN it opens Characters`() = runTest(dispatcher) {
+    fun `GIVEN saved server settings WHEN the app starts THEN it opens Topics`() = runTest(dispatcher) {
         val env = Environment(settings = StubServerSettings.stubServerSettings())
 
         advanceUntilIdle()
 
-        assertEquals(expected = Screen.Characters, actual = env.screen())
+        assertEquals(expected = Screen.Topics, actual = env.screen())
     }
 
     @Test
-    fun `GIVEN Characters is open WHEN Server is clicked THEN Server opens`() = runTest(dispatcher) {
+    fun `GIVEN Topics is open WHEN Server is clicked THEN Server opens`() = runTest(dispatcher) {
         val env = Environment(settings = StubServerSettings.stubServerSettings())
         advanceUntilIdle()
 

@@ -44,6 +44,12 @@ internal fun Sidebar(
         SidebarGroup(title = "Контент") {
             SidebarItem(
                 current = current,
+                label = "Темы",
+                onScreenClick = onScreenClick,
+                screen = Screen.Topics,
+            )
+            SidebarItem(
+                current = current,
                 label = "Персонажи",
                 onScreenClick = onScreenClick,
                 screen = Screen.Characters,

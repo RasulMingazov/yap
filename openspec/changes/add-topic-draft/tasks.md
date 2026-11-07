@@ -47,8 +47,8 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 11. [11/16] Topics and the sidebar · ~280 · `A/Main.kt`, `A/navigation/`, `A/ScreenCaptureTest.kt`, `T/presentation/ui/TopicsScreen.kt`
 
-- [ ] 11.1 Add the Topics screen without New topic and row clicks ([14/16] adds them), Topics before Characters and the start on Topics; verify with the navigation tests for both start screens
-- [ ] 11.2 Capture Topics with rows, empty, loading and the error; verify with the images
+- [x] 11.1 Add the Topics screen without New topic and row clicks ([14/16] adds them), Topics before Characters and the start on Topics; verify with the navigation tests for both start screens
+- [x] 11.2 Capture Topics with rows, empty, loading and the error; verify with the images
 
 ## 12. [12/16] The Topic use cases and state · ~260 · `T/domain/usecase/GetTopicUseCase.kt`, `SaveTopicUseCase.kt`, `T/presentation/TopicUiState*.kt`
 

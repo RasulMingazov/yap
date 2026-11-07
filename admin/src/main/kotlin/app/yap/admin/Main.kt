@@ -9,6 +9,7 @@ import app.yap.admin.core.design.AdminMaterialTheme
 import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.feature.characters.presentation.CharactersViewModel
 import app.yap.admin.feature.server.presentation.ServerViewModel
+import app.yap.admin.feature.topics.presentation.TopicsViewModel
 import app.yap.admin.navigation.NavigationViewModel
 import app.yap.admin.navigation.ui.AdminShell
 import org.koin.core.parameter.parametersOf
@@ -20,6 +21,7 @@ fun main() {
         val navigationViewModel = remember { koin.get<NavigationViewModel>() }
         val charactersViewModel = remember { koin.get<CharactersViewModel>() }
         val serverViewModel = remember { koin.get<ServerViewModel>() }
+        val topicsViewModel = remember { koin.get<TopicsViewModel>() }
         Window(
             onCloseRequest = {
                 koin.close()
@@ -38,6 +40,7 @@ fun main() {
                     characterViewModel = { characterId -> koin.get { parametersOf(characterId) } },
                     charactersViewModel = charactersViewModel,
                     serverViewModel = serverViewModel,
+                    topicsViewModel = topicsViewModel,
                     viewModel = navigationViewModel,
                 )
             }

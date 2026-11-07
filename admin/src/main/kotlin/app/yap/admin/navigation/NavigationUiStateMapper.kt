@@ -18,6 +18,7 @@ internal object NavigationUiStateMapper {
         is Screen.Character -> Screen.Characters
         is Screen.Characters,
         is Screen.Server,
+        is Screen.Topics,
         -> this
     }
 }

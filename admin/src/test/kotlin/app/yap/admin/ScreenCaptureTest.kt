@@ -19,14 +19,41 @@ import app.yap.admin.feature.server.domain.ServerConnection
 import app.yap.admin.feature.server.presentation.ServerUiStateMapper
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ui.ServerContent
+import app.yap.admin.feature.topics.domain.LoadTopicsResult
+import app.yap.admin.feature.topics.domain.StubTopic
+import app.yap.admin.feature.topics.presentation.TopicsUiStateMapper
+import app.yap.admin.feature.topics.presentation.TopicsViewModel
+import app.yap.admin.feature.topics.presentation.ui.TopicsContent
 import app.yap.admin.navigation.NavigationViewModel.Screen
 import app.yap.admin.navigation.ui.AdminFrame
 import java.io.File
+import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import org.jetbrains.skia.EncodedImageFormat
 
 internal class ScreenCaptureTest {
+
+    @Test
+    fun `GIVEN every state of Topics WHEN capturing THEN each state has an image`() {
+        val states = mapOf(
+            "loading" to TopicsViewModel.DataState(),
+            "empty" to TopicsViewModel.DataState(topics = LoadTopicsResult.Loaded(emptyList())),
+            "error" to TopicsViewModel.DataState(topics = LoadTopicsResult.Failed),
+            "content" to TopicsViewModel.DataState(topics = LoadTopicsResult.Loaded(TOPICS)),
+        )
+
+        val images = states.map { (state, dataState) ->
+            capture(name = "topics-$state", current = Screen.Topics) {
+                TopicsContent(
+                    onEvent = {},
+                    uiState = TopicsUiStateMapper.map(dataState),
+                )
+            }
+        }
+
+        assertTrue(images.all { image -> image.length() > 0 })
+    }
 
     @Test
     fun `GIVEN every state of Characters WHEN capturing THEN each state has an image`() {
@@ -169,5 +196,23 @@ internal class ScreenCaptureTest {
             .map(ServerViewModel.DataState(connection = ServerConnection.Connected(environment = "staging")))
             .serverLabel
         val SCREENS = File("build/screens")
+        val TOPICS = listOf(
+            StubTopic.stubTopic(),
+            StubTopic.stubTopic(
+                content = StubTopic.stubContent(
+                    releaseDate = LocalDate.of(2025, 10, 25),
+                    title = "A job interview for a junior designer role at a small studio that makes posters, " +
+                        "books and signs for museums, theatres, concert halls and the city libraries of the north",
+                ),
+                topicId = "5a4b3c2d-1e0f-4a9b-8c7d-6e5f4a3b2c1d",
+            ),
+            StubTopic.stubTopic(
+                content = StubTopic.stubContent(
+                    releaseDate = LocalDate.of(2025, 10, 26),
+                    title = "Small talk with a neighbour",
+                ),
+                topicId = "3c2b1a0f-9e8d-4c7b-a6f5-4e3d2c1b0a9f",
+            ),
+        )
     }
 }
