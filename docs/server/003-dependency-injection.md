@@ -30,7 +30,8 @@ fun featureCharactersModule(): Module = module {
 ## Composition root
 
 `app` owns it. `appModules(config)` lists every module. `serverModule(config, modules)` installs
-Koin, resolves each use case, and passes it to its route function. No other code touches Koin.
+Koin in its own context (`KoinIsolated`), resolves each use case, and passes it to its route
+function. No other code touches Koin.
 
 Koin stops with the application and runs every `onClose`, so the server needs no shutdown hook.
 

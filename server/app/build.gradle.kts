@@ -14,4 +14,10 @@ dependencies {
     testImplementation(testFixtures(project(":server:core-database")))
     testImplementation(testFixtures(project(":server:feature-characters")))
     testImplementation(libs.koin.test)
+
+    constraints {
+        implementation(libs.ktor.server.di) {
+            because("koin-ktor brings a ktor-server-di older than the Ktor version of the server")
+        }
+    }
 }

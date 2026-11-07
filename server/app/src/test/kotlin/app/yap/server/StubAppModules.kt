@@ -8,10 +8,8 @@ import org.koin.dsl.module
 
 internal object StubAppModules {
 
-    fun stubAppModules(
-        characterRepository: CharacterRepository = StubCharacterRepository(),
-    ): List<Module> = listOf(
+    fun stubAppModules(): List<Module> = listOf(
         featureCharactersModule(),
-        module { single<CharacterRepository> { characterRepository } },
+        module { single<CharacterRepository> { StubCharacterRepository() } },
     )
 }

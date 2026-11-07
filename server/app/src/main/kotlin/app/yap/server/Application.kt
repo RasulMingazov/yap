@@ -18,7 +18,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import org.koin.core.module.Module
 import org.koin.ktor.ext.getKoin
-import org.koin.ktor.plugin.Koin
+import org.koin.ktor.plugin.KoinIsolated
 
 fun main() {
     val config = AppConfigLoader().load()
@@ -35,7 +35,7 @@ internal fun Application.serverModule(
     config: AppConfig,
     modules: List<Module>,
 ) {
-    install(Koin) {
+    install(KoinIsolated) {
         modules(modules)
     }
     install(ContentNegotiation) {
