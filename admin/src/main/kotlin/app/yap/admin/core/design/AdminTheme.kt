@@ -57,8 +57,10 @@ internal object AdminTheme {
         val sideItemPadding = 10.dp
         val sidePadding = 12.dp
         val sideWidth = 200.dp
+        val toolbarActionsGap = 16.dp
         val toolbarHeight = 64.dp
         val toolbarTitleGap = 8.dp
+        val toolbarTitleMinWidth = 240.dp
         val windowHeight = 800.dp
         val windowWidth = 1280.dp
     }
