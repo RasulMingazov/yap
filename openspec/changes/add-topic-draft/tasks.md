@@ -19,7 +19,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 4. [4/16] The persistence · ~330 · `gradle/libs.versions.toml`, `server/feature-topics/src/main/resources/db/migration/V2__topics.sql`, `server/feature-topics/build.gradle.kts`, `S/persistence/`, `S/.../StubTopicRepository.kt` · `V2` merges before `V3` of #9; #10 reuses `exposed-java-time`
 
-- [ ] 4.1 Add `exposed-java-time`, `V2__topics.sql`, the tables and the Exposed repository; verify with the PostgreSQL tests for create, read, update with fewer steps, the step order, the list order, the guest and the clean bootstrap (CI runs them)
+- [x] 4.1 Add `exposed-java-time`, `V2__topics.sql`, the tables and the Exposed repository; verify with the PostgreSQL tests for create, read, update with fewer steps, the step order, the list order, the guest and the clean bootstrap (CI runs them)
 
 ## 5. [5/16] The use cases · ~215 · `server/feature-topics/build.gradle.kts` (`testImplementation(testFixtures(...))` of `:server:feature-characters`), `S/usecase/`
 
