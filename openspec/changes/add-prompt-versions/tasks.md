@@ -16,11 +16,11 @@ Starts after the #9 part with `V3__levels.sql` merges. That part starts after th
 
 ## 3. Server use cases (about 200 lines)
 
-- [ ] 3.1 Add the list, read, save and restore use cases and their outcomes. Files: `fp/usecase/`, `fp/model/` (the outcomes), `server/feature-prompts/src/testFixtures/` (`StubPromptRepository`). Verify with the use-case tests for the trimmed text, the empty text and the unknown version
+- [x] 3.1 Add the list, read, save and restore use cases and their outcomes. The save use case does not trim: the DTO mapper of 4.1 does, and the use case rejects an empty text. Files: `fp/usecase/`, `fp/model/` (the outcomes), `server/feature-prompts/build.gradle.kts`, `server/feature-prompts/src/testFixtures/` (`StubPromptRepository`, `StubPrompt`). Verify with the use-case tests for the empty text and the unknown version
 
 ## 4. Server admin API (about 330 lines)
 
-- [ ] 4.1 Add the prompt DTOs, the routes and their mount behind the admin key. Files: `contract-admin/src/main/kotlin/app/yap/contract/admin/Prompt*Dto.kt` (hot), `fp/api/PromptRoutes.kt`, `fp/api/PromptDtoMapper.kt`, `server/app/build.gradle.kts`, `server/app/src/main/kotlin/app/yap/server/Application.kt` (hot). Verify with the route tests for the six prompts of the list, 200, 201, 400, 401 and 404 for a key and for a version
+- [ ] 4.1 Add the prompt DTOs, the routes and their mount behind the admin key. Files: `contract-admin/src/main/kotlin/app/yap/contract/admin/Prompt*Dto.kt` (hot), `fp/api/PromptRoutes.kt`, `fp/api/PromptDtoMapper.kt`, `server/app/build.gradle.kts`, `server/app/src/main/kotlin/app/yap/server/Application.kt` (hot). The mapper trims the text of a save. Verify with the mapper test for the trimmed text and the route tests for the six prompts of the list, 200, 201, 400, 401 and 404 for a key and for a version
 
 ## 5. Admin data layer and use cases (about 380 lines)
 
