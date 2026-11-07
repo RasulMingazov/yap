@@ -13,7 +13,8 @@ shared infrastructure stays feature-independent.
   depend on `core-*`.
 
 Core modules never depend on features. Features never depend on `app`. A feature uses another
-feature only through that feature's use cases, and the dependency has no cycle.
+feature only through that feature's use cases and the model types in their signatures, and the
+dependency has no cycle.
 
 A module that needs settings owns their type, such as `DatabaseConfig` in `core-database`. `app`
 reads the values and builds it at start.
