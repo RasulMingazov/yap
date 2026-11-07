@@ -4,12 +4,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,7 +37,7 @@ internal fun ScreenToolbar(
     back: ToolbarBack? = null,
     subtitle: String? = null,
 ) {
-    Row(
+    FlowRow(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = AdminTheme.Sizes.toolbarHeight)
@@ -43,26 +45,39 @@ internal fun ScreenToolbar(
                 horizontal = AdminTheme.Sizes.contentPadding,
                 vertical = AdminTheme.Sizes.gap,
             ),
-        horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.toolbarTitleGap),
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.toolbarActionsGap),
+        verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
+        itemVerticalAlignment = Alignment.CenterVertically,
     ) {
-        back?.let { toolbarBack -> BackButton(toolbarBack = toolbarBack) }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                color = AdminTheme.Colors.ink,
-                style = AdminTheme.Type.title,
-                fontWeight = FontWeight.SemiBold,
-            )
-            subtitle?.let { text ->
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .widthIn(min = AdminTheme.Sizes.toolbarTitleMinWidth),
+            horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.toolbarTitleGap),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            back?.let { toolbarBack -> BackButton(toolbarBack = toolbarBack) }
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = text,
-                    color = AdminTheme.Colors.muted,
-                    style = AdminTheme.Type.sub,
+                    text = title,
+                    color = AdminTheme.Colors.ink,
+                    style = AdminTheme.Type.title,
+                    fontWeight = FontWeight.SemiBold,
                 )
+                subtitle?.let { text ->
+                    Text(
+                        text = text,
+                        color = AdminTheme.Colors.muted,
+                        style = AdminTheme.Type.sub,
+                    )
+                }
             }
         }
-        actions()
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
+            verticalAlignment = Alignment.CenterVertically,
+            content = actions,
+        )
     }
     HorizontalDivider(color = AdminTheme.Colors.line)
 }
