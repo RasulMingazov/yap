@@ -5,11 +5,12 @@ Koin declares each graph node once and resolves it by contract type.
 ```kotlin
 @HiddenFromObjC
 fun featureTopicModule(): Module = module {
-    single<TopicRepository> { DefaultTopicRepository(api = get<ApiClient>().createTopicApi()) }
+    single { get<ApiClient>().createTopicApi() }
+    singleOf(::DefaultTopicRepository) { bind<TopicRepository>() }
 
-    factory<GetTopicOfDayUseCase> { DefaultGetTopicOfDayUseCase(repository = get()) }
+    factoryOf(::DefaultGetTopicOfDayUseCase) { bind<GetTopicOfDayUseCase>() }
 
-    factory { TopicOfDayViewModel(getTopicOfDayUseCase = get()) }
+    factoryOf(::TopicOfDayViewModel)
 }
 ```
 
@@ -17,7 +18,11 @@ fun featureTopicModule(): Module = module {
   `core<Name>Module()`.
 - A Koin module function is public, because `shared` calls it, and hidden from Swift with
   `@HiddenFromObjC`.
-- Bind by contract type, never by implementation type.
+- Bind by contract type. Declare the implementation with `singleOf` or `factoryOf` and expose its
+  contract with `bind<Contract>()`. Consumers ask for the contract, never for the implementation.
+- Prefer that constructor form to a lambda: `verify()` reads the constructor of the declared class
+  and cannot see inside a lambda. Use a lambda only for a value that no public constructor builds,
+  such as `createTopicApi()`.
 - Use `single` for shared instances and `factory` for stateless collaborators and view models.
 - Pass configuration as module-function parameters, not through global state.
 - Release owned resources with `onClose`; a definition that opens a client, database, or socket

@@ -5,7 +5,7 @@ import app.yap.admin.feature.server.domain.repository.ServerSettingsRepository
 import java.util.prefs.Preferences
 
 internal class PreferencesServerSettingsRepository(
-    private val preferences: Preferences = Preferences.userRoot().node("app/yap/admin"),
+    private val preferences: Preferences,
 ) : ServerSettingsRepository {
 
     override suspend fun get(): ServerSettings? {

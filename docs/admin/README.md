@@ -10,3 +10,4 @@ admin app renders what the server returns and sends the owner's edits back.
 | --- | --- |
 | [View models](001-view-models.md) | screen state, events, one-shot output, or loading and errors |
 | [UI and Compose](002-ui-compose.md) | what belongs in `UiState` versus in a composable |
+| [Dependency injection](003-dependency-injection.md) | Koin modules, bindings, the composition root in `Main.kt`, or the graph test |
