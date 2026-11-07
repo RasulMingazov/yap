@@ -46,3 +46,31 @@ private fun StepDto.toDomain(): Step = Step(
     passWhen = passWhen,
     task = task,
 )
+
+internal fun TopicContent.toDto(): TopicContentDto = TopicContentDto(
+    description = description,
+    durationMinutes = durationMinutes,
+    interlocutor = interlocutor?.toDto(),
+    openingLine = openingLine.toDto(),
+    releaseDate = releaseDate?.toString(),
+    role = role,
+    setting = setting,
+    steps = steps.map { step -> step.toDto() },
+    title = title,
+)
+
+private fun Interlocutor.toDto(): InterlocutorDto = when (this) {
+    is Interlocutor.Cast -> InterlocutorDto.CastDto(characterId = characterId.value)
+    is Interlocutor.Guest -> InterlocutorDto.GuestDto(description = description)
+}
+
+private fun OpeningLine.toDto(): OpeningLineDto = OpeningLineDto(
+    english = english,
+    translation = translation,
+)
+
+private fun Step.toDto(): StepDto = StepDto(
+    outcome = outcome,
+    passWhen = passWhen,
+    task = task,
+)

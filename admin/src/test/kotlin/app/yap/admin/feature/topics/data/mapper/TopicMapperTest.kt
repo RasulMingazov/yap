@@ -55,4 +55,25 @@ internal class TopicMapperTest {
 
         assertNull(topic.content.durationMinutes)
     }
+
+    @Test
+    fun `GIVEN a guest WHEN mapping the content THEN the DTO holds that guest`() {
+        val content = StubTopic.stubContent(interlocutor = Interlocutor.Guest(description = "A tourist."))
+
+        val dto = content.toDto()
+
+        assertEquals(expected = InterlocutorDto.GuestDto(description = "A tourist."), actual = dto.interlocutor)
+    }
+
+    @Test
+    fun `GIVEN no date, duration or interlocutor WHEN mapping the content THEN the DTO has none of them`() {
+        val content = StubTopic.stubContent(durationMinutes = null, interlocutor = null, releaseDate = null)
+
+        val dto = content.toDto()
+
+        assertEquals(
+            expected = StubTopicDto.stubContentDto(durationMinutes = null, interlocutor = null, releaseDate = null),
+            actual = dto,
+        )
+    }
 }
