@@ -35,7 +35,7 @@ Files: `server/feature-levels/` `usecase/` and `api/`, `contract-admin/` level D
 Files: `admin/` `feature/levels/domain/` (models and repository interface) and
 `feature/levels/data/` (mapper and remote repository), and their tests.
 
-- [ ] 4.1 Add the admin levels repository; verify with mock engine tests for 200, 400, a call without saved settings and a failed call
+- [x] 4.1 Add the admin levels repository; verify with mock engine tests for 200, 400, a call without saved settings and a failed call
 
 ## 5. [5/7] Admin view model
 

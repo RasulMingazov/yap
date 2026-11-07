@@ -1,8 +1,8 @@
 package app.yap.admin.feature.characters.presentation
 
+import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.characters.domain.CharacterId
-import app.yap.admin.feature.characters.domain.LoadResult
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.StubCharacter
 import app.yap.admin.feature.characters.domain.usecase.StubGetCharacterUseCase

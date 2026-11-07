@@ -1,7 +1,7 @@
 package app.yap.admin.feature.characters.data.repository
 
+import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.feature.characters.domain.LoadResult
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.StubCharacter
 import app.yap.admin.feature.server.domain.ServerSettings
