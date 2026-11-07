@@ -1,5 +1,6 @@
 #!/bin/sh
-# merge-pr.sh <pr>: merges a reviewed PR when its checks pass, then cleans up after it.
+# merge-pr.sh <pr>: merges a PR when its checks pass and the Claude review of its head commit is
+# clean, then cleans up after it.
 # Prints one line per step. For the orchestrator; run it in the background.
 pr="${1:?usage: merge-pr.sh <pr>}"
 scripts="$(cd "$(dirname "$0")" && pwd)"
@@ -16,6 +17,9 @@ if [ "$(gh pr view "$pr" --json state -q .state)" != MERGED ]; then
     8) echo "WAIT · checks still running on #$pr"; exit 1 ;;
     *) echo "FAILED · checks of #$pr"; gh pr checks "$pr" 2>&1 | grep -v -E '\bpass\b' | head -10; exit 1 ;;
   esac
+  # A passing review check does not mean a clean review: read the review itself. A clean review
+  # also resolves the bot's threads, because the develop ruleset blocks a merge with an open thread.
+  node "$scripts/pr-review.mjs" "$pr" --resolve || exit 1
   # Move the PRs stacked on this branch to develop before the merge: when GitHub deletes the
   # branch at the merge, it can close them.
   [ -z "$release" ] && stacked="$(gh pr list --base "$branch" --state open --json number -q '.[].number')"
@@ -51,5 +55,11 @@ if [ -n "$worktree" ] && [ "$worktree" != "$main" ]; then
   if git worktree remove "$worktree" 2>/dev/null; then echo "WORKTREE removed · $worktree"; else echo "WORKTREE kept · $worktree"; fi
 fi
 git fetch -q origin develop
+# Reviewers read the main checkout: move it to the new develop when it is a clean develop checkout.
+if [ "$(git -C "$main" branch --show-current)" = develop ] && [ -z "$(git -C "$main" status --porcelain --untracked-files=no)" ]; then
+  git -C "$main" merge -q --ff-only origin/develop && echo "MAIN CHECKOUT · develop at $(git -C "$main" rev-parse --short HEAD)"
+else
+  echo "MAIN CHECKOUT kept · not a clean develop checkout"
+fi
 git merge-base --is-ancestor "$branch" origin/develop 2>/dev/null && git branch -D -q "$branch" && echo "LOCAL BRANCH deleted · $branch"
 exit 0

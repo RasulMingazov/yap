@@ -80,18 +80,20 @@ All in `docs/process/runs/<run>/`, local only.
    - in the first round, start `code-reviewer` with the path `reviews/pr-<n>-r1.md`;
    - when the diff touches a UI area of the profile, start `ux-review` and `ui-review`, and tell
      each to write its report to `reviews/pr-<n>-<agent>-r<k>.md` and return one line;
-   - watch the checks, then read only the first line of the last «Claude review:» comment;
+   - watch the PR (see «Watch») and read its output: the checks, the review and the open threads;
    - send the executor, in one message, the paths and «answer the open threads».
    Repeat until the Claude review says «No problems found», the checks pass and no finding is open.
    A thread with «Owner decision needed» waits for the owner: send a PushNotification and go on
    with other work.
 6. **Archive.** When the last part is clean, tell its executor to archive. A push that changes only
    `openspec/` needs no new review: wait for the `Build` run of that commit.
-7. **Merge.** With `Merge: on`, run `.claude/scripts/merge-pr.sh <pr>` in a background Bash. With
-   `Merge: off`, add the PR to «Ready to merge» in `REPORT.md`.
+7. **Merge.** With `Merge: on`, run `.claude/scripts/merge-pr.sh <pr>` in a background Bash. It
+   merges only after a clean Claude review of the head commit. It resolves the threads of the review
+   bot and updates the main checkout. With `Merge: off`, add the PR to «Ready to merge» in `REPORT.md`.
 
-**Watch.** For each push, start one background Bash `gh pr checks <pr> --watch --interval 60`. Its
-end wakes you; agents wake you themselves. Never poll.
+**Watch.** For each push, start one background Bash `.claude/scripts/pr-watch.sh <pr>`. It waits for
+the checks and for the Claude review of the head commit. Its end wakes you; agents wake you
+themselves. Never poll.
 
 **No new issues.** Never open an issue. The owner owns the backlog.
 
