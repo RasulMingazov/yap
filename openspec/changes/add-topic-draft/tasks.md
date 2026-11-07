@@ -35,7 +35,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 8. [8/16] The admin domain · ~170 · `T/domain/`, `T/data/mapper/`
 
-- [ ] 8.1 Add the domain model and the DTO mapper; verify with the mapper tests for both interlocutors, no date and no duration
+- [x] 8.1 Add the domain model and the DTO mapper; verify with the mapper tests for both interlocutors, no date and no duration
 
 ## 9. [9/16] The admin repository · ~270 · `T/domain/repository/`, `T/data/repository/`
 
