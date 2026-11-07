@@ -17,4 +17,7 @@ local.properties
 !.claude/settings.json
 !.claude/agents/
 !.claude/commands/
+!.claude/hooks/
+!.claude/scripts/
 !.claude/skills/
+docs/process/runs/
