@@ -11,8 +11,8 @@
 
 Starts after the #9 part with `V3__levels.sql` merges. That part starts after the #7 part with `V2__topics.sql` and `exposed-java-time`.
 
-- [ ] 2.1 Add `server/feature-prompts` with `PromptKey`, `PromptGroup`, `PromptVersion` and `Prompt`. Files: `settings.gradle.kts` (hot), `server/feature-prompts/build.gradle.kts`, `fp/model/`. Verify with `PromptKeyTest`: the six keys in order, their groups and the variables of each one, as the spec lists them
-- [ ] 2.2 Add `V4__prompts.sql`, the tables and the Exposed repository. Files: `server/feature-prompts/src/main/resources/db/migration/V4__prompts.sql` (hot, Flyway), `fp/persistence/PromptRepository.kt`, `fp/persistence/PromptTables.kt`, `fp/persistence/DatabasePromptRepository.kt`, `exposed-java-time` in `server/feature-prompts/build.gradle.kts`, and in `gradle/libs.versions.toml` (hot) only if #7 did not add it. Verify with the PostgreSQL tests for a read before a save, two saves, a restore, a save after a restore, an unknown version and the clean bootstrap (CI runs them)
+- [x] 2.1 Add `server/feature-prompts` with `PromptKey`, `PromptGroup`, `PromptVersion` and `Prompt`. Files: `settings.gradle.kts` (hot), `server/feature-prompts/build.gradle.kts`, `fp/model/`. Verify with `PromptKeyTest`: the six keys in order, their groups and the variables of each one, as the spec lists them
+- [x] 2.2 Add `V4__prompts.sql`, the tables and the Exposed repository. Files: `server/feature-prompts/src/main/resources/db/migration/V4__prompts.sql` (hot, Flyway), `fp/persistence/PromptRepository.kt`, `fp/persistence/PromptTables.kt`, `fp/persistence/DatabasePromptRepository.kt`, `exposed-java-time` in `server/feature-prompts/build.gradle.kts`, and in `gradle/libs.versions.toml` (hot) only if #7 did not add it. Verify with the PostgreSQL tests for a read before a save, two saves, a restore, a save after a restore, an unknown version and the clean bootstrap (CI runs them)
 
 ## 3. Server use cases (about 200 lines)
 
