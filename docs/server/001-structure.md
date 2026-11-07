@@ -6,7 +6,7 @@ shared infrastructure stays feature-independent.
 ## Modules
 
 - `app` owns the process lifecycle, the settings from environment variables and `.env`, shared
-  Ktor plugins, error mapping, `/health`, the admin key check, and manual graph construction.
+  Ktor plugins, error mapping, `/health`, the admin key check, and the Koin composition root.
 - `core-database` owns the connection, the migration bootstrap, and transactions, not feature tables.
 - `core-llm` owns the model provider interface and its adapters.
 - `feature-*` owns one product slice, such as `feature-characters` or `feature-topics`, and may
@@ -17,7 +17,7 @@ feature only through that feature's use cases and the model types in their signa
 dependency has no cycle.
 
 A module that needs settings owns their type, such as `DatabaseConfig` in `core-database`. `app`
-reads the values and builds it at start.
+reads the values, builds it at start, and passes it to the Koin module function of that module.
 
 Each module lives under `server/`, for example `server/app`.
 
@@ -77,6 +77,7 @@ internal class PublishTopicUseCase(
 - Keep provider-specific configuration in `core-llm`.
 - Preserve coroutine cancellation, and translate adapter failures at their boundary.
 - Default declarations to `internal`; widen visibility for a real boundary only.
-- Wire dependencies manually in `app`.
+- Wire dependencies with Koin: each module declares its bindings, and `app` lists the modules.
 
-Persistence rules follow [Server Persistence](002-persistence.md).
+Persistence rules follow [Server Persistence](002-persistence.md). Wiring rules follow
+[Server Dependency Injection](003-dependency-injection.md).

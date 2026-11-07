@@ -5,17 +5,9 @@ import app.yap.server.admin.installAdminAuthentication
 import app.yap.server.admin.serverRoutes
 import app.yap.server.config.AppConfig
 import app.yap.server.config.AppConfigLoader
-import app.yap.server.core.database.openDatabase
 import app.yap.server.feature.characters.api.characterRoutes
-import app.yap.server.feature.characters.persistence.CharacterRepository
-import app.yap.server.feature.characters.persistence.DatabaseCharacterRepository
-import app.yap.server.feature.characters.usecase.CreateCharacterUseCase
-import app.yap.server.feature.characters.usecase.GetCharacterUseCase
-import app.yap.server.feature.characters.usecase.GetCharactersUseCase
-import app.yap.server.feature.characters.usecase.UpdateCharacterUseCase
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
-import io.ktor.server.application.ApplicationStopped
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.engine.embeddedServer
@@ -24,43 +16,44 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import org.koin.core.module.Module
+import org.koin.ktor.ext.getKoin
+import org.koin.ktor.plugin.KoinIsolated
 
 fun main() {
     val config = AppConfigLoader().load()
-    val database = openDatabase(config.database)
-    runCatching {
-        embeddedServer(Netty, port = config.port) {
-            monitor.subscribe(ApplicationStopped) { database.close() }
-            serverModule(
-                characterRepository = DatabaseCharacterRepository(database),
-                config = config,
-            )
-        }
-            .start(wait = true)
+    embeddedServer(Netty, port = config.port) {
+        serverModule(
+            config = config,
+            modules = appModules(config),
+        )
     }
-        .onFailure { database.close() }
-        .getOrThrow()
+        .start(wait = true)
 }
 
 internal fun Application.serverModule(
-    characterRepository: CharacterRepository,
     config: AppConfig,
+    modules: List<Module>,
 ) {
+    install(KoinIsolated) {
+        modules(modules)
+    }
     install(ContentNegotiation) {
         json()
     }
     installStatusHandling()
     installAdminAuthentication(adminApiKey = config.adminApiKey)
 
+    val koin = getKoin()
     routing {
         get("/health") { call.respondText("ok") }
         authenticate(ADMIN_AUTHENTICATION) {
             serverRoutes(environment = config.environment)
             characterRoutes(
-                createCharacterUseCase = CreateCharacterUseCase(characterRepository = characterRepository),
-                getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
-                getCharactersUseCase = GetCharactersUseCase(characterRepository = characterRepository),
-                updateCharacterUseCase = UpdateCharacterUseCase(characterRepository = characterRepository),
+                createCharacterUseCase = koin.get(),
+                getCharacterUseCase = koin.get(),
+                getCharactersUseCase = koin.get(),
+                updateCharacterUseCase = koin.get(),
             )
         }
     }
