@@ -16,13 +16,8 @@ steps SHALL keep their order and SHALL be the same for every rating level.
 
 #### Scenario: A saved topic keeps its fields
 
-- **WHEN** the owner saves a topic with every field filled
-- **THEN** the server stores every field under the identifier of the topic
-
-#### Scenario: A restart
-
-- **WHEN** the server restarts after the owner saved a topic
-- **THEN** the admin API returns the topic with the same fields
+- **WHEN** the owner saves a topic with every field filled, and the server restarts
+- **THEN** the admin API returns every field under the identifier of the topic
 
 #### Scenario: The order of the steps
 
@@ -98,6 +93,12 @@ row for each topic, in the order of the server. Date SHALL show the short day of
 and the month, such as Fri, 24 Oct. A click on a title SHALL open the Topic screen of the topic.
 The toolbar SHALL have New topic.
 
+#### Scenario: Topics with rows
+
+- **WHEN** the server has topics for 24 and 25 October
+- **THEN** Topics shows them in the order of the server with the dates Fri, 24 Oct and Sat, 25 Oct,
+  and a click on a title opens the Topic screen of that topic
+
 #### Scenario: No topics yet
 
 - **WHEN** the server has no topics
@@ -138,6 +139,11 @@ toolbar SHALL have a back arrow to Topics, and Save draft with its status.
 
 - **WHEN** the owner picks a day in the date picker of Release date
 - **THEN** the popup shows that day with its day of the week, such as Friday, 24 October
+
+#### Scenario: Duration
+
+- **WHEN** the owner types a fourth digit or a letter into Duration
+- **THEN** the field does not take it
 
 #### Scenario: The topic does not load
 

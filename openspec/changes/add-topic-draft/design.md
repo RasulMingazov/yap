@@ -2,9 +2,8 @@
 
 ## Context
 
-`feature-characters` on the server and `feature/characters` in the admin app are the examples.
-Goal: the topic model that #8 publishes, #12 plays and #15 tries, with no second migration.
-Non-goals: a status column and one topic per date, which come with #8.
+`feature-characters` and the admin `feature/characters` are the examples. Goal: the topic model
+that #8, #12 and #15 use with no second migration. Not here: the status and one topic per date.
 
 ## Decisions
 
@@ -31,8 +30,6 @@ character, and return `Invalid` for either failure. Both apps use `java.time.Loc
 `position`, `task`, `pass_when`, `outcome`; cascade on delete). A guest with an empty description is
 `guest = ''`. An update writes the row, deletes the steps and inserts the new ones in one
 transaction. The list orders by `release_date`, then by `lower(title)`.
-
-### The wire contract
 
 `TopicContentDto` is the body of the create and the update calls. The date is an ISO string or
 null; a date that does not parse is a 400. `InterlocutorDto` is sealed: `character`
