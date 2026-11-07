@@ -4,6 +4,7 @@ import app.yap.server.core.database.withTestDatabase
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -42,6 +43,20 @@ internal class ApplicationTest {
         application { env.install(this) }
 
         val response = client.get("/admin/levels")
+
+        assertEquals(expected = HttpStatusCode.Unauthorized, actual = response.status)
+    }
+
+    @Test
+    fun `GIVEN a wrong admin key WHEN saving the levels THEN the call is unauthorized`() = testApplication {
+        val env = Environment()
+        application { env.install(this) }
+
+        val response = client.put("/admin/levels") {
+            bearerAuth("wrong-key")
+            contentType(ContentType.Application.Json)
+            setBody("[]")
+        }
 
         assertEquals(expected = HttpStatusCode.Unauthorized, actual = response.status)
     }
