@@ -17,42 +17,34 @@ Review. Calibration: Answer check and Sam's reply. The owner SHALL NOT add or re
 - **WHEN** the admin app lists the prompts
 - **THEN** the server returns the six prompts with their groups, in this order
 
-### Requirement: A prompt lists its variables
+### Requirement: A topic prompt lists its variables
 
-Each prompt SHALL list the variables that the server substitutes in its text. The list SHALL be
-fixed for each prompt. `{interlocutor}` SHALL describe a character of the cast or a guest.
-`{level.rules}` SHALL be the block of No rating in Sam's reply.
+Each prompt SHALL list the variables that the server substitutes in its text, in a fixed order. The
+topic prompts SHALL list:
 
-#### Scenario: The variables of Character reply
+- Character reply: `{interlocutor}`, `{topic.setting}`, `{topic.role}`, `{level.rules}`,
+  `{step.n}`, `{step.task}` and `{check.verdict}`.
+- Step check: `{step.task}`, `{step.passWhen}`, `{last.line}` and `{answers}`.
+- Hints: `{step.task}`, `{topic.setting}`, `{level.rules}` and `{hint.level}`.
+- Review: `{topic.title}`, `{steps}` and `{answers}`.
 
-- **WHEN** the admin app reads Character reply
-- **THEN** the server returns `{interlocutor}`, `{topic.setting}`, `{topic.role}`, `{level.rules}`,
-  `{step.n}`, `{step.task}` and `{check.verdict}`
+#### Scenario: The variables of a topic prompt
 
-#### Scenario: The variables of Step check
+- **WHEN** the admin app reads a topic prompt
+- **THEN** the server returns the variables of that prompt from this list, in this order
 
-- **WHEN** the admin app reads Step check
-- **THEN** the server returns `{step.task}`, `{step.passWhen}`, `{last.line}` and `{answers}`
+### Requirement: A calibration prompt lists its variables
 
-#### Scenario: The variables of Hints
+The calibration prompts SHALL list:
 
-- **WHEN** the admin app reads Hints
-- **THEN** the server returns `{step.task}`, `{topic.setting}`, `{level.rules}` and `{hint.level}`
+- Answer check: `{step.task}` and `{answer}`.
+- Sam's reply: `{step.n}`, `{level.rules}` and `{check.verdict}`. Here `{level.rules}` is the block
+  of No rating.
 
-#### Scenario: The variables of Review
+#### Scenario: The variables of a calibration prompt
 
-- **WHEN** the admin app reads Review
-- **THEN** the server returns `{topic.title}`, `{steps}` and `{answers}`
-
-#### Scenario: The variables of Answer check
-
-- **WHEN** the admin app reads Answer check
-- **THEN** the server returns `{step.task}` and `{answer}`
-
-#### Scenario: The variables of Sam's reply
-
-- **WHEN** the admin app reads Sam's reply
-- **THEN** the server returns `{step.n}`, `{level.rules}` and `{check.verdict}`
+- **WHEN** the admin app reads a calibration prompt
+- **THEN** the server returns the variables of that prompt from this list, in this order
 
 ### Requirement: No text until the first save
 
@@ -78,7 +70,7 @@ its start and its end are removed.
 #### Scenario: An empty text
 
 - **WHEN** the owner saves a text of spaces only
-- **THEN** the server rejects it and stores nothing
+- **THEN** the server answers 400 and stores nothing
 
 ### Requirement: Restore makes an older version current
 
@@ -119,11 +111,6 @@ Behind the admin key, the server SHALL:
 
 - **WHEN** the admin app reads an unknown prompt or restores an unknown version
 - **THEN** the server answers 404
-
-#### Scenario: An empty text
-
-- **WHEN** the admin app saves an empty text
-- **THEN** the server answers 400
 
 ### Requirement: The sidebar opens the prompts
 

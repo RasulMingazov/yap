@@ -23,11 +23,9 @@ change makes the replies worse (#10).
 Out of scope:
 
 - The use of the prompts and the substitution of the variables: #12, #13 and #14.
-- The calibration engine. No issue, not planned: the owner confirms.
 - Drafts and saved test conversations. Try at a topic is #15.
-- A note for each version. The canvas shows one, but the issue does not ask for it. No issue, not
-  planned: the owner confirms.
-- A check of the variables in the text. No issue, not planned: the owner confirms.
+- No issue, not planned, for the owner to confirm: the calibration engine, a note for each version
+  (the canvas shows one, the issue does not ask for it), and a check of the variables in the text.
 
 ## Capabilities
 
@@ -42,9 +40,6 @@ None.
 
 ## Impact
 
-- A new Gradle module `server/feature-prompts`.
-- The Flyway migration `V4__prompts.sql`. #7 takes `V2`, #9 takes `V3`. They merge in this order.
-- `exposed-java-time` for the time of a version. #7 adds it to the catalog first.
-- The screen part waits for the Topics part of #7 and the Levels screen part of #9.
-- `contract-admin` gets the prompt DTOs.
-- `admin` gets the Prompts screen and its data layer.
+- A new module `server/feature-prompts` with `V4__prompts.sql`, after `V2` of #7 and `V3` of #9.
+- `contract-admin` gets the prompt DTOs. `admin` gets the Prompts screen and its data layer.
+- The parts wait for parts of #7 and #9, as `tasks.md` says.
