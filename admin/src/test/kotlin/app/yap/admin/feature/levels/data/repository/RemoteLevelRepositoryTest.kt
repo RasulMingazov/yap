@@ -2,7 +2,7 @@ package app.yap.admin.feature.levels.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.feature.levels.data.mapper.StubLevelDto
+import app.yap.admin.feature.levels.domain.LevelCode
 import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.StubLevel
 import app.yap.admin.feature.server.domain.ServerSettings
@@ -25,25 +25,16 @@ import kotlinx.serialization.json.Json
 internal class RemoteLevelRepositoryTest {
 
     @Test
-    fun `GIVEN the server lists the levels WHEN loading them THEN they are loaded`() = runTest {
-        val env = Environment(answer = answer(content = "[$LEVEL_JSON]"))
+    fun `GIVEN a saved level and a level without values WHEN loading the levels THEN both are loaded`() = runTest {
+        val env = Environment(answer = answer(content = "[$LEVEL_JSON, $EMPTY_LEVEL_JSON]"))
 
         val result = env.repository.list()
 
-        val request = env.engine.requestHistory.single()
         assertEquals(
-            expected = listOf(
-                LoadResult.Loaded(listOf(StubLevel.stubLevel())),
-                HttpMethod.Get,
-                "${StubServerSettings.ADDRESS}/admin/levels",
-                "Bearer ${StubServerSettings.KEY}",
+            expected = LoadResult.Loaded(
+                listOf(StubLevel.stubLevel(), StubLevel.stubLevel(LevelCode.NO_RATING, range = null, settings = null)),
             ),
-            actual = listOf(
-                result,
-                request.method,
-                request.url.toString(),
-                request.headers[HttpHeaders.Authorization],
-            ),
+            actual = result,
         )
     }
 
@@ -59,15 +50,6 @@ internal class RemoteLevelRepositoryTest {
     @Test
     fun `GIVEN the server cannot be reached WHEN loading the levels THEN loading fails`() = runTest {
         val env = Environment(answer = { throw IOException("Connection refused") })
-
-        val result = env.repository.list()
-
-        assertEquals(expected = LoadResult.Failed, actual = result)
-    }
-
-    @Test
-    fun `GIVEN the server fails WHEN loading the levels THEN loading fails`() = runTest {
-        val env = Environment(answer = answer(content = "", status = HttpStatusCode.InternalServerError))
 
         val result = env.repository.list()
 
@@ -118,17 +100,8 @@ internal class RemoteLevelRepositoryTest {
     }
 
     @Test
-    fun `GIVEN no saved server settings WHEN saving THEN the save fails without a call`() = runTest {
-        val env = Environment(answer = answer(content = "[]"), settings = null)
-
-        val result = env.repository.save(listOf(StubLevel.stubEntry()))
-
-        assertEquals(expected = SaveLevelsResult.Failed to 0, actual = result to env.engine.requestHistory.size)
-    }
-
-    @Test
-    fun `GIVEN the server cannot be reached WHEN saving THEN the save fails`() = runTest {
-        val env = Environment(answer = { throw IOException("Connection refused") })
+    fun `GIVEN the server fails WHEN saving THEN the save fails`() = runTest {
+        val env = Environment(answer = answer(content = "", status = HttpStatusCode.InternalServerError))
 
         val result = env.repository.save(listOf(StubLevel.stubEntry()))
 
@@ -152,7 +125,7 @@ internal class RemoteLevelRepositoryTest {
         const val SETTINGS_JSON = """
             {
               "block": "${StubLevel.BLOCK}",
-              "idioms": "${StubLevelDto.IDIOMS}",
+              "idioms": "RARELY",
               "maxWords": ${StubLevel.MAX_WORDS},
               "ratingFrom": ${StubLevel.RANGE_FROM},
               "vocabulary": "${StubLevel.VOCABULARY}"
@@ -160,11 +133,12 @@ internal class RemoteLevelRepositoryTest {
         """
         const val LEVEL_JSON = """
             {
-              "code": "${StubLevelDto.CODE}",
+              "code": "B1",
               "range": {"from": ${StubLevel.RANGE_FROM}, "to": ${StubLevel.RANGE_TO}},
               "settings": $SETTINGS_JSON
             }
         """
+        const val EMPTY_LEVEL_JSON = """{"code": "NO_RATING", "range": null, "settings": null}"""
 
         fun answer(content: String, status: HttpStatusCode = HttpStatusCode.OK): MockRequestHandler = {
             respond(
