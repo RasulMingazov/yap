@@ -3,11 +3,11 @@ package app.yap.admin
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.unit.Density
+import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.design.AdminMaterialTheme
 import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.core.design.ToolbarBack
 import app.yap.admin.feature.characters.domain.CharacterId
-import app.yap.admin.feature.characters.domain.LoadResult
 import app.yap.admin.feature.characters.domain.StubCharacter
 import app.yap.admin.feature.characters.presentation.CharacterUiStateMapper
 import app.yap.admin.feature.characters.presentation.CharacterViewModel

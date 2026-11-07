@@ -1,4 +1,4 @@
-package app.yap.admin.feature.characters.domain
+package app.yap.admin.core.common
 
 internal sealed interface LoadResult<out T> {
 

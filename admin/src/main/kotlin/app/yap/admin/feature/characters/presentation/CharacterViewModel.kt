@@ -2,11 +2,11 @@ package app.yap.admin.feature.characters.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.presentation.Status
 import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.CharacterProfile
-import app.yap.admin.feature.characters.domain.LoadResult
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.usecase.GetCharacterUseCase
 import app.yap.admin.feature.characters.domain.usecase.SaveCharacterUseCase

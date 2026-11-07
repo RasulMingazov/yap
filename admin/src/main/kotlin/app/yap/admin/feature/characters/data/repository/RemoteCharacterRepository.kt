@@ -1,15 +1,16 @@
 package app.yap.admin.feature.characters.data.repository
 
-import app.yap.admin.core.common.runSuspendCatching
+import app.yap.admin.core.common.LoadResult
+import app.yap.admin.core.network.callServer
+import app.yap.admin.core.network.toLoadResult
+import app.yap.admin.core.network.url
 import app.yap.admin.feature.characters.data.mapper.toDomain
 import app.yap.admin.feature.characters.data.mapper.toDto
 import app.yap.admin.feature.characters.domain.Character
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.CharacterProfile
-import app.yap.admin.feature.characters.domain.LoadResult
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.repository.CharacterRepository
-import app.yap.admin.feature.server.domain.ServerSettings
 import app.yap.admin.feature.server.domain.repository.ServerSettingsRepository
 import app.yap.contract.admin.CharacterDto
 import io.ktor.client.HttpClient
@@ -29,7 +30,7 @@ internal class RemoteCharacterRepository(
     private val serverSettingsRepository: ServerSettingsRepository,
 ) : CharacterRepository {
 
-    override suspend fun create(profile: CharacterProfile): SaveCharacterResult = request(
+    override suspend fun create(profile: CharacterProfile): SaveCharacterResult = serverSettingsRepository.callServer(
         failed = SaveCharacterResult.Failed,
         read = { response -> response.toSaveResult() },
         send = { settings ->
@@ -41,7 +42,7 @@ internal class RemoteCharacterRepository(
         },
     )
 
-    override suspend fun find(characterId: CharacterId): LoadResult<Character> = request(
+    override suspend fun find(characterId: CharacterId): LoadResult<Character> = serverSettingsRepository.callServer(
         failed = LoadResult.Failed,
         read = { response -> response.toLoadResult { body<CharacterDto>().toDomain() } },
         send = { settings ->
@@ -49,7 +50,7 @@ internal class RemoteCharacterRepository(
         },
     )
 
-    override suspend fun list(): LoadResult<List<Character>> = request(
+    override suspend fun list(): LoadResult<List<Character>> = serverSettingsRepository.callServer(
         failed = LoadResult.Failed,
         read = { response ->
             response.toLoadResult {
@@ -60,7 +61,7 @@ internal class RemoteCharacterRepository(
         send = { settings -> httpClient.get(settings.url(CHARACTERS_PATH)) { bearerAuth(settings.key) } },
     )
 
-    override suspend fun update(character: Character): SaveCharacterResult = request(
+    override suspend fun update(character: Character): SaveCharacterResult = serverSettingsRepository.callServer(
         failed = SaveCharacterResult.Failed,
         read = { response -> response.toSaveResult() },
         send = { settings ->
@@ -72,16 +73,6 @@ internal class RemoteCharacterRepository(
         },
     )
 
-    private suspend fun <T> request(
-        failed: T,
-        read: suspend (HttpResponse) -> T,
-        send: suspend (ServerSettings) -> HttpResponse,
-    ): T {
-        val settings = serverSettingsRepository.get() ?: return failed
-        return runSuspendCatching { read(send(settings)) }
-            .getOrElse { failed }
-    }
-
     private suspend fun HttpResponse.toSaveResult(): SaveCharacterResult = when (status) {
         HttpStatusCode.OK,
         HttpStatusCode.Created,
@@ -89,11 +80,6 @@ internal class RemoteCharacterRepository(
         HttpStatusCode.BadRequest -> SaveCharacterResult.Invalid
         else -> SaveCharacterResult.Failed
     }
-
-    private suspend fun <T> HttpResponse.toLoadResult(read: suspend HttpResponse.() -> T): LoadResult<T> =
-        if (status == HttpStatusCode.OK) LoadResult.Loaded(read()) else LoadResult.Failed
-
-    private fun ServerSettings.url(path: String): String = "${address.trimEnd('/')}$path"
 
     private companion object {
 
