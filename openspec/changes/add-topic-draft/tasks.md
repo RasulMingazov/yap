@@ -17,11 +17,11 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 - [x] 3.1 Add the module, the model and the draft rule; verify with the model tests for the trim, the empty step, no title, no date, a zero duration and an empty guest
 
-## 4. [4/16] The persistence · ~330 · `gradle/libs.versions.toml`, `server/feature-topics/src/main/resources/db/migration/V2__topics.sql`, `server/feature-topics/build.gradle.kts`, `S/persistence/`, `S/.../StubTopicRepository.kt` · `V2` merges before `V3` of #9; #10 reuses `exposed-java-time`
+## 4. [4/16] The persistence · ~400 · `gradle/libs.versions.toml`, `server/feature-topics/src/main/resources/db/migration/V2__topics.sql`, `server/feature-topics/build.gradle.kts`, `S/persistence/` · `V2` merges before `V3` of #9; #10 reuses `exposed-java-time`
 
-- [ ] 4.1 Add `exposed-java-time`, `V2__topics.sql`, the tables and the Exposed repository; verify with the PostgreSQL tests for create, read, update with fewer steps, the step order, the list order, the guest and the clean bootstrap (CI runs them)
+- [x] 4.1 Add `exposed-java-time`, `V2__topics.sql`, the tables and the Exposed repository; verify with the PostgreSQL tests for create, read, update with fewer steps, the step order, the list order, the guest and the clean bootstrap (CI runs them)
 
-## 5. [5/16] The use cases · ~215 · `server/feature-topics/build.gradle.kts` (`testImplementation(testFixtures(...))` of `:server:feature-characters`), `S/usecase/`
+## 5. [5/16] The use cases · ~240 · `server/feature-topics/build.gradle.kts` (`testFixturesApi(libs.stubcall)` and `testImplementation(testFixtures(...))` of `:server:feature-characters`), `S/usecase/`, `S/persistence/StubTopicRepository.kt` (moved from [4/16], so its first consumer adds it)
 
 - [ ] 5.1 Add the list, read, create and update use cases; verify with the stub tests for the trimmed content, the rejected content, the unknown character and the unknown topic
 
