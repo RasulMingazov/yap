@@ -9,22 +9,25 @@ change makes the replies worse (#10).
 
 - The server knows six prompts. Topic: Character reply, Step check, Hints, Review. Calibration:
   Answer check, Sam's reply.
-- Each prompt lists the variables that the server substitutes, such as `{character.name}`.
+- Each prompt lists the variables that the server substitutes, such as `{interlocutor}`. The design
+  gives the value of each variable for #12, #13 and #14.
 - The server does not seed the texts. A prompt has no text until the owner saves its first version.
 - Save makes a new version of a prompt, and the new version is current at once.
 - Restore makes an older version current again.
 - The admin API lists the prompts, reads one prompt with its versions, saves a version and restores
   a version, behind the admin key.
 - The admin app gets the Prompts screen: the list grouped as Topic and Calibration, the editor, the
-  variables and Versions. The sidebar shows Prompts in the group Rules.
+  variables and Versions. The sidebar shows Prompts in the group Rules that #9 adds. Save uses the
+  toolbar actions slot that #7 adds.
 
 Out of scope:
 
 - The use of the prompts and the substitution of the variables: #12, #13 and #14.
-- The calibration engine.
+- The calibration engine. No issue, not planned: the owner confirms.
 - Drafts and saved test conversations. Try at a topic is #15.
-- A note for each version. The canvas shows one, but the issue does not ask for it.
-- A check of the variables in the text.
+- A note for each version. The canvas shows one, but the issue does not ask for it. No issue, not
+  planned: the owner confirms.
+- A check of the variables in the text. No issue, not planned: the owner confirms.
 
 ## Capabilities
 
@@ -40,7 +43,8 @@ None.
 ## Impact
 
 - A new Gradle module `server/feature-prompts`.
-- The Flyway migration `V4__prompts.sql`. #7 takes `V2`, #9 takes `V3`.
-- `exposed-java-time` for the time of a version.
+- The Flyway migration `V4__prompts.sql`. #7 takes `V2`, #9 takes `V3`. They merge in this order.
+- `exposed-java-time` for the time of a version. #7 adds it to the catalog first.
+- The screen part waits for the Topics part of #7 and the Levels screen part of #9.
 - `contract-admin` gets the prompt DTOs.
 - `admin` gets the Prompts screen and its data layer.

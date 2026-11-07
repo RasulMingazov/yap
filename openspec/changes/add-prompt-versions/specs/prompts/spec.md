@@ -20,13 +20,14 @@ Review. Calibration: Answer check and Sam's reply. The owner SHALL NOT add or re
 ### Requirement: A prompt lists its variables
 
 Each prompt SHALL list the variables that the server substitutes in its text. The list SHALL be
-fixed for each prompt.
+fixed for each prompt. `{interlocutor}` SHALL describe a character of the cast or a guest.
+`{level.rules}` SHALL be the block of No rating in Sam's reply.
 
 #### Scenario: The variables of Character reply
 
 - **WHEN** the admin app reads Character reply
-- **THEN** the server returns `{character.name}`, `{character.personality}`, `{character.manner}`, `{topic.setting}`,
-  `{topic.role}`, `{level.rules}`, `{step.n}`, `{step.task}` and `{check.verdict}`
+- **THEN** the server returns `{interlocutor}`, `{topic.setting}`, `{topic.role}`, `{level.rules}`,
+  `{step.n}`, `{step.task}` and `{check.verdict}`
 
 #### Scenario: The variables of Step check
 
@@ -51,7 +52,7 @@ fixed for each prompt.
 #### Scenario: The variables of Sam's reply
 
 - **WHEN** the admin app reads Sam's reply
-- **THEN** the server returns `{step.n}` and `{check.verdict}`
+- **THEN** the server returns `{step.n}`, `{level.rules}` and `{check.verdict}`
 
 ### Requirement: No text until the first save
 
@@ -102,7 +103,7 @@ The server SHALL keep the versions in its database.
 
 Behind the admin key, the server SHALL:
 
-- list the prompts with their groups and current version numbers at `GET /admin/prompts`;
+- list the prompts with their groups, in order, at `GET /admin/prompts`;
 - return a prompt with its variables, its current text and its versions at
   `GET /admin/prompts/{promptKey}`;
 - save a version and return the prompt at `POST /admin/prompts/{promptKey}/versions`;
@@ -175,7 +176,8 @@ app SHALL show the prompt that the server returns, and a Saved status for Save.
 #### Scenario: An empty text
 
 - **WHEN** the owner clicks Save with an empty editor
-- **THEN** the admin app shows an error beside Save that asks for the text
+- **THEN** the admin app sends the text, the server answers 400, and the admin app shows an error
+  beside Save that asks for the text
 
 #### Scenario: Restore
 
