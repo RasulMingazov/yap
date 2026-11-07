@@ -19,4 +19,11 @@ internal class ReleaseDateFormatTest {
 
         assertEquals(expected = "Пн, 4 мая", actual = text)
     }
+
+    @Test
+    fun `GIVEN a Friday in October WHEN formatting long THEN it shows the full weekday and the month in genitive`() {
+        val text = ReleaseDateFormat.long(LocalDate.of(2025, 10, 24))
+
+        assertEquals(expected = "Пятница, 24 октября", actual = text)
+    }
 }
