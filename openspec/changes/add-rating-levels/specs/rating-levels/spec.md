@@ -43,8 +43,24 @@ next level. The range of C2 SHALL have no end. No rating SHALL have no range.
 ### Requirement: The owner saves every level at once
 
 Save SHALL replace the values of all seven levels. The server SHALL remove the spaces at the start
-and at the end of the vocabulary and the block. It SHALL reject the save when a value is empty, when
-the maximum words is not greater than zero, or when the rating from does not grow from A1 to C2.
+and at the end of the vocabulary and the block. It SHALL reject the save when a level is missing or
+comes twice, when a value is empty, when the maximum words is not greater than zero, when No rating
+has a rating from, or when the rating from does not grow from A1 to C2.
+
+#### Scenario: A save without C2
+
+- **WHEN** the owner saves the levels without C2
+- **THEN** the server rejects the save and keeps the levels as they were
+
+#### Scenario: A block of only spaces
+
+- **WHEN** the owner saves the levels with a block of only spaces for B1
+- **THEN** the server rejects the save and keeps the levels as they were
+
+#### Scenario: No rating with a rating from
+
+- **WHEN** the owner saves No rating with a rating from
+- **THEN** the server rejects the save and keeps the levels as they were
 
 #### Scenario: An empty block
 
@@ -55,6 +71,21 @@ the maximum words is not greater than zero, or when the rating from does not gro
 
 - **WHEN** the owner saves B2 with a rating from below the rating from of B1
 - **THEN** the server rejects the save and keeps the levels as they were
+
+### Requirement: The level block is the value of `{level.rules}`
+
+The server SHALL give the saved block of a level as the value of `{level.rules}` for that level. A
+level without saved values SHALL have no value.
+
+#### Scenario: A changed block
+
+- **WHEN** the owner saves a new block for B1
+- **THEN** the value of `{level.rules}` for B1 is the new block
+
+#### Scenario: A level before a save
+
+- **WHEN** the owner did not save the levels yet
+- **THEN** `{level.rules}` has no value for any level
 
 ### Requirement: Levels stay after a restart
 
@@ -100,7 +131,7 @@ the block into the reply and hints prompts as `{level.rules}`.
 #### Scenario: The first open
 
 - **WHEN** the owner opens Levels
-- **THEN** A1 is the chosen level and its prompt block shows below the table
+- **THEN** B1 is the chosen level and its prompt block shows below the table
 
 #### Scenario: A click on a level
 
