@@ -80,7 +80,7 @@ transaction. A read returns all seven codes, each with its row or with no settin
   shows it.
 - Rating shows the range from the server as text, and below it the field for the rating from. An
   unsaved level shows no range.
-- The Russian names of the idioms come from the canvas: нет, редко, иногда, да.
+- The screen takes the names of the idioms from the canvas.
 
 ### Tests
 
