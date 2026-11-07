@@ -50,12 +50,14 @@ console.log(`REVIEW ${clean ? "CLEAN" : "PROBLEMS"} · ${head.slice(0, 7)} · ${
 
 let left = 0;
 for (const thread of open) {
-  if (flag === "--resolve" && clean && isDone(thread.comments.nodes) && resolve(thread.id)) {
+  const result = flag === "--resolve" && clean && isDone(thread.comments.nodes) ? resolve(thread.id) : null;
+  if (result?.ok) {
     console.log(`RESOLVED ${where(thread)}`);
-  } else {
-    printThread(thread);
-    left++;
+    continue;
   }
+  if (result) console.log(`NOT RESOLVED ${where(thread)} · ${result.err.split("\n")[0]}`);
+  else printThread(thread);
+  left++;
 }
 process.exit(clean && (flag !== "--resolve" || left === 0) ? 0 : 1);
 
@@ -71,10 +73,12 @@ function isBot(author) {
 
 // A thread of the bot is done when the bot wrote «Agreed.» last, or when the author wrote last
 // before the clean review: the review saw that reply and did not answer it, so the point is fixed.
-// A thread where the bot wrote anything else last, or that waits for the owner, stays open.
+// A thread where the bot wrote anything else last, or asked for the owner's decision, stays open.
+// A reply that only quotes that phrase does not count.
 function isDone(messages) {
   const last = messages.at(-1);
-  if (!isBot(messages[0]?.author) || messages.some((message) => message.body.includes(OWNER_WAIT))) return false;
+  const ownerWait = messages.some((message) => isBot(message.author) && message.body.trim().startsWith(OWNER_WAIT));
+  if (!isBot(messages[0]?.author) || ownerWait) return false;
   return isBot(last.author) ? last.body.trim().startsWith("Agreed") : Date.parse(last.createdAt) < Date.parse(review.createdAt);
 }
 
@@ -87,7 +91,7 @@ function onlySpecsSince(sha) {
 
 function resolve(id) {
   const mutation = "mutation($id: ID!) { resolveReviewThread(input: { threadId: $id }) { thread { isResolved } } }";
-  return gh("api", "graphql", "-f", `id=${id}`, "-f", `query=${mutation}`).ok;
+  return gh("api", "graphql", "-f", `id=${id}`, "-f", `query=${mutation}`);
 }
 
 function where(thread) {
