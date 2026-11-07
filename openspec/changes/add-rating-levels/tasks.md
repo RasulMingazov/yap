@@ -40,7 +40,7 @@ Slice 1 of this part holds the shared helpers: `admin/` `core/common/LoadResult.
 `feature/characters/` to them, and the import in `ScreenCaptureTest.kt`. Slice 2 holds the levels
 files above.
 
-- [ ] 4.1 Add the admin levels repository; verify with mock engine tests for 200, 400, a call without saved settings and a failed call
+- [x] 4.1 Add the admin levels repository; verify with mock engine tests for 200, 400, a call without saved settings and a failed call
 
 ## 5. [5/7] Admin view model
 
