@@ -30,7 +30,7 @@ leak into domain contracts.
 
 ## Errors
 
-- Always rethrow `CancellationException`; `runSuspendCatching` from `core/common` does.
+- Always rethrow `CancellationException`; `runSuspendCatching` from `core-common` does.
 - Never expose protocol, storage, or provider errors through repository contracts.
 - A failed request must not erase the last successful cache.
 

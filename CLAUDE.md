@@ -68,6 +68,13 @@ When you are the PR author:
 - A thread holds at most 5 messages, review comment included. Do not write message 5: the reviewer
   writes it as "Owner decision needed". Then wait for the owner.
 
+## Agents
+
+`/orchestrate` runs the open backlog with the agents in `.claude/agents/`: `planner` writes the
+OpenSpec change of an issue, `plan-reviewer` checks it, an `executor` builds each part, and
+`code-reviewer` checks the first round of each code PR. `docs/process/README.md` holds the limits,
+the models and the hot files. Each agent also works alone: call it with its job in the prompt.
+
 ## Git
 
 - Branch names start with the kind: `feature/...`, `tech/...` or `test/...`. A branch for an issue
