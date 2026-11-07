@@ -27,7 +27,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 6. [6/16] The DTOs · ~170 · `contract-admin/src/main/kotlin/app/yap/contract/admin/` (`TopicDto`, `TopicContentDto`, `InterlocutorDto`), `S/api/TopicDtoMapper.kt`
 
-- [ ] 6.1 Add the DTOs and the server mapper, which trims every text and drops the empty steps; verify with the mapper tests for the trim, the empty step, both interlocutors, no interlocutor and a date that does not parse
+- [x] 6.1 Add the DTOs and the server mapper, which trims every text and drops the empty steps; verify with the mapper tests for the trim, the empty step, both interlocutors, no interlocutor and a date that does not parse
 
 ## 7. [7/16] The routes · ~330 · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `server/app/build.gradle.kts`, `S/api/TopicRoutes.kt`
 

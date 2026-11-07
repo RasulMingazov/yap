@@ -1,10 +1,11 @@
 plugins {
-    alias(libs.plugins.yap.jvm.library)
+    alias(libs.plugins.yap.ktor.server)
     `java-test-fixtures`
 }
 
 dependencies {
     implementation(libs.exposed.java.time)
+    implementation(project(":contract-admin"))
     implementation(project(":server:core-database"))
     implementation(project(":server:feature-characters"))
 
