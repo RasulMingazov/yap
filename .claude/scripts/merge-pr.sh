@@ -23,6 +23,18 @@ for issue in $(printf '%s\n' "$body" | grep -o -i -E '^(closes|part of) #[0-9]+'
   node "$scripts/issue-state.mjs" "$issue" "stage=$stage" --log "merged #$pr" >/dev/null && echo "ISSUE #$issue · $stage"
 done
 
+# Move the PRs stacked on this branch to develop before the branch goes: GitHub closes them
+# otherwise. A base change starts no checks, so merge develop into each one to push a commit.
+for dep in $(gh pr list --base "$branch" --state open --json number -q '.[].number'); do
+  gh pr edit "$dep" --base develop >/dev/null || { echo "FAILED · base of #$dep: branch $branch kept"; exit 1; }
+  echo "RETARGETED #$dep · develop"
+  if gh api -X PUT "repos/{owner}/{repo}/pulls/$dep/update-branch" >/dev/null 2>&1; then
+    echo "UPDATED #$dep · develop merged in"
+  else
+    echo "NOT UPDATED #$dep · merge develop into it by hand"
+  fi
+done
+
 gh api -X DELETE "repos/{owner}/{repo}/git/refs/heads/$branch" >/dev/null 2>&1 && echo "REMOTE BRANCH deleted · $branch"
 worktree="$(git worktree list --porcelain | awk -v ref="refs/heads/$branch" '
   /^worktree / { path = substr($0, 10); entries++ }
