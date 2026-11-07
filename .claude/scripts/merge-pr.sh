@@ -23,6 +23,9 @@ for issue in $(printf '%s\n' "$body" | grep -o -i -E '^(closes|part of) #[0-9]+'
   node "$scripts/issue-state.mjs" "$issue" "stage=$stage" --log "merged #$pr" >/dev/null && echo "ISSUE #$issue · $stage"
 done
 
+# A release PR merges develop: keep it and the PRs based on it as they are.
+case "$branch" in develop|main) echo "BRANCH kept · $branch"; exit 0 ;; esac
+
 # Move the PRs stacked on this branch to develop before the branch goes: GitHub closes them
 # otherwise. A base change starts no checks, so merge develop into each one to push a commit.
 for dep in $(gh pr list --base "$branch" --state open --json number -q '.[].number'); do
