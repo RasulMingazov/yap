@@ -1,5 +1,6 @@
 package app.yap.admin.feature.server.presentation
 
+import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.server.domain.ServerConnection
 import app.yap.admin.feature.server.presentation.ServerViewModel.DataState
 import app.yap.admin.feature.server.presentation.ServerViewModel.UiState
@@ -25,7 +26,7 @@ internal class ServerUiStateMapperTest {
                 isConnectEnabled = true,
                 key = "key",
                 serverLabel = "Сервер: staging",
-                status = "Подключено",
+                status = Status(text = "Подключено", tone = Status.Tone.SUCCESS),
             ),
             actual = uiState,
         )
@@ -36,7 +37,7 @@ internal class ServerUiStateMapperTest {
         val uiState = ServerUiStateMapper.map(DataState(connection = ServerConnection.Unauthorized, key = "key"))
 
         assertEquals(
-            expected = "Сервер: не подключён" to "Сервер не принял ключ",
+            expected = "Сервер: не подключён" to Status(text = "Сервер не принял ключ", tone = Status.Tone.ERROR),
             actual = uiState.serverLabel to uiState.status,
         )
     }

@@ -1,5 +1,6 @@
 package app.yap.admin.feature.characters.presentation
 
+import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.LoadResult
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
@@ -76,7 +77,7 @@ internal class CharacterViewModelTest {
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
-        assertEquals(expected = "Sam" to "Сохранено", actual = env.content().title to env.content().saveStatus)
+        assertEquals(expected = "Sam" to Status(text = "Сохранено", tone = Status.Tone.SUCCESS), actual = env.content().title to env.content().saveStatus)
     }
 
     @Test
@@ -87,7 +88,7 @@ internal class CharacterViewModelTest {
             env.viewModel.onEvent(Event.SaveClicked)
             advanceUntilIdle()
 
-            assertEquals(expected = "Заполните все поля", actual = env.content().saveStatus)
+            assertEquals(expected = Status(text = "Заполните все поля", tone = Status.Tone.ERROR), actual = env.content().saveStatus)
         }
 
     @Test

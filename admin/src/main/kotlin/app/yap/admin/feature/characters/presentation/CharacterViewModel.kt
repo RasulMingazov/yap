@@ -2,6 +2,7 @@ package app.yap.admin.feature.characters.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.yap.admin.core.presentation.Status
 import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.CharacterProfile
@@ -135,7 +136,7 @@ internal class CharacterViewModel(
             val form: CharacterProfile,
             val hint: String?,
             val isSaveEnabled: Boolean,
-            val saveStatus: String?,
+            val saveStatus: Status?,
             val subtitle: String,
             val title: String,
         ) : UiState

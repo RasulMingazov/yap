@@ -58,6 +58,7 @@ internal class ScreenCaptureTest {
             "loading" to CharacterViewModel.DataState(characterId = CHARACTER_ID),
             "error" to CharacterViewModel.DataState(characterId = CHARACTER_ID).copy(load = CharacterViewModel.Load.FAILED),
             "new" to CharacterViewModel.DataState(characterId = null),
+            "opened" to saved,
             "empty-field" to CharacterViewModel.DataState(characterId = null).copy(
                 form = StubCharacter.stubProfile(manner = ""),
                 saveStatus = CharacterViewModel.SaveStatus.EMPTY_FIELD,
@@ -90,6 +91,7 @@ internal class ScreenCaptureTest {
         )
         val states = mapOf(
             "first-start" to ServerViewModel.DataState(),
+            "filled" to filled,
             "connecting" to filled.copy(isConnecting = true),
             "connected" to filled.copy(connection = ServerConnection.Connected(environment = "staging")),
             "wrong-key" to filled.copy(connection = ServerConnection.Unauthorized),

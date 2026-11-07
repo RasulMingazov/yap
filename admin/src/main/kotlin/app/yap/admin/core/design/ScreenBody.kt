@@ -9,9 +9,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 
 @Composable
-internal fun ScreenBody(content: @Composable ColumnScope.() -> Unit) {
+internal fun ScreenBody(
+    spacing: Dp = AdminTheme.Sizes.gap,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier = Modifier
             .widthIn(max = AdminTheme.Sizes.contentMaxWidth)
@@ -22,7 +26,7 @@ internal fun ScreenBody(content: @Composable ColumnScope.() -> Unit) {
                 end = AdminTheme.Sizes.contentPadding,
                 bottom = AdminTheme.Sizes.contentBottomPadding,
             ),
-        verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
+        verticalArrangement = Arrangement.spacedBy(spacing),
         content = content,
     )
 }
