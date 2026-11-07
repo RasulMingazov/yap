@@ -5,15 +5,8 @@ data class CharacterProfile(
     val manner: String,
     val name: String,
     val personality: String,
-)
+) {
 
-internal fun CharacterProfile.trimmedIfFilled(): CharacterProfile? {
-    val trimmed = CharacterProfile(
-        history = history.trim(),
-        manner = manner.trim(),
-        name = name.trim(),
-        personality = personality.trim(),
-    )
-    val fields = listOf(trimmed.history, trimmed.manner, trimmed.name, trimmed.personality)
-    return trimmed.takeIf { fields.none(String::isEmpty) }
+    internal val isFilled: Boolean
+        get() = listOf(history, manner, name, personality).none(String::isEmpty)
 }

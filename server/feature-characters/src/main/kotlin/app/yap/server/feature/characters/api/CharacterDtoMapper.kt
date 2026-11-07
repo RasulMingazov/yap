@@ -18,8 +18,8 @@ private fun CharacterProfile.toDto(): CharacterProfileDto = CharacterProfileDto(
 )
 
 internal fun CharacterProfileDto.toModel(): CharacterProfile = CharacterProfile(
-    history = history,
-    manner = manner,
-    name = name,
-    personality = personality,
+    history = history.trim(),
+    manner = manner.trim(),
+    name = name.trim(),
+    personality = personality.trim(),
 )

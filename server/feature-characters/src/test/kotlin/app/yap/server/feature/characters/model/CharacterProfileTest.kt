@@ -1,39 +1,22 @@
 package app.yap.server.feature.characters.model
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 internal class CharacterProfileTest {
 
     @Test
-    fun `GIVEN fields with spaces around WHEN checking the profile THEN the fields are trimmed`() {
-        val profile = StubCharacter.stubProfile(
-            history = " Moved here. ",
-            manner = " Casual. ",
-            name = " Sam ",
-            personality = " Friendly. ",
-        )
+    fun `GIVEN every field has text WHEN checking the profile THEN it is filled`() {
+        val profile = StubCharacter.stubProfile()
 
-        val checked = profile.trimmedIfFilled()
-
-        assertEquals(
-            expected = StubCharacter.stubProfile(
-                history = "Moved here.",
-                manner = "Casual.",
-                name = "Sam",
-                personality = "Friendly.",
-            ),
-            actual = checked,
-        )
+        assertTrue(profile.isFilled)
     }
 
     @Test
-    fun `GIVEN a field with spaces only WHEN checking the profile THEN there is no profile`() {
-        val profile = StubCharacter.stubProfile(manner = "   ")
+    fun `GIVEN an empty field WHEN checking the profile THEN it is not filled`() {
+        val profile = StubCharacter.stubProfile(manner = "")
 
-        val checked = profile.trimmedIfFilled()
-
-        assertNull(checked)
+        assertFalse(profile.isFilled)
     }
 }

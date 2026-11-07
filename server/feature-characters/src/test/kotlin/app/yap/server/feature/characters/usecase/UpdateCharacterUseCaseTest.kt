@@ -10,21 +10,20 @@ import kotlinx.coroutines.test.runTest
 internal class UpdateCharacterUseCaseTest {
 
     @Test
-    fun `GIVEN a profile with spaces around a field WHEN updating THEN the trimmed profile is stored`() = runTest {
+    fun `GIVEN a filled profile WHEN updating THEN the character is stored`() = runTest {
         val env = Environment()
-        val trimmed = StubCharacter.stubCharacter(profile = StubCharacter.stubProfile(name = "Samuel"))
 
-        val outcome = env.useCase(StubCharacter.stubCharacter(profile = StubCharacter.stubProfile(name = " Samuel ")))
+        val outcome = env.useCase(StubCharacter.stubCharacter())
 
-        env.characterRepository.updateCall.calledWith(trimmed)
-        assertEquals(expected = UpdateCharacterOutcome.Updated(trimmed), actual = outcome)
+        env.characterRepository.updateCall.calledWith(StubCharacter.stubCharacter())
+        assertEquals(expected = UpdateCharacterOutcome.Updated(StubCharacter.stubCharacter()), actual = outcome)
     }
 
     @Test
     fun `GIVEN a profile with an empty field WHEN updating THEN nothing is stored`() = runTest {
         val env = Environment()
 
-        val outcome = env.useCase(StubCharacter.stubCharacter(profile = StubCharacter.stubProfile(personality = " ")))
+        val outcome = env.useCase(StubCharacter.stubCharacter(profile = StubCharacter.stubProfile(personality = "")))
 
         env.characterRepository.updateCall.notCalled()
         assertEquals(expected = UpdateCharacterOutcome.Invalid, actual = outcome)

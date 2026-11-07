@@ -10,12 +10,12 @@ import kotlinx.coroutines.test.runTest
 internal class CreateCharacterUseCaseTest {
 
     @Test
-    fun `GIVEN a profile with spaces around a field WHEN creating THEN the trimmed profile is stored`() = runTest {
+    fun `GIVEN a filled profile WHEN creating THEN the profile is stored`() = runTest {
         val env = Environment()
 
-        val outcome = env.useCase(StubCharacter.stubProfile(name = " Sam "))
+        val outcome = env.useCase(StubCharacter.stubProfile())
 
-        env.characterRepository.createCall.calledWith(StubCharacter.stubProfile(name = "Sam"))
+        env.characterRepository.createCall.calledWith(StubCharacter.stubProfile())
         assertEquals(expected = CreateCharacterOutcome.Created(StubCharacter.stubCharacter()), actual = outcome)
     }
 
