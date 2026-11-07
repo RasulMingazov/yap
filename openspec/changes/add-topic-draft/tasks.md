@@ -31,7 +31,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 7. [7/16] The routes · ~330 · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `server/app/build.gradle.kts`, `S/api/TopicRoutes.kt`
 
-- [ ] 7.1 Add the routes behind the admin key; verify with the route tests for 200, 201, 400 (no title, no date, zero duration, unknown character, bad date), 401 and 404
+- [x] 7.1 Add the routes behind the admin key; verify with the route tests for 200, 201, 400 (no title, no date, zero duration, unknown character, bad date), 401 and 404
 
 ## 8. [8/16] The admin domain · ~170 · `T/domain/`, `T/data/mapper/`
 

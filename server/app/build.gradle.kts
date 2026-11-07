@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":contract-admin"))
     implementation(project(":server:core-database"))
     implementation(project(":server:feature-characters"))
+    implementation(project(":server:feature-topics"))
     implementation(libs.koin.core)
     implementation(libs.koin.ktor)
     implementation(libs.ktor.server.auth)
@@ -13,6 +14,7 @@ dependencies {
 
     testImplementation(testFixtures(project(":server:core-database")))
     testImplementation(testFixtures(project(":server:feature-characters")))
+    testImplementation(testFixtures(project(":server:feature-topics")))
     testImplementation(libs.koin.test)
 
     constraints {

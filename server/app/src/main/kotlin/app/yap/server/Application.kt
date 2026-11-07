@@ -6,6 +6,7 @@ import app.yap.server.admin.serverRoutes
 import app.yap.server.config.AppConfig
 import app.yap.server.config.AppConfigLoader
 import app.yap.server.feature.characters.api.characterRoutes
+import app.yap.server.feature.topics.api.topicRoutes
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -54,6 +55,12 @@ internal fun Application.serverModule(
                 getCharacterUseCase = koin.get(),
                 getCharactersUseCase = koin.get(),
                 updateCharacterUseCase = koin.get(),
+            )
+            topicRoutes(
+                createTopicUseCase = koin.get(),
+                getTopicUseCase = koin.get(),
+                getTopicsUseCase = koin.get(),
+                updateTopicUseCase = koin.get(),
             )
         }
     }
