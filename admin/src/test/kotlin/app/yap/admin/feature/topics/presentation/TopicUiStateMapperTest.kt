@@ -47,6 +47,7 @@ internal class TopicUiStateMapperTest {
         assertEquals(expected = "At the cafe", actual = content.title)
         assertEquals(expected = "Пятница, 24 октября · черновик", actual = content.subtitle)
         assertEquals(expected = "Пятница, 24 октября", actual = content.releaseDateText)
+        assertEquals(expected = null, actual = content.guestDescription)
         assertEquals(expected = listOf(true, false), actual = content.choices.map { choice -> choice.isSelected })
         assertEquals(
             expected = Interlocutor.Cast(characterId = CharacterId(StubCharacter.CHARACTER_ID)),

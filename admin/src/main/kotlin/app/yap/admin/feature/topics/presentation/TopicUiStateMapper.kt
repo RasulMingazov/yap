@@ -56,6 +56,8 @@ internal object TopicUiStateMapper {
 
     private fun DataState.guestDescription(): String? = (form.interlocutor as? Interlocutor.Guest)?.description
 
+    private fun LocalDate?.longText(): String = this?.let(ReleaseDateFormat::long).orEmpty()
+
     private fun SaveStatus.status(): Status = when (this) {
         SaveStatus.REJECTED -> Status(
             text = "Сервер не принял черновик: проверьте название, дату, длительность и собеседника",
@@ -71,6 +73,4 @@ internal object TopicUiStateMapper {
     }
 
     private fun DataState.title(): String = saved?.content?.title ?: "Новая тема"
-
-    private fun LocalDate?.longText(): String = this?.let(ReleaseDateFormat::long).orEmpty()
 }
