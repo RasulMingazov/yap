@@ -2,14 +2,27 @@ package app.yap.server.feature.levels.model
 
 object StubLevel {
 
+    const val BLOCK = "Speak in short, simple sentences. Avoid phrasal verbs."
+    const val MAX_WORDS = 16
     const val RATING_FROM = 1050
+    const val VOCABULARY = "B1"
+
+    fun stubLevel(
+        code: LevelCode = LevelCode.B1,
+        range: RatingRange? = RatingRange(from = RATING_FROM, to = 1199),
+        settings: LevelSettings? = stubSettings(),
+    ): Level = Level(
+        code = code,
+        range = range,
+        settings = settings,
+    )
 
     fun stubSettings(
-        block: String = "Speak in short, simple sentences. Avoid phrasal verbs.",
+        block: String = BLOCK,
         idioms: Idioms = Idioms.RARELY,
-        maxWords: Int = 16,
+        maxWords: Int = MAX_WORDS,
         ratingFrom: Int? = RATING_FROM,
-        vocabulary: String = "B1",
+        vocabulary: String = VOCABULARY,
     ): LevelSettings = LevelSettings(
         block = block,
         idioms = idioms,
