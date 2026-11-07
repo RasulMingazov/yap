@@ -52,7 +52,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 12. [12/16] The Topic use cases and state · ~260 · `T/domain/usecase/GetTopicUseCase.kt`, `SaveTopicUseCase.kt`, `T/presentation/TopicUiState*.kt`
 
-- [ ] 12.1 Add the use cases, the UI state and its mapper; verify with the tests for create, update, a new and a saved topic, the long date, Guest and the 400 error
+- [x] 12.1 Add the use cases, the UI state and its mapper; verify with the tests for create, update, a new and a saved topic, the long date, Guest and the 400 error
 
 ## 13. [13/16] The Topic view model · ~370, at risk · `T/presentation/TopicViewModel.kt` and its test
 
