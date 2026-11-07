@@ -39,7 +39,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 9. [9/16] The admin repository · ~270 · `T/domain/repository/`, `T/data/repository/`
 
-- [ ] 9.1 Add `RemoteTopicRepository`; verify with mock engine tests for 200, 201, 400, a call without saved settings and a failed call
+- [x] 9.1 Add `RemoteTopicRepository`; verify with mock engine tests for 200, 201, 400, a call without saved settings and a failed call
 
 ## 10. [10/16] The Topics view model · ~280 · `T/domain/usecase/GetTopicsUseCase.kt`, `T/presentation/Topics*.kt`, `T/presentation/ReleaseDateFormat.kt`, `T/di/`
 
