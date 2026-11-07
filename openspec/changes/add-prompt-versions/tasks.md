@@ -20,7 +20,7 @@ Starts after the #9 part with `V3__levels.sql` merges. That part starts after th
 
 ## 4. Server admin API (about 330 lines)
 
-- [ ] 4.1 Add the prompt DTOs, the routes and their mount behind the admin key. Files: `contract-admin/src/main/kotlin/app/yap/contract/admin/Prompt*Dto.kt` (hot), `fp/api/PromptRoutes.kt`, `fp/api/PromptDtoMapper.kt`, `server/app/build.gradle.kts`, `server/app/src/main/kotlin/app/yap/server/Application.kt` (hot). The mapper trims the text of a save. Verify with the mapper test for the trimmed text and the route tests for the six prompts of the list, 200, 201, 400, 401 and 404 for a key and for a version
+- [x] 4.1 Add the prompt DTOs, the routes and their mount behind the admin key. Files: `contract-admin/src/main/kotlin/app/yap/contract/admin/Prompt*Dto.kt` (hot), `fp/api/PromptRoutes.kt`, `fp/api/PromptDtoMapper.kt`, `server/app/build.gradle.kts`, `server/app/src/main/kotlin/app/yap/server/Application.kt` (hot). The mapper trims the text of a save. Verify with the mapper test for the trimmed text and the route tests for the six prompts of the list, 200, 201, 400, 401 and 404 for a key and for a version
 
 ## 5. Admin data layer and use cases (about 380 lines)
 

@@ -7,6 +7,7 @@ dependencies {
     implementation(project(":server:core-database"))
     implementation(project(":server:feature-characters"))
     implementation(project(":server:feature-levels"))
+    implementation(project(":server:feature-prompts"))
     implementation(project(":server:feature-topics"))
     implementation(libs.koin.core)
     implementation(libs.koin.ktor)
@@ -16,6 +17,7 @@ dependencies {
     testImplementation(testFixtures(project(":server:core-database")))
     testImplementation(testFixtures(project(":server:feature-characters")))
     testImplementation(testFixtures(project(":server:feature-levels")))
+    testImplementation(testFixtures(project(":server:feature-prompts")))
     testImplementation(testFixtures(project(":server:feature-topics")))
     testImplementation(libs.koin.test)
 

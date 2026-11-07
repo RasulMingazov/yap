@@ -62,6 +62,32 @@ internal class ApplicationTest {
     }
 
     @Test
+    fun `GIVEN a wrong admin key WHEN listing the prompts THEN the call is unauthorized`() = testApplication {
+        val env = Environment()
+        application { env.install(this) }
+
+        val response = client.get("/admin/prompts") {
+            bearerAuth("wrong-key")
+        }
+
+        assertEquals(expected = HttpStatusCode.Unauthorized, actual = response.status)
+    }
+
+    @Test
+    fun `GIVEN a wrong admin key WHEN saving a prompt version THEN the call is unauthorized`() = testApplication {
+        val env = Environment()
+        application { env.install(this) }
+
+        val response = client.post("/admin/prompts/TOPIC_REPLY/versions") {
+            bearerAuth("wrong-key")
+            contentType(ContentType.Application.Json)
+            setBody(PROMPT_TEXT_JSON)
+        }
+
+        assertEquals(expected = HttpStatusCode.Unauthorized, actual = response.status)
+    }
+
+    @Test
     fun `GIVEN no admin key WHEN listing the topics THEN the call is unauthorized`() = testApplication {
         val env = Environment()
         application { env.install(this) }
@@ -115,5 +141,6 @@ internal class ApplicationTest {
     private companion object {
 
         const val NAME_ONLY_JSON = """{"name": "Sam"}"""
+        const val PROMPT_TEXT_JSON = """{"text": "Play Sam."}"""
     }
 }
