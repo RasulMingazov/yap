@@ -9,7 +9,7 @@
 
 ## 2. Server model and persistence (about 330 lines)
 
-Starts after part 2/7 of #9 (`V3__levels.sql`) merges. That part starts after part 2/9 of #7 (`V2__topics.sql`, `exposed-java-time`).
+Starts after the #9 part with `V3__levels.sql` merges. That part starts after the #7 part with `V2__topics.sql` and `exposed-java-time`.
 
 - [ ] 2.1 Add `server/feature-prompts` with `PromptKey`, `PromptGroup`, `PromptVersion` and `Prompt`. Files: `settings.gradle.kts` (hot), `server/feature-prompts/build.gradle.kts`, `fp/model/`. Verify with `PromptKeyTest`: the six keys in order, their groups and the variables of each one, as the spec lists them
 - [ ] 2.2 Add `V4__prompts.sql`, the tables and the Exposed repository. Files: `server/feature-prompts/src/main/resources/db/migration/V4__prompts.sql` (hot, Flyway), `fp/persistence/PromptRepository.kt`, `fp/persistence/PromptTables.kt`, `fp/persistence/DatabasePromptRepository.kt`, `exposed-java-time` in `server/feature-prompts/build.gradle.kts`, and in `gradle/libs.versions.toml` (hot) only if #7 did not add it. Verify with the PostgreSQL tests for a read before a save, two saves, a restore, a save after a restore, an unknown version and the clean bootstrap (CI runs them)
@@ -33,7 +33,7 @@ Starts after part 2/7 of #9 (`V3__levels.sql`) merges. That part starts after pa
 
 ## 7. Admin Prompts screen (about 350 lines)
 
-Starts after part 6/9 of #7 (the actions slot of `ScreenToolbar`) and part 6/7 of #9 (the mono style and the sidebar group Rules) merge. This part reuses them and does not change them.
+Starts after the #7 part with the actions slot of `ScreenToolbar` and the #9 part with the mono style and the sidebar group Rules merge. This part reuses them and does not change them.
 
 - [ ] 7.1 Add `Chip`, the Prompts screen, its graph, and Prompts in the sidebar group Rules after Levels. Files: `admin/src/main/kotlin/app/yap/admin/core/design/Chip.kt` (hot), `ap/presentation/ui/PromptsScreen.kt`, `ap/di/PromptsGraph.kt`, `admin/src/main/kotlin/app/yap/admin/Main.kt` (hot), `admin/src/main/kotlin/app/yap/admin/navigation/` (hot), `admin/src/test/kotlin/app/yap/admin/ScreenCaptureTest.kt`. Verify with the navigation view-model test for Prompts, `./gradlew build` and the images of the screen capture
 - [ ] 7.2 Run the admin app against a server with a database; verify a first save, a second save, a restore and the versions after a server restart

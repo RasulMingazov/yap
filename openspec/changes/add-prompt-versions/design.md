@@ -95,7 +95,7 @@ A save inserts the version with `max(number) + 1` and upserts the current row in
 Restore updates the current row only when the version exists. The migration is `V4__prompts.sql`.
 
 The migrations merge as `V2` (#7), `V3` (#9), `V4` (#10). `saved_at` needs `exposed-java-time`.
-Part 2/9 of #7 adds it to the catalog for `release_date`. This change reuses it.
+The #7 part with `V2` adds it to the catalog for `release_date`. This change reuses it.
 
 ### The wire contract
 
