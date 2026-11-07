@@ -20,10 +20,8 @@ admin app, without a release (#9).
 
 Out of scope:
 
-- The substitution of `{level.rules}` into the reply and hints prompts: #12 and #13. The prompts
-  do not exist before #10, and nothing builds a prompt before #12. #12 calls the value that this
-  change gives, and owns the end-to-end check of the issue: a changed block shows in the next reply
-  prompt for that level.
+- The substitution of `{level.rules}` into the reply and hints prompts: #12 and #13. Nothing builds
+  a prompt before #12. #12 owns the end-to-end check of the issue.
 - The calculation of the rating.
 - The Model column of the table: #11. It adds an optional model to the level values.
 - Prompts in the group Rules: #10 adds it to the group that this change adds.
@@ -42,7 +40,6 @@ None.
 ## Impact
 
 - A new Gradle module `server/feature-levels`.
-- The Flyway migration `V3__levels.sql`. The migrations deploy in order: `V2` (#7), `V3` (#9),
-  `V4` (#10).
+- The Flyway migration `V3__levels.sql`, deployed after `V2` (#7) and before `V4` (#10).
 - `contract-admin` gets the level DTOs.
 - `admin` gets the Levels screen and its data layer, and the sidebar group Rules.

@@ -1,20 +1,15 @@
 # Tasks
 
-One group is one PR, in merge order. (hot) marks a hot file of `docs/process/README.md`. Paths
-under `server/feature-levels/` start at `src/main/kotlin/app/yap/server/feature/levels/` or the
-matching test folder. Paths under `admin/` start at `src/main/kotlin/app/yap/admin/` or the matching
-test folder.
+One group is one PR, in merge order. (hot) marks a hot file. Paths start at the package root of
+the module, main or test.
 
 ## 1. [1/7] The plan
-
-Files: `openspec/changes/add-rating-levels/`.
 
 - [ ] 1.1 Propose the change; verify with `openspec validate add-rating-levels --strict`
 
 ## 2. [2/7] Server model and persistence
 
-Needs: the part of #7 with `V2__topics.sql` is merged. The migrations deploy as `V2` (#7), `V3`
-(#9), `V4` (#10).
+Needs: the `V2` part of #7 is merged.
 
 Files: `settings.gradle.kts` (hot), `server/feature-levels/build.gradle.kts`,
 `server/feature-levels/` `model/` and `persistence/`,
@@ -50,8 +45,7 @@ Files: `admin/` `feature/levels/domain/usecase/`, `feature/levels/presentation/`
 
 ## 6. [6/7] Admin Levels screen and the group Rules
 
-Needs: the part of #7 that adds the actions slot of `ScreenToolbar` is merged. Save uses that slot.
-This part adds no second slot.
+Needs: the part of #7 with the actions slot of `ScreenToolbar` is merged.
 
 Files: `admin/` `core/design/AdminSelect.kt` (hot), `core/design/AdminTheme.kt` (hot, the mono
 style, unless #10 added it first), `feature/levels/presentation/ui/LevelsScreen.kt`, `Main.kt`
