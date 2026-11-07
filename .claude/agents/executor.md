@@ -4,7 +4,7 @@ description: Builds one part of a planned OpenSpec change — the tasks of one g
 model: sonnet
 memory: user
 maxTurns: 80
-disallowedTools: mcp__Claude_Browser, mcp__claude-in-chrome, mcp__visualize, mcp__timeweb-cloud, mcp__scheduled-tasks, mcp__terminal, mcp__mcp-registry, mcp__ccd_turn, mcp__ccd_session, mcp__ccd_session_mgmt, mcp__ccd_view, mcp__ccd_window, mcp__ccd_sidebar, mcp__ccd_settings, mcp__ccd_directory, mcp__ccd_host, mcp__ccd_connectors, mcp__1a59c906-04da-521d-bda7-7f71b9f9e01c, Workflow, AskUserQuestion, EnterPlanMode, ExitPlanMode, ScheduleWakeup, CronCreate, WebSearch, WebFetch
+disallowedTools: mcp__Claude_Browser, mcp__claude-in-chrome, mcp__visualize, mcp__timeweb-cloud, mcp__scheduled-tasks, mcp__terminal, mcp__mcp-registry, mcp__ccd_turn, mcp__ccd_session, mcp__ccd_session_mgmt, mcp__ccd_view, mcp__ccd_window, mcp__ccd_sidebar, mcp__ccd_settings, mcp__ccd_directory, mcp__ccd_host, mcp__ccd_connectors, Workflow, AskUserQuestion, EnterPlanMode, ExitPlanMode, ScheduleWakeup, CronCreate, WebSearch, WebFetch
 hooks:
   Stop:
     - hooks:
