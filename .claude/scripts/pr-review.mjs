@@ -1,8 +1,8 @@
 // The state of the Claude review of the head commit of a PR, for the orchestrator's scripts.
 //   node .claude/scripts/pr-review.mjs <pr>             the review state and one line per open thread
 //   node .claude/scripts/pr-review.mjs <pr> --resolve   also resolve the review threads that are done
-// Exit 0: the newest «Claude review:» of the head commit says «No problems found», and with
-// --resolve no thread stays open. A push that changes only openspec/ keeps the review of the commit
+// Exit 0: the newest «Claude review:» of the head commit says «No problems found» with no open
+// thread, and with --resolve no thread stays open. A push that changes only openspec/ keeps the review of the commit
 // before it. Exit 8: no review of the head commit yet. Exit 1: problems, or a gh call failed.
 import { spawnSync } from "node:child_process";
 
@@ -11,9 +11,9 @@ const QUERY = `query($owner: String!, $name: String!, $pr: Int!) {
   repository(owner: $owner, name: $name) {
     pullRequest(number: $pr) {
       headRefOid
-      comments(last: 50) { nodes { author { login __typename } body } }
+      comments(last: 50) { nodes { author { login __typename } body createdAt } }
       reviewThreads(first: 100) {
-        nodes { id isResolved path line comments(first: 20) { nodes { author { login __typename } body } } }
+        nodes { id isResolved path line comments(first: 20) { nodes { author { login __typename } body createdAt } } }
       }
     }
   }
@@ -43,15 +43,14 @@ if (!reviewed || !(head.startsWith(reviewed) || onlySpecsSince(reviewed))) {
   process.exit(8);
 }
 const summary = review.body.split("\n")[0].replace(/^Claude review:\s*/, "");
-const clean = /^No problems found/i.test(summary);
+// «No problems found» counts only new problems: the review must also report no open thread.
+const openCount = Number(review.body.match(/(\d+) open threads?|open threads: (\d+)/i)?.slice(1).find(Boolean) ?? 0);
+const clean = /^No problems found/i.test(summary) && openCount === 0;
 console.log(`REVIEW ${clean ? "CLEAN" : "PROBLEMS"} · ${head.slice(0, 7)} · ${summary}`);
 
-// A clean review of the head commit closes the bot's threads: each one is fixed or agreed.
 let left = 0;
 for (const thread of open) {
-  const messages = thread.comments.nodes;
-  const done = clean && isBot(messages[0]?.author) && !messages.some((message) => message.body.includes(OWNER_WAIT));
-  if (flag === "--resolve" && done && resolve(thread.id)) {
+  if (flag === "--resolve" && clean && isDone(thread.comments.nodes) && resolve(thread.id)) {
     console.log(`RESOLVED ${where(thread)}`);
   } else {
     printThread(thread);
@@ -68,6 +67,15 @@ function gh(...args) {
 // GraphQL gives the bot's login without the [bot] suffix.
 function isBot(author) {
   return author?.__typename === "Bot" && author.login === "claude";
+}
+
+// A thread of the bot is done when the bot wrote «Agreed.» last, or when the author wrote last
+// before the clean review: the review saw that reply and did not answer it, so the point is fixed.
+// A thread where the bot wrote anything else last, or that waits for the owner, stays open.
+function isDone(messages) {
+  const last = messages.at(-1);
+  if (!isBot(messages[0]?.author) || messages.some((message) => message.body.includes(OWNER_WAIT))) return false;
+  return isBot(last.author) ? last.body.trim().startsWith("Agreed") : Date.parse(last.createdAt) < Date.parse(review.createdAt);
 }
 
 function onlySpecsSince(sha) {
