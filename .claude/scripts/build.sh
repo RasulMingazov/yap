@@ -3,10 +3,12 @@
 # or the failing lines on failure. The full log goes to a file whose path is printed.
 # A passing full build of a clean tree marks its commit, so the agent gate does not build it again.
 log="${TMPDIR:-/tmp}/build-$(git rev-parse --short HEAD 2>/dev/null || echo nogit)-$$.log"
-./gradlew "${@:-build}" --console=plain > "$log" 2>&1
+task_count="$#"
+[ "$#" -eq 0 ] && set -- build
+./gradlew "$@" --console=plain > "$log" 2>&1
 status=$?
 if [ "$status" -eq 0 ]; then
-  if [ "$#" -eq 0 ] && [ -z "$(git status --porcelain 2>/dev/null)" ]; then
+  if [ "$task_count" -eq 0 ] && [ -z "$(git status --porcelain 2>/dev/null)" ]; then
     marks="$(git rev-parse --path-format=absolute --git-common-dir)/build-ok"
     mkdir -p "$marks" && touch "$marks/$(git rev-parse HEAD)"
   fi
