@@ -15,7 +15,7 @@ internal fun TableHeaderCell(
     Text(
         text = text,
         color = AdminTheme.Colors.muted,
-        style = AdminTheme.Type.small,
+        style = AdminTheme.Type.tableHeader,
         fontWeight = FontWeight.Medium,
         maxLines = 1,
         modifier = modifier.padding(

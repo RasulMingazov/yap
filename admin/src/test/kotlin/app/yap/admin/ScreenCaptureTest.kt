@@ -201,8 +201,8 @@ internal class ScreenCaptureTest {
             StubTopic.stubTopic(
                 content = StubTopic.stubContent(
                     releaseDate = LocalDate.of(2025, 10, 25),
-                    title = "A job interview for a junior designer role at a small studio that makes posters " +
-                        "for museums, theatres and the city libraries",
+                    title = "A job interview for a junior designer role at a small studio that makes posters, " +
+                        "books and signs for museums, theatres, concert halls and the city libraries of the north",
                 ),
                 topicId = "5a4b3c2d-1e0f-4a9b-8c7d-6e5f4a3b2c1d",
             ),

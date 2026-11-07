@@ -13,12 +13,13 @@ import androidx.compose.ui.unit.Dp
 
 @Composable
 internal fun ScreenBody(
+    maxWidth: Dp = AdminTheme.Sizes.contentMaxWidth,
     spacing: Dp = AdminTheme.Sizes.gap,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         modifier = Modifier
-            .widthIn(max = AdminTheme.Sizes.contentMaxWidth)
+            .widthIn(max = maxWidth)
             .verticalScroll(rememberScrollState())
             .padding(
                 start = AdminTheme.Sizes.contentPadding,

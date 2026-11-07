@@ -5,6 +5,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -76,10 +77,20 @@ internal object AdminTheme {
             Font(resource = "font/inter_semibold.ttf", weight = FontWeight.SemiBold),
         )
 
+        private val fullLineHeight = LineHeightStyle(
+            alignment = LineHeightStyle.Alignment.Center,
+            trim = LineHeightStyle.Trim.None,
+        )
+
         val body = TextStyle(fontFamily = inter, fontSize = 14.sp, lineHeight = 20.sp)
         val brand = TextStyle(fontFamily = inter, fontSize = 15.sp, lineHeight = 20.sp)
         val small = TextStyle(fontFamily = inter, fontSize = 12.sp, lineHeight = 16.sp)
         val sub = TextStyle(fontFamily = inter, fontSize = 13.sp, lineHeight = 18.sp)
+        val tableCell = body.copy(lineHeightStyle = fullLineHeight)
+        val tableHeader = small.copy(
+            lineHeight = 20.sp,
+            lineHeightStyle = fullLineHeight,
+        )
         val title = TextStyle(fontFamily = inter, fontSize = 17.sp, lineHeight = 22.sp)
     }
 }
