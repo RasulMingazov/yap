@@ -53,7 +53,8 @@ internal class TopicsViewModelTest {
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 env.viewModel.uiState.collect { state -> rowCounts += (state as? UiState.Content)?.rows?.size }
             }
-            env.getTopicsUseCase.invokeCall.returns(LoadTopicsResult.Loaded(TOPICS))
+            val twoTopics = listOf(StubTopic.stubTopic(), StubTopic.stubTopic(topicId = "second-topic"))
+            env.getTopicsUseCase.invokeCall.returns(LoadTopicsResult.Loaded(twoTopics))
 
             env.viewModel.onEvent(Event.Opened)
             advanceUntilIdle()
@@ -115,13 +116,5 @@ internal class TopicsViewModelTest {
 
         val getTopicsUseCase = StubGetTopicsUseCase(topics = topics)
         val viewModel = TopicsViewModel(getTopicsUseCase = getTopicsUseCase)
-    }
-
-    private companion object {
-
-        val TOPICS = listOf(
-            StubTopic.stubTopic(),
-            StubTopic.stubTopic(topicId = "3b9d6f4a-1c2e-4d7b-8a5f-0e9c8b7a6d5c"),
-        )
     }
 }

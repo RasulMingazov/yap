@@ -5,6 +5,7 @@ import app.yap.admin.feature.topics.domain.StubTopic
 import app.yap.admin.feature.topics.domain.TopicId
 import app.yap.admin.feature.topics.presentation.TopicsViewModel.DataState
 import app.yap.admin.feature.topics.presentation.TopicsViewModel.UiState
+import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -12,8 +13,12 @@ import kotlin.test.assertIs
 internal class TopicsUiStateMapperTest {
 
     @Test
-    fun `GIVEN loaded topics WHEN mapping THEN each topic is a row with its short date and title`() {
-        val state = DataState(topics = LoadTopicsResult.Loaded(listOf(StubTopic.stubTopic())))
+    fun `GIVEN topics for two days WHEN mapping THEN the rows keep the server order with their short dates`() {
+        val saturdayTopic = StubTopic.stubTopic(
+            content = StubTopic.stubContent(releaseDate = LocalDate.of(2025, 10, 25)),
+            topicId = "saturday-topic",
+        )
+        val state = DataState(topics = LoadTopicsResult.Loaded(listOf(StubTopic.stubTopic(), saturdayTopic)))
 
         val uiState = TopicsUiStateMapper.map(state)
 
@@ -24,6 +29,11 @@ internal class TopicsUiStateMapperTest {
                         date = "Пт, 24 окт",
                         title = "At the cafe",
                         topicId = TopicId(StubTopic.TOPIC_ID),
+                    ),
+                    UiState.Content.Row(
+                        date = "Сб, 25 окт",
+                        title = "At the cafe",
+                        topicId = TopicId("saturday-topic"),
                     ),
                 ),
             ),
