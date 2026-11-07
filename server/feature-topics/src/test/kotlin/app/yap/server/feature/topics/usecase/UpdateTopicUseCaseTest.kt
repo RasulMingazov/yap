@@ -2,8 +2,8 @@ package app.yap.server.feature.topics.usecase
 
 import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import app.yap.server.feature.characters.usecase.GetCharacterUseCase
-import app.yap.server.feature.topics.model.Interlocutor
 import app.yap.server.feature.topics.model.StubTopic
+import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.UpdateTopicOutcome
 import app.yap.server.feature.topics.persistence.StubTopicRepository
 import kotlin.test.Test
@@ -23,16 +23,6 @@ internal class UpdateTopicUseCaseTest {
     }
 
     @Test
-    fun `GIVEN a draft that is not ready WHEN updating THEN nothing is stored`() = runTest {
-        val env = Environment()
-
-        val outcome = env.useCase(StubTopic.stubTopic(content = StubTopic.stubContent(releaseDate = null)))
-
-        env.topicRepository.updateCall.notCalled()
-        assertEquals(expected = UpdateTopicOutcome.Invalid, actual = outcome)
-    }
-
-    @Test
     fun `GIVEN a character that does not exist WHEN updating THEN nothing is stored`() = runTest {
         val env = Environment()
         env.characterRepository.findCall.returns(null)
@@ -41,20 +31,6 @@ internal class UpdateTopicUseCaseTest {
 
         env.topicRepository.updateCall.notCalled()
         assertEquals(expected = UpdateTopicOutcome.Invalid, actual = outcome)
-    }
-
-    @Test
-    fun `GIVEN a guest and no characters WHEN updating THEN the topic is stored`() = runTest {
-        val env = Environment()
-        env.characterRepository.findCall.returns(null)
-        val topic = StubTopic.stubTopic(
-            content = StubTopic.stubContent(interlocutor = Interlocutor.Guest(description = "A tourist.")),
-        )
-
-        val outcome = env.useCase(topic)
-
-        env.topicRepository.updateCall.calledWith(topic)
-        assertEquals(expected = UpdateTopicOutcome.Updated(topic), actual = outcome)
     }
 
     @Test
@@ -72,7 +48,9 @@ internal class UpdateTopicUseCaseTest {
         val characterRepository = StubCharacterRepository()
         val topicRepository = StubTopicRepository()
         val useCase = UpdateTopicUseCase(
-            getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
+            topicDraftRule = TopicDraftRule(
+                getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
+            ),
             topicRepository = topicRepository,
         )
     }
