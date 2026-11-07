@@ -21,7 +21,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 - [ ] 4.1 Add `exposed-java-time`, `V2__topics.sql`, the tables and the Exposed repository; verify with the PostgreSQL tests for create, read, update with fewer steps, the step order, the list order, the guest and the clean bootstrap (CI runs them)
 
-## 5. [5/16] The use cases · ~215 · `server/feature-topics/build.gradle.kts` (`implementation` and `testImplementation(testFixtures(...))` of `:server:feature-characters`), `S/usecase/`
+## 5. [5/16] The use cases · ~215 · `server/feature-topics/build.gradle.kts` (`testImplementation(testFixtures(...))` of `:server:feature-characters`), `S/usecase/`
 
 - [ ] 5.1 Add the list, read, create and update use cases; verify with the stub tests for the trimmed content, the rejected content, the unknown character and the unknown topic
 

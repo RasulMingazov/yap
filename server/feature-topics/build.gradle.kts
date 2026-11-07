@@ -6,5 +6,5 @@ plugins {
 dependencies {
     implementation(project(":server:feature-characters"))
 
-    testFixturesImplementation(project(":server:feature-characters"))
+    testFixturesImplementation(testFixtures(project(":server:feature-characters")))
 }

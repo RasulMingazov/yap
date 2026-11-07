@@ -1,6 +1,6 @@
 package app.yap.server.feature.topics.model
 
-import app.yap.server.feature.characters.model.CharacterId
+import app.yap.server.feature.characters.model.StubCharacter
 import java.time.LocalDate
 import kotlin.uuid.Uuid
 
@@ -16,7 +16,6 @@ object StubTopic {
     const val TASK = "Order a drink."
     const val TITLE = "At the cafe"
     const val TRANSLATION = "Привет! Что вам предложить?"
-    val CHARACTER_ID = CharacterId(Uuid.parse("2c7a5f1e-9a8b-4c3d-8e2f-1a2b3c4d5e6f"))
     val RELEASE_DATE: LocalDate = LocalDate.of(2026, 10, 24)
     val TOPIC_ID = TopicId(Uuid.parse("7d0c2b8e-4f31-4a6b-9c55-3e1f8a2d6b90"))
 
@@ -31,7 +30,7 @@ object StubTopic {
     fun stubContent(
         description: String = DESCRIPTION,
         durationMinutes: Int? = DURATION_MINUTES,
-        interlocutor: Interlocutor? = Interlocutor.Cast(characterId = CHARACTER_ID),
+        interlocutor: Interlocutor? = Interlocutor.Cast(characterId = StubCharacter.CHARACTER_ID),
         openingLine: OpeningLine = stubOpeningLine(),
         releaseDate: LocalDate? = RELEASE_DATE,
         role: String = ROLE,

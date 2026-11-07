@@ -1,6 +1,5 @@
 package app.yap.server.feature.topics.model
 
-import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -111,10 +110,7 @@ internal class TopicContentTest {
 
     @Test
     fun `GIVEN a duration of 1 minute WHEN checking the draft THEN the draft is valid`() {
-        val content = StubTopic.stubContent(
-            durationMinutes = 1,
-            releaseDate = LocalDate.of(2026, 10, 25),
-        )
+        val content = StubTopic.stubContent(durationMinutes = 1)
 
         val checked = content.trimmedIfDraft()
 
