@@ -30,7 +30,7 @@ internal class RemoteLevelRepository(
 
     override suspend fun list(): LoadResult<List<Level>> = serverSettingsRepository.callServer(
         failed = LoadResult.Failed,
-        read = { response -> response.toLoadResult { body<List<LevelDto>>().map { level -> level.toDomain() } } },
+        read = { response -> response.toLoadResult { toLevels() } },
         send = { settings -> httpClient.get(settings.url(LEVELS_PATH)) { bearerAuth(settings.key) } },
     )
 
@@ -47,10 +47,13 @@ internal class RemoteLevelRepository(
     )
 
     private suspend fun HttpResponse.toSaveResult(): SaveLevelsResult = when (status) {
-        HttpStatusCode.OK -> SaveLevelsResult.Saved(body<List<LevelDto>>().map { level -> level.toDomain() })
+        HttpStatusCode.OK -> SaveLevelsResult.Saved(toLevels())
         HttpStatusCode.BadRequest -> SaveLevelsResult.Invalid
         else -> SaveLevelsResult.Failed
     }
+
+    private suspend fun HttpResponse.toLevels(): List<Level> = body<List<LevelDto>>()
+        .map { level -> level.toDomain() }
 
     private companion object {
 
