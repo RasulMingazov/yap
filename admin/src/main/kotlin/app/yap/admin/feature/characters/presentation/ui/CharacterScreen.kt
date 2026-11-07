@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -102,14 +103,6 @@ private fun CharacterForm(
     onEvent: (Event) -> Unit,
 ) {
     ScreenToolbar(
-        actions = {
-            content.saveStatus?.let { status -> StatusText(status = status) }
-            PrimaryButton(
-                enabled = content.isSaveEnabled,
-                onClick = { onEvent(Event.SaveClicked) },
-                text = "Сохранить",
-            )
-        },
         back = back,
         subtitle = content.subtitle,
         title = content.title,
@@ -177,6 +170,17 @@ private fun CharacterForm(
                 color = AdminTheme.Colors.muted,
                 style = AdminTheme.Type.sub,
             )
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            PrimaryButton(
+                enabled = content.isSaveEnabled,
+                onClick = { onEvent(Event.SaveClicked) },
+                text = "Сохранить",
+            )
+            content.saveStatus?.let { status -> StatusText(status = status) }
         }
     }
 }

@@ -120,7 +120,8 @@ below the list.
 The Character form SHALL have one section with the fields Name, History, Personality and Manner of
 speech. The Name field SHALL say that this is the name the users see. Below the fields SHALL be a
 note: the topic sets the role in a scene, and the levels set the lexicon difficulty for all
-characters. The toolbar SHALL have Characters to go back, and Save.
+characters. The toolbar SHALL have a back arrow that opens Characters. Save SHALL be below the
+fields, with the save status beside it.
 
 #### Scenario: A saved character
 

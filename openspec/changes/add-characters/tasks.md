@@ -27,6 +27,7 @@
 - [x] 5.1 Add `GetCharacterUseCase`, `SaveCharacterUseCase` and `CharacterViewModel`; verify with the use-case test for create and update, and with the mapper and view-model tests for a new and a saved character, the Saved status, the error for an empty field, the save failure and the load error
 - [x] 5.2 Add the Character form screen and open it from a row and from New character; verify with `./gradlew build`
 - [ ] 5.3 Run the admin app against a server with a database; verify both start screens, the form from a row and from New character, a create and an edit, and the profile after a server restart
+- [x] 5.4 Put the back arrow in the toolbar and Save below the fields of the Character form, as the canvas shows them now; verify with `./gradlew :admin:build` and the images of the screen capture
 
 ## Workflow follow-up
 
