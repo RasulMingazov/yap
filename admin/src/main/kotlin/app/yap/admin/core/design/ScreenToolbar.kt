@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.Dp
 @Composable
 internal fun ScreenToolbar(
     title: String,
+    actions: @Composable RowScope.() -> Unit = {},
     back: ToolbarBack? = null,
     subtitle: String? = null,
 ) {
@@ -60,6 +62,7 @@ internal fun ScreenToolbar(
                 )
             }
         }
+        actions()
     }
     HorizontalDivider(color = AdminTheme.Colors.line)
 }

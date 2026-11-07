@@ -11,7 +11,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 2. [2/16] The toolbar actions slot · ~30 · `A/core/design/ScreenToolbar.kt` · before the screens of #9 and #10
 
-- [ ] 2.1 Add `actions: @Composable RowScope.() -> Unit = {}` after the title; verify with `./gradlew build` and unchanged capture images
+- [x] 2.1 Add `actions: @Composable RowScope.() -> Unit = {}` after the title; verify with `./gradlew build` and unchanged capture images
 
 ## 3. [3/16] The topic model · ~190 · `settings.gradle.kts`, `server/feature-topics/build.gradle.kts`, `S/model/`
 
