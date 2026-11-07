@@ -3,7 +3,8 @@
 Koin declares each graph node once and resolves it by contract type.
 
 ```kotlin
-internal fun featureTopicModule(): Module = module {
+@HiddenFromObjC
+fun featureTopicModule(): Module = module {
     single<TopicRepository> { DefaultTopicRepository(api = get<ApiClient>().createTopicApi()) }
 
     factory<GetTopicOfDayUseCase> { DefaultGetTopicOfDayUseCase(repository = get()) }
@@ -12,7 +13,10 @@ internal fun featureTopicModule(): Module = module {
 }
 ```
 
-- Name a feature module `feature<Name>Module()` and a core module `core<Name>Module()`.
+- Name the Koin module of a feature `feature<Name>Module()`, and of a core module
+  `core<Name>Module()`.
+- A Koin module function is public, because `shared` calls it, and hidden from Swift with
+  `@HiddenFromObjC`.
 - Bind by contract type, never by implementation type.
 - Use `single` for shared instances and `factory` for stateless collaborators and view models.
 - Pass configuration as module-function parameters, not through global state.
@@ -23,7 +27,7 @@ internal fun featureTopicModule(): Module = module {
 
 ## Composition root
 
-The `app` package owns the composition root: `appModules(...)` lists every module and
+The `app` package of `shared` owns the composition root: `appModules(...)` lists every module and
 `initKoin(...)` starts Koin. The iOS app calls `initKoin` once at launch with its configuration,
 such as the server address. No other code starts Koin.
 
@@ -34,7 +38,7 @@ Swift never sees Koin types.
 
 - Application-wide collaborators are root singletons and live for the process.
 - Account-owned state lives in feature singletons and is dropped on sign-out: the feature
-  registers a `UserDataCleaner` (`core/common`), and `app` runs every cleaner when the session
+  registers a `UserDataCleaner` (`core-common`), and `app` runs every cleaner when the session
   ends.
 
 ## Verification
