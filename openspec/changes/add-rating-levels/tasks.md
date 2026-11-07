@@ -27,7 +27,7 @@ Files: `server/feature-levels/` `usecase/` and `api/`, `contract-admin/` level D
 `server/app/src/test/.../ApplicationTest.kt` and `server/app/src/test/.../admin/ServerRoutesTest.kt`
 (the new `serverModule` parameter), and their tests.
 
-- [ ] 3.1 Add the read and the save use cases and `GetLevelRulesUseCase`; verify with the use-case tests for a rejected table, and for the value of `{level.rules}` after a save and before a save
+- [x] 3.1 Add the read and the save use cases and `GetLevelRulesUseCase`; verify with the use-case tests for a rejected table, and for the value of `{level.rules}` after a save and before a save
 - [ ] 3.2 Add the level DTOs in `contract-admin`, the mapper that reads names with `entries.find`, the routes, and mount them in `app` behind the admin key; verify with the route tests for 200, 400 for an unknown code and for a rejected table, 401, and the JSON
 
 ## 4. [4/7] Admin data layer
