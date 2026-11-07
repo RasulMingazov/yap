@@ -15,19 +15,19 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 3. [3/16] The topic model · ~190 · `settings.gradle.kts`, `server/feature-topics/build.gradle.kts`, `S/model/`
 
-- [ ] 3.1 Add the module, the model and the draft rule; verify with the model tests for the trim, the empty step, no title, no date, a zero duration and an empty guest
+- [x] 3.1 Add the module, the model and the member `TopicContent.isDraftReady`; verify with the model tests for no title, no date, a zero duration, no duration and an empty guest
 
 ## 4. [4/16] The persistence · ~330 · `gradle/libs.versions.toml`, `server/feature-topics/src/main/resources/db/migration/V2__topics.sql`, `server/feature-topics/build.gradle.kts`, `S/persistence/`, `S/.../StubTopicRepository.kt` · `V2` merges before `V3` of #9; #10 reuses `exposed-java-time`
 
 - [ ] 4.1 Add `exposed-java-time`, `V2__topics.sql`, the tables and the Exposed repository; verify with the PostgreSQL tests for create, read, update with fewer steps, the step order, the list order, the guest and the clean bootstrap (CI runs them)
 
-## 5. [5/16] The use cases · ~215 · `server/feature-topics/build.gradle.kts` (`implementation` and `testImplementation(testFixtures(...))` of `:server:feature-characters`), `S/usecase/`
+## 5. [5/16] The use cases · ~215 · `server/feature-topics/build.gradle.kts` (`testImplementation(testFixtures(...))` of `:server:feature-characters`), `S/usecase/`
 
-- [ ] 5.1 Add the list, read, create and update use cases; verify with the stub tests for the trimmed content, the rejected content, the unknown character and the unknown topic
+- [ ] 5.1 Add the list, read, create and update use cases; create and update check `isDraftReady` and the character, and return a typed `Invalid` outcome; verify with the stub tests for the content that is ready, the content that is not ready, the unknown character and the unknown topic
 
 ## 6. [6/16] The DTOs · ~170 · `contract-admin/src/main/kotlin/app/yap/contract/admin/` (`TopicDto`, `TopicContentDto`, `InterlocutorDto`), `S/api/TopicDtoMapper.kt`
 
-- [ ] 6.1 Add the DTOs and the server mapper; verify with the mapper tests for both interlocutors, no interlocutor and a date that does not parse
+- [ ] 6.1 Add the DTOs and the server mapper, which trims every text and drops the empty steps; verify with the mapper tests for the trim, the empty step, both interlocutors, no interlocutor and a date that does not parse
 
 ## 7. [7/16] The routes · ~330 · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `server/app/build.gradle.kts`, `S/api/TopicRoutes.kt`
 

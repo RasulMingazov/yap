@@ -21,9 +21,10 @@ TopicContent(title, releaseDate: LocalDate?, durationMinutes: Int?, description,
 Interlocutor = Cast(characterId) | Guest(description)
 ```
 
-One rule in `model/` trims every text, drops the empty steps, and returns no content for an empty
-title, no date or a duration under 1. The create and the update use cases call it, then check the
-character, and return `Invalid` for either failure. Both apps use `java.time.LocalDate`.
+`TopicContent.isDraftReady` is the draft rule: a title, a date and no duration under 1. The server
+DTO mapper trims every text and drops the empty steps, so the model holds no trim function. The
+create and the update use cases check the rule, then the character, and return `Invalid` for either
+failure. Both apps use `java.time.LocalDate`.
 
 `V2__topics.sql` adds `topics` (one column per field; `character_id` references `characters`;
 `guest` is text; a check allows at most one of the two) and `topic_steps` (`topic_id`,
@@ -31,7 +32,8 @@ character, and return `Invalid` for either failure. Both apps use `java.time.Loc
 `guest = ''`. An update writes the row, deletes the steps and inserts the new ones in one
 transaction. The list orders by `release_date`, then by `lower(title)`.
 
-`TopicContentDto` is the body of the create and the update calls. The date is an ISO string or
+`TopicContentDto` is the body of the create and the update calls. The mapper trims every text and
+drops a step whose texts are all empty. The date is an ISO string or
 null; a date that does not parse is a 400. `InterlocutorDto` is sealed: `character`
 (`characterId`) or `guest` (`description`). The server returns `TopicDto(topicId, content)`, and
 the list is an array of it. The full topic in each row is fine before launch; #8 adds a row type.
