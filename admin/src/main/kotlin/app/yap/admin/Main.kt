@@ -7,22 +7,22 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import app.yap.admin.core.design.AdminMaterialTheme
 import app.yap.admin.core.design.AdminTheme
-import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.feature.characters.di.characterViewModel
-import app.yap.admin.feature.characters.di.charactersViewModel
-import app.yap.admin.feature.server.di.serverViewModel
-import app.yap.admin.navigation.di.navigationViewModel
+import app.yap.admin.feature.characters.presentation.CharactersViewModel
+import app.yap.admin.feature.server.presentation.ServerViewModel
+import app.yap.admin.navigation.NavigationViewModel
 import app.yap.admin.navigation.ui.AdminShell
+import org.koin.core.parameter.parametersOf
+import org.koin.dsl.koinApplication
 
 fun main() {
-    val httpClient = adminHttpClient()
+    val koin = koinApplication { modules(appModules()) }.koin
     application {
-        val navigationViewModel = remember { navigationViewModel() }
-        val charactersViewModel = remember { charactersViewModel(httpClient = httpClient) }
-        val serverViewModel = remember { serverViewModel(httpClient = httpClient) }
+        val navigationViewModel = remember { koin.get<NavigationViewModel>() }
+        val charactersViewModel = remember { koin.get<CharactersViewModel>() }
+        val serverViewModel = remember { koin.get<ServerViewModel>() }
         Window(
             onCloseRequest = {
-                httpClient.close()
+                koin.close()
                 exitApplication()
             },
             state = rememberWindowState(
@@ -35,12 +35,7 @@ fun main() {
         ) {
             AdminMaterialTheme {
                 AdminShell(
-                    characterViewModel = { characterId ->
-                        characterViewModel(
-                            characterId = characterId,
-                            httpClient = httpClient,
-                        )
-                    },
+                    characterViewModel = { characterId -> koin.get { parametersOf(characterId) } },
                     charactersViewModel = charactersViewModel,
                     serverViewModel = serverViewModel,
                     viewModel = navigationViewModel,
