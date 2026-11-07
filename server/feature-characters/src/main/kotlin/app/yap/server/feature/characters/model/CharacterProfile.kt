@@ -7,6 +7,6 @@ data class CharacterProfile(
     val personality: String,
 ) {
 
-    val isFilled: Boolean
+    internal val isFilled: Boolean
         get() = listOf(history, manner, name, personality).none(String::isEmpty)
 }
