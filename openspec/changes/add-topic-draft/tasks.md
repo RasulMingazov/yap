@@ -23,7 +23,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 5. [5/16] The use cases · ~240 · `server/feature-topics/build.gradle.kts` (`testFixturesApi(libs.stubcall)` and `testImplementation(testFixtures(...))` of `:server:feature-characters`), `S/usecase/`, `S/persistence/StubTopicRepository.kt` (moved from [4/16], so its first consumer adds it)
 
-- [ ] 5.1 Add the list, read, create and update use cases; create and update check `isDraftReady` and the character, and return a typed `Invalid` outcome; verify with the stub tests for the content that is ready, the content that is not ready, the unknown character and the unknown topic
+- [x] 5.1 Add the list, read, create and update use cases; create and update check `isDraftReady` and the character, and return a typed `Invalid` outcome; verify with the stub tests for the content that is ready, the content that is not ready, the unknown character and the unknown topic
 
 ## 6. [6/16] The DTOs · ~170 · `contract-admin/src/main/kotlin/app/yap/contract/admin/` (`TopicDto`, `TopicContentDto`, `InterlocutorDto`), `S/api/TopicDtoMapper.kt`
 
