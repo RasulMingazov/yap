@@ -1,8 +1,6 @@
 package app.yap.server.feature.levels.usecase
 
-import app.yap.server.feature.levels.model.Level
 import app.yap.server.feature.levels.model.LevelCode
-import app.yap.server.feature.levels.model.RatingRange
 import app.yap.server.feature.levels.model.SaveLevelsOutcome
 import app.yap.server.feature.levels.model.StubLevel
 import app.yap.server.feature.levels.persistence.StubLevelRepository
@@ -23,11 +21,7 @@ internal class SaveLevelsUseCaseTest {
         env.levelRepository.saveCall.calledWith(table)
         val saved = assertIs<SaveLevelsOutcome.Saved>(outcome)
         assertEquals(
-            expected = Level(
-                code = LevelCode.B1,
-                range = RatingRange(from = 1050, to = 1199),
-                settings = StubLevel.stubSettings(),
-            ),
+            expected = StubLevel.stubLevel(),
             actual = saved.levels.single { level -> level.code == LevelCode.B1 },
         )
     }

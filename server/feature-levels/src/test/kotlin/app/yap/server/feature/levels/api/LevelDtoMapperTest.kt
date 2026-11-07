@@ -2,10 +2,8 @@ package app.yap.server.feature.levels.api
 
 import app.yap.contract.admin.LevelDto
 import app.yap.contract.admin.RatingRangeDto
-import app.yap.server.feature.levels.model.Level
 import app.yap.server.feature.levels.model.LevelCode
 import app.yap.server.feature.levels.model.LevelEntry
-import app.yap.server.feature.levels.model.RatingRange
 import app.yap.server.feature.levels.model.StubLevel
 import io.ktor.server.plugins.BadRequestException
 import kotlin.test.Test
@@ -47,11 +45,7 @@ internal class LevelDtoMapperTest {
 
     @Test
     fun `GIVEN a level with values WHEN mapping it to the DTO THEN the DTO holds every field`() {
-        val level = Level(
-            code = LevelCode.B1,
-            range = RatingRange(from = 1050, to = 1199),
-            settings = StubLevel.stubSettings(),
-        )
+        val level = StubLevel.stubLevel()
 
         val dto = level.toDto()
 

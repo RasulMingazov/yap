@@ -7,6 +7,16 @@ object StubLevel {
     const val RATING_FROM = 1050
     const val VOCABULARY = "B1"
 
+    fun stubLevel(
+        code: LevelCode = LevelCode.B1,
+        range: RatingRange? = RatingRange(from = RATING_FROM, to = 1199),
+        settings: LevelSettings? = stubSettings(),
+    ): Level = Level(
+        code = code,
+        range = range,
+        settings = settings,
+    )
+
     fun stubSettings(
         block: String = BLOCK,
         idioms: Idioms = Idioms.RARELY,
