@@ -1,6 +1,7 @@
 package app.yap.admin.feature.topics.data.repository
 
 import app.yap.admin.core.common.LoadResult
+import app.yap.admin.core.common.runSuspendCatching
 import app.yap.admin.core.network.callServer
 import app.yap.admin.core.network.settings.ServerSettingsRepository
 import app.yap.admin.core.network.toLoadResult
@@ -11,6 +12,7 @@ import app.yap.admin.feature.topics.domain.LoadTopicResult
 import app.yap.admin.feature.topics.domain.SaveTopicResult
 import app.yap.admin.feature.topics.domain.TopicCalendar
 import app.yap.admin.feature.topics.domain.TopicContent
+import app.yap.admin.feature.topics.domain.TopicGap
 import app.yap.admin.feature.topics.domain.TopicId
 import app.yap.admin.feature.topics.domain.repository.TopicRepository
 import app.yap.contract.admin.TopicCalendarDto
@@ -64,12 +66,18 @@ internal class RemoteTopicRepository(
         HttpStatusCode.OK,
         HttpStatusCode.Created,
         -> SaveTopicResult.Saved(body<TopicDto>().toDomain())
-        HttpStatusCode.BadRequest -> SaveTopicResult.Invalid(
-            gaps = body<TopicRejectionDto>().gaps.map { gap -> gap.toDomain() },
-        )
+        HttpStatusCode.BadRequest -> SaveTopicResult.Invalid(gaps = toGaps())
         HttpStatusCode.Conflict -> SaveTopicResult.DateTaken
         else -> SaveTopicResult.Failed
     }
+
+    private suspend fun HttpResponse.toGaps(): List<TopicGap> = runSuspendCatching { body<TopicRejectionDto>() }
+        .map { rejection ->
+            rejection
+                .gaps
+                .map { gap -> gap.toDomain() }
+        }
+        .getOrDefault(emptyList())
 
     private suspend fun HttpResponse.toLoadTopicResult(): LoadTopicResult = when (status) {
         HttpStatusCode.OK -> LoadTopicResult.Loaded(body<TopicDto>().toDomain())

@@ -16,6 +16,9 @@ internal class DefaultSaveTopicUseCase(
 
     override suspend fun invoke(topicId: TopicId?, content: TopicContent): SaveTopicResult {
         if (topicId == null) return topicRepository.create(content)
-        return topicRepository.update(topicId = topicId, content = content)
+        return topicRepository.update(
+            content = content,
+            topicId = topicId,
+        )
     }
 }

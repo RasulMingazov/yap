@@ -137,7 +137,7 @@ internal class RemoteTopicRepositoryTest {
     fun `GIVEN a saved topic WHEN updating it THEN the server gets a PUT at its address`() = runTest {
         val env = Environment(answer = answer(content = TOPIC_JSON))
 
-        val result = env.repository.update(topicId = TopicId(StubTopic.TOPIC_ID), content = StubTopic.stubContent())
+        val result = env.update()
 
         val request = env.engine.requestHistory.single()
         assertEquals(
@@ -162,7 +162,7 @@ internal class RemoteTopicRepositoryTest {
             ),
         )
 
-        val result = env.repository.update(topicId = TopicId(StubTopic.TOPIC_ID), content = StubTopic.stubContent())
+        val result = env.update()
 
         assertEquals(
             expected = SaveTopicResult.Invalid(gaps = listOf(TopicGap.PastDate, TopicGap.DateTaken)),
@@ -171,10 +171,19 @@ internal class RemoteTopicRepositoryTest {
     }
 
     @Test
+    fun `GIVEN the server rejects the draft with no body WHEN updating a topic THEN the result has no gaps`() = runTest {
+        val env = Environment(answer = answer(content = "", status = HttpStatusCode.BadRequest))
+
+        val result = env.update()
+
+        assertEquals(expected = SaveTopicResult.Invalid(gaps = emptyList()), actual = result)
+    }
+
+    @Test
     fun `GIVEN the date is taken WHEN updating a topic THEN the date is taken`() = runTest {
         val env = Environment(answer = answer(content = "", status = HttpStatusCode.Conflict))
 
-        val result = env.repository.update(topicId = TopicId(StubTopic.TOPIC_ID), content = StubTopic.stubContent())
+        val result = env.update()
 
         assertEquals(expected = SaveTopicResult.DateTaken, actual = result)
     }
@@ -201,6 +210,11 @@ internal class RemoteTopicRepositoryTest {
         val repository = RemoteTopicRepository(
             serverSettingsRepository = serverSettingsRepository,
             topicApi = ktorfit.createTopicApi(),
+        )
+
+        suspend fun update(): SaveTopicResult = repository.update(
+            content = StubTopic.stubContent(),
+            topicId = TopicId(StubTopic.TOPIC_ID),
         )
     }
 

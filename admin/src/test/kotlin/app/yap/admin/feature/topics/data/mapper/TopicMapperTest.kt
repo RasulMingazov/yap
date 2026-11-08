@@ -64,11 +64,19 @@ internal class TopicMapperTest {
 
     @Test
     fun `GIVEN a topic of each status WHEN mapping it THEN each has its release state`() {
-        val dtos = TopicStatusDto.entries.map { status -> StubTopicDto.stubTopicDto(status = status) }
+        val dtos = listOf(
+            StubTopicDto.stubTopicDto(status = TopicStatusDto.DRAFT),
+            StubTopicDto.stubTopicDto(status = TopicStatusDto.PUBLISHED),
+            StubTopicDto.stubTopicDto(status = TopicStatusDto.TODAY),
+            StubTopicDto.stubTopicDto(status = TopicStatusDto.OUT),
+        )
 
         val topics = dtos.map { dto -> dto.toDomain() }
 
-        assertEquals(expected = ReleaseState.entries, actual = topics.map { topic -> topic.state })
+        assertEquals(
+            expected = listOf(ReleaseState.DRAFT, ReleaseState.PUBLISHED, ReleaseState.TODAY, ReleaseState.OUT),
+            actual = topics.map { topic -> topic.state },
+        )
     }
 
     @Test
