@@ -108,16 +108,16 @@ the 400 body and 409, as two PRs.
 
 Create opens a new topic without a date until [17/26].
 
-- [ ] 16.1 Build To do, the header All topics, the five columns, the empty day row, the note and the reload banner with Retry from the UI state; verify with `./gradlew build` and the UI state tests of [15/26]
-- [ ] 16.2 Moved from [15/26] (UX review of PR 162, M-1 and M-2): a Retry over a kept calendar keeps the banner and marks the retry (Retry disabled, a progress mark), and keeps one load at a time; an empty day in To do has the title and the note of the canvas (`admin.dc.html:515`): no topic, and users see an empty day; verify with the mapper tests for the banner during a retry and for an empty day, and a view model test for a second Retry during a retry
+- [x] 16.1 Build To do, the header All topics, the five columns, the empty day row, the note and the reload banner with Retry from the UI state; verify with `./gradlew build` and the UI state tests of [15/26]
+- [x] 16.2 Moved from [15/26] (UX review of PR 162, M-1 and M-2): a Retry over a kept calendar keeps the banner and marks the retry (Retry disabled, a progress mark), and keeps one load at a time; an empty day in To do has the title and the note of the canvas (`admin.dc.html:515`): no topic, and users see an empty day; verify with the mapper tests for the banner during a retry and for an empty day, and a view model test for a second Retry during a retry
 
 ## 17. [17/26] Create on an empty day · ~150 · `A/Main.kt`, `A/navigation/` (`Screen.Topic` with the date), `T/FeatureTopicsModule.kt`, `T/presentation/TopicViewModel.kt`, `T/presentation/ui/TopicsScreen.kt`
 
 - [ ] 17.1 Pass the date of Create to a new topic; verify with the navigation test for Create, and the view model test for a new topic with a date (Release date shows the long date)
 
-## 18. [18/26] The captures of Topics · ~100 · `A/ScreenCaptureTest.kt`
+## 18. [18/26] The captures of Topics · ~130 · `A/core/design/` (`AdminTheme.Type`: Inter Medium and a medium body style; the status text size of a table cell), `admin/src/main/resources/font/` (Inter Medium), `A/ScreenCaptureTest.kt`, `T/presentation/ui/TopicsScreen.kt`
 
-- [ ] 18.1 Capture Topics with every status, an empty day, 2 of 5, a draft with the steps 3–5, nothing to do, the reload banner, loading and the error; verify with the images
+- [ ] 18.1 Capture Topics with every status, an empty day, 2 of 5, a draft with the steps 3–5, nothing to do, the reload banner, loading and the error; moved from [16/26] (reviews of PR 166): the titles in To do and All topics take weight 500 from Inter Medium and a theme style, not a literal `FontWeight.Medium` (ux 6), and the status in the All topics table has the 14 px size of the other cells, not 13 px (ui-review); verify with the images
 
 ## 19. [19/26] The admin publish domain · ~220 · `T/domain/` (`Topic` with the release state and the gaps, `SaveTopicResult` with the gaps and `DateTaken`, `PublishTopicResult`), `T/data/mapper/TopicMapper.kt`, `T/presentation/TopicViewModel.kt` (compile only)
 

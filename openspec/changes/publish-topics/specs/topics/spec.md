@@ -503,6 +503,11 @@ SHALL have New topic.
 - **THEN** it keeps the calendar, and shows above it an error that the topics did not update, with
   Retry
 
+#### Scenario: Retry over a kept calendar
+
+- **WHEN** the owner clicks Retry in the error above a kept calendar
+- **THEN** the error stays with a progress mark and a disabled Retry until the server answers
+
 #### Scenario: No topics yet
 
 - **WHEN** the server has no topics

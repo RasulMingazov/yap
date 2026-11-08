@@ -57,6 +57,7 @@ internal object AdminTheme {
         val gap = 12.dp
         val hintHorizontalPadding = 14.dp
         val hintVerticalPadding = 12.dp
+        val ledByColumnWidth = 110.dp
         val levelCodeColumnWidth = 120.dp
         val levelColumnWidth = 110.dp
         val levelWordsColumnWidth = 130.dp
@@ -90,8 +91,10 @@ internal object AdminTheme {
         val sideItemPadding = 10.dp
         val sidePadding = 12.dp
         val sideWidth = 200.dp
+        val statusColumnWidth = 110.dp
         val stepNumberTopPadding = 24.dp
         val stepNumberWidth = 28.dp
+        val stepsColumnWidth = 90.dp
         val tableCellEndPadding = 16.dp
         val tableCellPadding = 12.dp
         val tableCellStartPadding = 8.dp

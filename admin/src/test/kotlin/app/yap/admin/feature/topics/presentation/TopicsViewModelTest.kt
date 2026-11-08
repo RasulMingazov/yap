@@ -135,6 +135,43 @@ internal class TopicsViewModelTest {
         assertEquals(expected = 1, actual = env.getTopicCalendarUseCase.invokeCall.callCount)
     }
 
+    @Test
+    fun `GIVEN a failed reload WHEN Retry is clicked THEN the banner marks the retry until the calendar loads`() =
+        runTest(dispatcher) {
+            val env = Environment(calendar = LoadResult.Loaded(ONE_DAY))
+            env.viewModel.onEvent(Event.Opened)
+            advanceUntilIdle()
+            env.getTopicCalendarUseCase.invokeCall.returns(LoadResult.Failed)
+            env.viewModel.onEvent(Event.Opened)
+            advanceUntilIdle()
+            val retrying = mutableListOf<Boolean?>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                env.viewModel.uiState.collect { state -> retrying += (state as? UiState.Content)?.reloadError?.isRetrying }
+            }
+            env.getTopicCalendarUseCase.invokeCall.returns(LoadResult.Loaded(ONE_DAY))
+
+            env.viewModel.onEvent(Event.RetryClicked)
+            advanceUntilIdle()
+
+            assertEquals(expected = listOf(false, true, null), actual = retrying)
+        }
+
+    @Test
+    fun `GIVEN a retry in progress WHEN Retry is clicked again THEN the calendar loads once more`() = runTest(dispatcher) {
+        val env = Environment(calendar = LoadResult.Loaded(ONE_DAY))
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+        env.getTopicCalendarUseCase.invokeCall.returns(LoadResult.Failed)
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.RetryClicked)
+        env.viewModel.onEvent(Event.RetryClicked)
+        advanceUntilIdle()
+
+        assertEquals(expected = 3, actual = env.getTopicCalendarUseCase.invokeCall.callCount)
+    }
+
     private class Environment(
         calendar: LoadResult<TopicCalendar>,
     ) {
