@@ -90,7 +90,7 @@ m8, before the screen. Split of the view model: this part holds the state types 
 `ModelsViewModel` and the mapper with its tests; part 8 holds the logic.
 
 Files: `am/presentation/ModelsViewModel.kt` (the nested `DataState`, `UiState`, `Event` and `News`
-only), `am/presentation/ModelsUiStateMapper.kt`, `am/presentation/ModelTaskTitles.kt` (it calls
+only), `am/domain/Models.kt` (`hasEveryTask`), `am/presentation/ModelsUiStateMapper.kt`, `am/presentation/ModelTaskTitles.kt` (it calls
 `PromptKey.title()` and `PromptKey.usage()` of `admin/.../feature/prompts/presentation/PromptTitles.kt`),
 and `ModelsUiStateMapperTest`. `Event` and `News` move to part 8 with `onEvent`, their first
 consumer. The warning tone (`Status.Tone.WARNING`, `AdminTheme.Colors.warn`, `StatusText`) comes

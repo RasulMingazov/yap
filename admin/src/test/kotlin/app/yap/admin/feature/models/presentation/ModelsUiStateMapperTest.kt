@@ -4,6 +4,7 @@ import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.models.domain.ModelChoice
 import app.yap.admin.feature.models.domain.ModelTask
 import app.yap.admin.feature.models.domain.Models
+import app.yap.admin.feature.models.domain.Provider
 import app.yap.admin.feature.models.domain.SaveModelsResult
 import app.yap.admin.feature.models.domain.StubModels
 import app.yap.admin.feature.models.presentation.ModelsViewModel.DataState
@@ -114,26 +115,72 @@ internal class ModelsUiStateMapperTest {
     }
 
     @Test
-    fun `GIVEN Review with another provider WHEN mapping THEN its Model offers the models of that provider`() {
-        val other = StubModels.stubProvider(
-            code = "OTHER",
-            models = listOf("other-mini"),
-            name = "Other",
-        )
-        val state = loaded(StubModels.stubModels(providers = listOf(StubModels.stubProvider(), other)))
-        val review = ModelTask.TOPIC_REVIEW to ModelChoice(
-            model = "other-mini",
-            provider = "OTHER",
+    fun `GIVEN Review with deepseek-v4-pro WHEN mapping THEN its row shows deepseek-v4-pro`() {
+        val state = reviewWith(
+            choice = ModelChoice(
+                model = "deepseek-v4-pro",
+                provider = "DEEPSEEK",
+            ),
+            models = StubModels.stubModels(),
         )
 
-        val uiState = ModelsUiStateMapper(state.copy(choices = state.choices + review)) as UiState.Content
+        val uiState = ModelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
-            expected = UiState.ProviderOption(
-                code = "OTHER",
-                name = "Other",
-            ) to listOf("other-mini"),
-            actual = uiState.tasks[ModelTask.TOPIC_REVIEW.ordinal].let { row -> row.provider to row.models },
+            expected = "deepseek-v4-pro",
+            actual = uiState.tasks
+                .single { row -> row.task == ModelTask.TOPIC_REVIEW }
+                .model,
+        )
+    }
+
+    @Test
+    fun `GIVEN Review with another provider WHEN mapping THEN its Model offers the models of that provider`() {
+        val state = reviewWith(
+            choice = ModelChoice(
+                model = "other-mini",
+                provider = "OTHER",
+            ),
+            models = StubModels.stubModels(providers = listOf(StubModels.stubProvider(), otherProvider())),
+        )
+
+        val uiState = ModelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = UiState.TaskRow(
+                mark = null,
+                model = "other-mini",
+                models = listOf("other-mini"),
+                provider = UiState.ProviderOption(
+                    code = "OTHER",
+                    name = "Other",
+                ),
+                task = ModelTask.TOPIC_REVIEW,
+                title = "Разбор и рекомендации",
+                usage = "в конце темы",
+            ),
+            actual = uiState.tasks.single { row -> row.task == ModelTask.TOPIC_REVIEW },
+        )
+    }
+
+    @Test
+    fun `GIVEN two providers WHEN mapping THEN Provider offers both in the server's order`() {
+        val models = StubModels.stubModels(providers = listOf(StubModels.stubProvider(), otherProvider()))
+
+        val uiState = ModelsUiStateMapper(loaded(models)) as UiState.Content
+
+        assertEquals(
+            expected = listOf(
+                UiState.ProviderOption(
+                    code = "DEEPSEEK",
+                    name = "DeepSeek",
+                ),
+                UiState.ProviderOption(
+                    code = "OTHER",
+                    name = "Other",
+                ),
+            ),
+            actual = uiState.providerOptions,
         )
     }
 
@@ -226,8 +273,22 @@ internal class ModelsUiStateMapperTest {
         )
     }
 
+    private fun reviewWith(
+        choice: ModelChoice,
+        models: Models,
+    ): DataState {
+        val state = loaded(models)
+        return state.copy(choices = state.choices + (ModelTask.TOPIC_REVIEW to choice))
+    }
+
     private fun loaded(models: Models): DataState = DataState(
         choices = models.tasks.associate { taskModel -> taskModel.task to taskModel.choice },
         models = models,
+    )
+
+    private fun otherProvider(): Provider = StubModels.stubProvider(
+        code = "OTHER",
+        models = listOf("other-mini"),
+        name = "Other",
     )
 }
