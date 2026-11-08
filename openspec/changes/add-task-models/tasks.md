@@ -159,9 +159,13 @@ Files: `al/data/repository/RemoteLevelRepository.kt` (409),
 
 ## 12. [12/15] Admin Levels Model column (about 200 lines)
 
-This part uses the state of parts 10 and 11 and does not change it. Part 14 holds the captures.
+This part uses the state of parts 10 and 11. Review round 1 adds to it the reload and models
+loading flags, the form availability in the mapper and one wording with Models (about 140 lines).
+Part 14 holds the captures.
 
-Files: `al/presentation/ui/LevelsScreen.kt`.
+Files: `al/presentation/ui/LevelsScreen.kt`, `al/presentation/LevelsUiStateMapper.kt`,
+`al/presentation/LevelsViewModel.kt`, `am/presentation/ui/ModelsScreen.kt` (the note on Default),
+and their tests `LevelsUiStateMapperTest` and `LevelsViewModelTest`.
 
 - [x] 12.1 Add the Model column, the table note on Character reply, Hints and Default (M2), the No rating line (M3), the models error with Retry (M4), and the status with Refresh beside Save (M6); verify with `./gradlew build`
 - [ ] 12.2 Owner check: run the admin app against a server with a database; verify a level model after a save and after a server restart

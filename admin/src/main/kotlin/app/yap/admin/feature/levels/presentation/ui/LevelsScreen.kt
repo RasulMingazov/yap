@@ -144,6 +144,7 @@ private fun LevelsForm(
                 content = content,
                 onEvent = onEvent,
             )
+            content.modelProgress?.let { progress -> Note(text = progress) }
             content.modelError?.let { message ->
                 LoadError(
                     message = message,
@@ -285,7 +286,7 @@ private fun LevelRow(
         }
         TableCell(modifier = Modifier.weight(1f)) {
             AdminSelect(
-                enabled = enabled && content.isModelChoiceEnabled,
+                enabled = content.isModelChoiceEnabled,
                 label = { option -> option.label },
                 onSelect = { option -> onFormChange(form.copy(model = option.model)) },
                 options = content.models,

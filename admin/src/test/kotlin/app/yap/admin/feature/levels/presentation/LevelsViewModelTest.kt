@@ -262,7 +262,7 @@ internal class LevelsViewModelTest {
 
             val content = env.content()
             assertEquals(
-                expected = listOf(LevelCode.entries, false, "Не удалось загрузить модели"),
+                expected = listOf(LevelCode.entries, false, "Не удалось загрузить модели. Сохранение не меняет модели уровней"),
                 actual = listOf(content.rows.map { row -> row.code }, content.isModelChoiceEnabled, content.modelError),
             )
         }
@@ -412,6 +412,42 @@ internal class LevelsViewModelTest {
             advanceUntilIdle()
 
             env.saveLevelsUseCase.invokeCall.called(times = 1)
+        }
+
+    @Test
+    fun `GIVEN a level model is no longer available WHEN Refresh is clicked THEN the reload status shows beside a disabled Save`() =
+        runTest(dispatcher) {
+            val env = Environment(saveResult = SaveLevelsResult.ModelUnavailable)
+            advanceUntilIdle()
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.RefreshClicked)
+            yield()
+
+            assertEquals(
+                expected = Status(text = "Обновление…", tone = Status.Tone.MUTED) to false,
+                actual = env.content().saveStatus to env.content().isSaveEnabled,
+            )
+        }
+
+    @Test
+    fun `GIVEN the models did not load WHEN models Retry is clicked THEN the loading sign shows until they answer`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Failed)
+            advanceUntilIdle()
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels()))
+
+            env.viewModel.onEvent(Event.ModelsRetryClicked)
+            yield()
+            val during = env.content().modelProgress
+            advanceUntilIdle()
+
+            assertEquals(
+                expected = listOf("Загрузка моделей…", null),
+                actual = listOf(during, env.content().modelProgress),
+            )
         }
 
     private class Environment(
