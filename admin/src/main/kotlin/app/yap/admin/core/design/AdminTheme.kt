@@ -82,6 +82,8 @@ internal object AdminTheme {
             Font(resource = "font/inter_semibold.ttf", weight = FontWeight.SemiBold),
         )
 
+        private val jetBrainsMono = FontFamily(Font(resource = "font/jetbrains_mono_regular.ttf"))
+
         private val fullLineHeight = LineHeightStyle(
             alignment = LineHeightStyle.Alignment.Center,
             trim = LineHeightStyle.Trim.None,
@@ -89,7 +91,7 @@ internal object AdminTheme {
 
         val body = TextStyle(fontFamily = inter, fontSize = 14.sp, lineHeight = 20.sp)
         val brand = TextStyle(fontFamily = inter, fontSize = 15.sp, lineHeight = 20.sp)
-        val mono = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 19.sp)
+        val mono = TextStyle(fontFamily = jetBrainsMono, fontSize = 12.sp, lineHeight = 19.sp)
         val small = TextStyle(fontFamily = inter, fontSize = 12.sp, lineHeight = 16.sp)
         val sub = TextStyle(fontFamily = inter, fontSize = 13.sp, lineHeight = 18.sp)
         val tableCell = body.copy(lineHeightStyle = fullLineHeight)

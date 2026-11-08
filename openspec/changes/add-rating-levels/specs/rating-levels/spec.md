@@ -133,6 +133,11 @@ the block into the reply and hints prompts as `{level.rules}`.
 - **WHEN** the owner opens Levels
 - **THEN** B1 is the chosen level and its prompt block shows below the table
 
+#### Scenario: Levels opens again
+
+- **WHEN** the owner opens Levels again
+- **THEN** the admin app loads the levels from the server again
+
 #### Scenario: A click on a level
 
 - **WHEN** the owner clicks B2 in the table
@@ -173,6 +178,11 @@ and a Saved status.
 
 - **WHEN** the owner fills every level and clicks Save
 - **THEN** the table shows the ranges from the server and the Saved status shows beside Save
+
+#### Scenario: The save answer misses a level
+
+- **WHEN** the server accepts the levels and returns them without one of the seven
+- **THEN** the Saved status shows beside Save, and the admin app loads the levels again
 
 #### Scenario: The save is in progress
 

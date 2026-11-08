@@ -21,6 +21,7 @@ fun main() {
     application {
         val navigationViewModel = remember { koin.get<NavigationViewModel>() }
         val charactersViewModel = remember { koin.get<CharactersViewModel>() }
+        val levelsViewModel = remember { koin.get<LevelsViewModel>() }
         val serverViewModel = remember { koin.get<ServerViewModel>() }
         val topicsViewModel = remember { koin.get<TopicsViewModel>() }
         Window(
@@ -40,7 +41,7 @@ fun main() {
                 AdminShell(
                     characterViewModel = { characterId -> koin.get { parametersOf(characterId) } },
                     charactersViewModel = charactersViewModel,
-                    levelsViewModel = { koin.get<LevelsViewModel>() },
+                    levelsViewModel = levelsViewModel,
                     serverViewModel = serverViewModel,
                     topicViewModel = { topicId -> koin.get { parametersOf(topicId) } },
                     topicsViewModel = topicsViewModel,

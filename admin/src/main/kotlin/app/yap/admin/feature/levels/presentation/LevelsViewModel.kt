@@ -32,13 +32,10 @@ internal class LevelsViewModel(
     private val newsChannel = Channel<News>(Channel.BUFFERED)
     val news: Flow<News> = newsChannel.receiveAsFlow()
 
-    init {
-        load()
-    }
-
     fun onEvent(event: Event) = when (event) {
         is Event.FormChanged -> onFormChanged(event)
         is Event.LevelClicked -> dataState.update { state -> state.copy(chosen = event.code) }
+        is Event.Opened -> onOpened()
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
     }
@@ -56,6 +53,11 @@ internal class LevelsViewModel(
                 saveStatus = null,
             )
         }
+    }
+
+    private fun onOpened() {
+        if (dataState.value.isSaving) return
+        load()
     }
 
     private fun onRetryClicked() {
@@ -103,12 +105,21 @@ internal class LevelsViewModel(
                         saveStatus = SaveStatus.Invalid,
                     )
                 }
-                is SaveLevelsResult.Saved -> dataState.update { state ->
-                    state
-                        .loaded(result.levels)
-                        .copy(saveStatus = SaveStatus.Saved)
-                }
+                is SaveLevelsResult.Saved -> onSaved(result.levels)
             }
+        }
+    }
+
+    private fun onSaved(levels: List<Level>) {
+        if (!levels.hasEveryLevel()) {
+            dataState.update { state -> state.copy(saveStatus = SaveStatus.Saved) }
+            load()
+            return
+        }
+        dataState.update { state ->
+            state
+                .loaded(levels)
+                .copy(saveStatus = SaveStatus.Saved)
         }
     }
 
@@ -126,15 +137,12 @@ internal class LevelsViewModel(
         val saveStatus: SaveStatus? = null,
     ) {
 
-        fun loaded(levels: List<Level>): DataState {
-            val hasEveryLevel = levels.map { level -> level.code } == LevelCode.entries
-            return copy(
-                forms = levels.associate { level -> level.code to (level.settings?.let(LevelForm::of) ?: LevelForm.EMPTY) },
-                isSaving = false,
-                levels = levels,
-                load = if (hasEveryLevel) Load.LOADED else Load.FAILED,
-            )
-        }
+        fun loaded(levels: List<Level>): DataState = copy(
+            forms = levels.associate { level -> level.code to (level.settings?.let(LevelForm::of) ?: LevelForm.EMPTY) },
+            isSaving = false,
+            levels = levels,
+            load = if (levels.hasEveryLevel()) Load.LOADED else Load.FAILED,
+        )
     }
 
     data class LevelForm(
@@ -238,8 +246,9 @@ internal class LevelsViewModel(
         data object Loading : UiState
 
         data class Block(
+            val code: LevelCode,
+            val form: LevelForm,
             val rating: String?,
-            val text: String,
             val title: String,
         )
 
@@ -273,8 +282,12 @@ internal class LevelsViewModel(
 
         data class LevelClicked(val code: LevelCode) : Event
 
+        data object Opened : Event
+
         data object RetryClicked : Event
 
         data object SaveClicked : Event
     }
 }
+
+private fun List<Level>.hasEveryLevel(): Boolean = map { level -> level.code } == LevelCode.entries

@@ -67,8 +67,9 @@ tests. #7 and #10 change the same navigation and design files.
 Slice 1 of this part holds the decisions of the Levels UX review that change the state:
 `feature/levels/domain/LevelCode.kt`, `LevelsViewModel`, `LevelsUiStateMapper`, `StubLevel`, their
 tests, and the scenarios of these decisions in `specs/rating-levels/spec.md` (about 250 lines). Slice 2 came to
-about 520 lines and has two PRs. Slice 2a holds the mono style, `Note`, `LevelsScreen` with Save and the prompt
-block, the saving status, and the navigation files (about 240 lines). Slice 2b holds `AdminSelect`, `CellTextField`,
+about 520 lines and has two PRs. Slice 2a holds the mono style with the bundled JetBrains Mono, `Note`, `AdminTextField(textStyle)`,
+`AdminTheme.Sizes.sectionInnerGap`, `LevelsScreen` with Save and the prompt block, the saving status, the load on
+open, and the navigation files (about 300 lines). Slice 2b holds `AdminSelect`, `CellTextField`,
 the height of `PopupButton` and the level table (about 280 lines). Slice 3 holds `ScreenCaptureTest.kt` and the images.
 
 - [ ] 6.1 Add `AdminSelect`, the mono style and the Levels screen with Save in the toolbar; verify with `./gradlew build` and the images of the screen capture for each state

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,6 +20,7 @@ import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.core.design.Hint
 import app.yap.admin.core.design.LoadError
 import app.yap.admin.core.design.Loader
+import app.yap.admin.core.design.Note
 import app.yap.admin.core.design.PrimaryButton
 import app.yap.admin.core.design.ScreenBody
 import app.yap.admin.core.design.ScreenToolbar
@@ -141,11 +141,9 @@ private fun CharacterForm(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Британский или американский, длинные или короткие фразы, есть ли сленг.",
             )
-            Text(
+            Note(
                 text = "Роль в сцене — таксист, врач, сосед — задаётся в теме. " +
                     "Сложность лексики задаётся в «Уровнях» и одна для всех персонажей.",
-                color = AdminTheme.Colors.muted,
-                style = AdminTheme.Type.sub,
             )
         }
         Row(

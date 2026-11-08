@@ -40,6 +40,7 @@ internal fun LevelsScreen(viewModel: LevelsViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(viewModel) {
+        viewModel.onEvent(Event.Opened)
         viewModel.news.collect { news ->
             when (news) {
                 is News.ShowSnackbar -> snackbarHostState.showSnackbar(news.message)
@@ -127,7 +128,6 @@ private fun BlockSection(
     onEvent: (Event) -> Unit,
 ) {
     val block = content.block
-    val chosen = content.rows.first { row -> row.isChosen }
     Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.sectionInnerGap)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -145,8 +145,8 @@ private fun BlockSection(
         }
         AdminTextField(
             label = "Текст блока",
-            onValueChange = { text -> onEvent(Event.FormChanged(chosen.code, chosen.form.copy(block = text))) },
-            value = block.text,
+            onValueChange = { text -> onEvent(Event.FormChanged(block.code, block.form.copy(block = text))) },
+            value = block.form.block,
             enabled = content.isSaveEnabled,
             minLines = BLOCK_LINES,
             modifier = Modifier.fillMaxWidth(),

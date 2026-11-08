@@ -27,7 +27,7 @@ import app.yap.admin.navigation.NavigationViewModel.UiState
 internal fun AdminShell(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: CharactersViewModel,
-    levelsViewModel: () -> LevelsViewModel,
+    levelsViewModel: LevelsViewModel,
     serverViewModel: ServerViewModel,
     topicViewModel: (TopicId?) -> TopicViewModel,
     topicsViewModel: TopicsViewModel,
@@ -61,7 +61,7 @@ internal fun AdminShell(
 private fun ScreenContent(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: CharactersViewModel,
-    levelsViewModel: () -> LevelsViewModel,
+    levelsViewModel: LevelsViewModel,
     onScreenClick: (Screen) -> Unit,
     screen: Screen,
     serverViewModel: ServerViewModel,
@@ -78,7 +78,7 @@ private fun ScreenContent(
             onNewCharacterClick = { onScreenClick(Screen.Character(characterId = null)) },
             viewModel = charactersViewModel,
         )
-        is Screen.Levels -> LevelsScreen(viewModel = remember(screen) { levelsViewModel() })
+        is Screen.Levels -> LevelsScreen(viewModel = levelsViewModel)
         is Screen.Server -> ServerScreen(viewModel = serverViewModel)
         is Screen.Topic -> TopicScreen(
             onBackClick = { onScreenClick(Screen.Topics) },
