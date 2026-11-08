@@ -309,10 +309,6 @@ internal class ScreenCaptureTest {
     private companion object {
 
         const val LONG_ADDRESS = "https://staging.yap-admin.example.com"
-        const val LONG_BLOCK = "Speak in short, simple sentences of up to 16 words.\n" +
-            "Use everyday B1 words. Explain a rare word in a few simple words.\n" +
-            "Use an idiom rarely, and only a common one.\n" +
-            "Ask one question at a time and wait for the answer."
         const val SETTLED_FRAMES = 5
         const val SETTLED_NANOS = 1_000_000_000L
         val CHARACTER_ID = CharacterId(StubCharacter.CHARACTER_ID)
@@ -438,16 +434,22 @@ internal class ScreenCaptureTest {
             idioms: Idioms,
             maxWords: Int,
             to: Int?,
-        ): Level = StubLevel.stubLevel(
-            code = code,
-            range = from?.let { start -> StubLevel.stubRange(from = start, to = to) },
-            settings = StubLevel.stubSettings(
-                block = LONG_BLOCK,
-                idioms = idioms,
-                maxWords = maxWords,
-                ratingFrom = from,
-                vocabulary = if (code == LevelCode.NO_RATING) "A2–B1, слова темы" else code.name,
-            ),
-        )
+        ): Level {
+            val vocabulary = if (code == LevelCode.NO_RATING) "A2–B1, слова темы" else code.name
+            return StubLevel.stubLevel(
+                code = code,
+                range = from?.let { start -> StubLevel.stubRange(from = start, to = to) },
+                settings = StubLevel.stubSettings(
+                    block = "Speak in short sentences of up to $maxWords words.\n" +
+                        "Use $vocabulary words. Explain a rare word in a few simple words.\n" +
+                        "Idioms: ${idioms.name.lowercase()}.\n" +
+                        "Ask one question at a time and wait for the answer.",
+                    idioms = idioms,
+                    maxWords = maxWords,
+                    ratingFrom = from,
+                    vocabulary = vocabulary,
+                ),
+            )
+        }
     }
 }

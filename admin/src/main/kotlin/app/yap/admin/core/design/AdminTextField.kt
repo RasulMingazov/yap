@@ -2,6 +2,7 @@ package app.yap.admin.core.design
 
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,5 +33,6 @@ internal fun AdminTextField(
         visualTransformation = if (secret) PasswordVisualTransformation() else VisualTransformation.None,
         singleLine = minLines == 1,
         minLines = minLines,
+        colors = OutlinedTextFieldDefaults.colors(disabledContainerColor = AdminTheme.Colors.fill),
     )
 }
