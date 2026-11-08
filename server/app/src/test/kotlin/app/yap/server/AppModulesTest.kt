@@ -11,6 +11,6 @@ internal class AppModulesTest {
     fun `GIVEN every module of the server WHEN verifying the graph THEN no binding is missing`() {
         val modules = appModules(config = StubAppConfig.stubAppConfig())
 
-        module { includes(modules) }.verify(extraTypes = listOf(DeepSeekConfig::class))
+        module { includes(modules) }.verify(extraTypes = listOf(DeepSeekConfig::class, Map::class))
     }
 }
