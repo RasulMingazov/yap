@@ -202,6 +202,36 @@ internal class TopicViewModelTest {
         }
 
     @Test
+    fun `GIVEN a saved topic WHEN Add step is clicked THEN an empty step comes below the last one`() =
+        runTest(dispatcher) {
+            val env = Environment(topicId = TopicId(StubTopic.TOPIC_ID))
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.AddStepClicked)
+            advanceUntilIdle()
+
+            assertEquals(
+                expected = listOf(StubTopic.stubStep(), StubTopic.stubStep(outcome = "", passWhen = "", task = "")),
+                actual = env.content().form.steps,
+            )
+        }
+
+    @Test
+    fun `GIVEN two steps WHEN the second step changes THEN only the second step takes it`() = runTest(dispatcher) {
+        val env = Environment(topicId = TopicId(StubTopic.TOPIC_ID))
+        advanceUntilIdle()
+        env.viewModel.onEvent(Event.AddStepClicked)
+
+        env.viewModel.onEvent(Event.StepChanged(index = 1, step = StubTopic.stubStep(task = "Pay")))
+        advanceUntilIdle()
+
+        assertEquals(
+            expected = listOf(StubTopic.stubStep(), StubTopic.stubStep(task = "Pay")),
+            actual = env.content().form.steps,
+        )
+    }
+
+    @Test
     fun `GIVEN a new topic WHEN the save succeeds THEN the next save updates the saved topic`() = runTest(dispatcher) {
         val env = Environment(topicId = null)
         advanceUntilIdle()
