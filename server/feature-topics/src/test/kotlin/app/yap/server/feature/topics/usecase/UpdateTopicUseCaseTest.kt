@@ -2,8 +2,11 @@ package app.yap.server.feature.topics.usecase
 
 import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import app.yap.server.feature.characters.usecase.GetCharacterUseCase
+import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.StubTopic
 import app.yap.server.feature.topics.model.Topic
+import app.yap.server.feature.topics.model.TopicDetails
+import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicField
 import app.yap.server.feature.topics.model.TopicGap
@@ -22,13 +25,18 @@ import kotlinx.coroutines.test.runTest
 internal class UpdateTopicUseCaseTest {
 
     @Test
-    fun `GIVEN a draft that is ready WHEN updating THEN the topic is stored`() = runTest {
+    fun `GIVEN a draft that is ready WHEN updating THEN the topic is stored with its details`() = runTest {
         val env = Environment()
 
         val outcome = env.useCase(content = StubTopic.stubContent(), topicId = StubTopic.TOPIC_ID)
 
         env.topicRepository.updateCall.calledWith(StubTopic.stubTopic())
-        assertEquals(expected = UpdateTopicOutcome.Updated(StubTopic.stubTopic()), actual = outcome)
+        assertEquals(
+            expected = UpdateTopicOutcome.Updated(
+                TopicDetails(gaps = emptySet(), state = ReleaseState.DRAFT, topic = StubTopic.stubTopic()),
+            ),
+            actual = outcome,
+        )
     }
 
     @Test
@@ -164,10 +172,16 @@ internal class UpdateTopicUseCaseTest {
         val topicDraftRule = TopicDraftRule(
             getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
         )
+        val topicPublishRule = TopicPublishRule(topicDraftRule = topicDraftRule)
         val useCase = UpdateTopicUseCase(
             clock = StubTopic.CLOCK,
+            topicDetailsRule = TopicDetailsRule(
+                clock = StubTopic.CLOCK,
+                topicPublishRule = topicPublishRule,
+                topicRepository = topicRepository,
+            ),
             topicDraftRule = topicDraftRule,
-            topicPublishRule = TopicPublishRule(topicDraftRule = topicDraftRule),
+            topicPublishRule = topicPublishRule,
             topicRepository = wrap(topicRepository),
         )
     }

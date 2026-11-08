@@ -8,5 +8,5 @@ sealed interface PublishTopicOutcome {
 
     data object NotFound : PublishTopicOutcome
 
-    data class Published(val topic: Topic) : PublishTopicOutcome
+    data class Published(val details: TopicDetails) : PublishTopicOutcome
 }

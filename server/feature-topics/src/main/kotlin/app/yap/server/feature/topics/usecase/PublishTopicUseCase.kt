@@ -4,6 +4,7 @@ import app.yap.server.feature.topics.model.PublishTopicOutcome
 import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
+import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicId
 import app.yap.server.feature.topics.model.TopicPublishRule
 import app.yap.server.feature.topics.persistence.TopicPublish
@@ -12,6 +13,7 @@ import java.time.Clock
 
 class PublishTopicUseCase(
     private val clock: Clock,
+    private val topicDetailsRule: TopicDetailsRule,
     private val topicPublishRule: TopicPublishRule,
     private val topicRepository: TopicRepository,
 ) {
@@ -38,9 +40,9 @@ class PublishTopicUseCase(
         }
     }
 
-    private fun TopicPublish.toOutcome(): PublishTopicOutcome = when (this) {
+    private suspend fun TopicPublish.toOutcome(): PublishTopicOutcome = when (this) {
         is TopicPublish.DateTaken -> PublishTopicOutcome.DateTaken
         is TopicPublish.NotFound -> PublishTopicOutcome.NotFound
-        is TopicPublish.Published -> PublishTopicOutcome.Published(topic)
+        is TopicPublish.Published -> PublishTopicOutcome.Published(topicDetailsRule.details(topic))
     }
 }
