@@ -84,7 +84,7 @@ A blank line separates one pair from the next, never the two halves of a pair.
 
 - Write an extension for a type you do not own, such as `Modifier.pullStart()`, or for a mapping
   that belongs to another layer, such as `CharacterDto.toDomain()`.
-- Put the behavior of your own type into the type as a member, such as `val isDraftReady`.
+- Put the behavior of your own type into the type as a member, such as `val isComplete`.
 - Give a function one job. Cleaning input and checking a rule are two functions.
 - Return a typed outcome, not `null`, when the caller must know why the input fails.
 

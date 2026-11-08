@@ -20,7 +20,7 @@ Options:
 
 1. A unique index on `release_date` for every topic. The calendar has one row per day. A second
    draft for a date fails. If the database has two drafts on one date, `V5` fails at deploy.
-2. A partial unique index on `release_date` where `status = 'published'`. Drafts can share a date.
+2. A partial unique index on `release_date` where `status = 'PUBLISHED'`. Drafts can share a date.
 
 Choice: 2. It needs no change to the stored drafts, because no topic is published before `V5`. It
 keeps the owner's drafts. It matches the example in `docs/testing/003-backend-integration.md`.
@@ -39,11 +39,13 @@ keeps its stored fields.
 ### `V5__topic_status.sql`
 
 ```sql
-alter table topics add column status text not null default 'draft'
-    check (status in ('draft', 'published'));
+alter table topics add column status text not null default 'DRAFT'
+    check (status in ('DRAFT', 'PUBLISHED'));
 create unique index topics_published_release_date on topics (release_date)
-    where status = 'published';
+    where status = 'PUBLISHED';
 ```
+
+The column holds the enum names, as the levels and prompts tables do.
 
 V2 to V4 stay as they are. `docs/server/002-persistence.md` says to edit a migration in place
 until launch, but then the reset flag clears the database, and `yap_prod` holds the owner's drafts.

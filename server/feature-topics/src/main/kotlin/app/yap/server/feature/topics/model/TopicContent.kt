@@ -12,8 +12,4 @@ data class TopicContent(
     val setting: String,
     val steps: List<Step>,
     val title: String,
-) {
-
-    val isDraftReady: Boolean
-        get() = title.isNotEmpty() && releaseDate != null && (durationMinutes ?: 1) >= 1
-}
+)

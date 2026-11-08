@@ -8,12 +8,15 @@ import app.yap.server.feature.topics.model.Step
 import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
 import app.yap.server.feature.topics.model.TopicId
+import app.yap.server.feature.topics.model.TopicStatus
 import kotlin.uuid.Uuid
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.lowerCase
 import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
+import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
 import org.jetbrains.exposed.v1.jdbc.batchInsert
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
@@ -28,10 +31,12 @@ class DatabaseTopicRepository(
     override suspend fun create(content: TopicContent): Topic {
         val topic = Topic(
             content = content,
+            status = TopicStatus.DRAFT,
             topicId = TopicId(Uuid.random()),
         )
         database.transaction {
             TopicsTable.insert { statement ->
+                statement[TopicsTable.status] = topic.status
                 statement[TopicsTable.topicId] = topic.topicId.value
                 statement.write(content)
             }
@@ -62,19 +67,37 @@ class DatabaseTopicRepository(
             .map { row -> row.toTopic(steps = stepsByTopic[row[TopicsTable.topicId]].orEmpty()) }
     }
 
-    override suspend fun update(topic: Topic): Boolean = database.transaction {
-        val updatedRows = TopicsTable.update(
-            where = { TopicsTable.topicId eq topic.topicId.value },
-        ) { statement ->
-            statement.write(topic.content)
+    override suspend fun update(topic: Topic): TopicWrite = try {
+        database.transaction {
+            maxAttempts = 1
+            val updatedRows = TopicsTable.update(
+                where = { (TopicsTable.topicId eq topic.topicId.value) and (TopicsTable.status eq topic.status) },
+            ) { statement ->
+                statement.write(topic.content)
+            }
+            when {
+                updatedRows > 0 -> {
+                    TopicStepsTable.deleteWhere { TopicStepsTable.topicId eq topic.topicId.value }
+                    insertSteps(topic)
+                    TopicWrite.Written(topic)
+                }
+
+                isStored(topic.topicId.value) -> TopicWrite.StaleStatus
+                else -> TopicWrite.NotFound
+            }
         }
-        if (updatedRows > 0) {
-            TopicStepsTable.deleteWhere { TopicStepsTable.topicId eq topic.topicId.value }
-            insertSteps(topic)
-        }
-        updatedRows > 0
+    } catch (exception: ExposedSQLException) {
+        if (exception.sqlState != UNIQUE_VIOLATION) throw exception
+        TopicWrite.DateTaken
     }
 }
+
+private const val UNIQUE_VIOLATION = "23505"
+
+private fun JdbcTransaction.isStored(topicId: Uuid): Boolean = !TopicsTable
+    .selectAll()
+    .where { TopicsTable.topicId eq topicId }
+    .empty()
 
 private fun JdbcTransaction.readSteps(topicId: Uuid): List<Step> = TopicStepsTable
     .selectAll()
@@ -97,6 +120,7 @@ private fun ResultRow.toTopic(steps: List<Step>): Topic = Topic(
         steps = steps,
         title = this[TopicsTable.title],
     ),
+    status = this[TopicsTable.status],
     topicId = TopicId(this[TopicsTable.topicId]),
 )
 
