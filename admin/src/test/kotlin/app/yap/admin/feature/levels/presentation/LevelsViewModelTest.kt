@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.yield
 
 internal class LevelsViewModelTest {
 
@@ -68,24 +69,15 @@ internal class LevelsViewModelTest {
         val env = Environment()
         advanceUntilIdle()
         val form = StubLevel.stubInput(maxWords = "16a")
+        val forms = StubLevel
+            .stubLevels()
+            .toInputs()
 
         env.viewModel.onEvent(Event.FormChanged(code = LevelCode.C1, form = form))
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
-        env.saveLevelsUseCase.invokeCall.calledWith(StubLevel.stubLevels().toInputs() + (LevelCode.C1 to form))
-    }
-
-    @Test
-    fun `GIVEN a word count that is not a number WHEN saving THEN it names the level`() = runTest(dispatcher) {
-        val result = SaveLevelsResult.UnreadNumber(LevelCode.C1, SaveLevelsResult.NumberField.MAX_WORDS)
-        val env = Environment(saveResult = result)
-        advanceUntilIdle()
-
-        env.viewModel.onEvent(Event.SaveClicked)
-        advanceUntilIdle()
-
-        assertEquals(expected = "Проверьте число в «Слов в фразе»: C1", actual = env.content().saveStatus?.text)
+        env.saveLevelsUseCase.invokeCall.calledWith(forms + (LevelCode.C1 to form))
     }
 
     @Test
@@ -172,6 +164,20 @@ internal class LevelsViewModelTest {
 
             env.getLevelsUseCase.invokeCall.called(times = 2)
             assertEquals(expected = "Сохранено", actual = env.content().saveStatus?.text)
+        }
+
+    @Test
+    fun `GIVEN a save answer with only B1 WHEN Save is clicked during the reload THEN the levels are saved once`() =
+        runTest(dispatcher) {
+            val env = Environment(saveResult = SaveLevelsResult.Saved(listOf(StubLevel.stubLevel())))
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.SaveClicked)
+            yield()
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.saveLevelsUseCase.invokeCall.called(times = 1)
         }
 
     @Test

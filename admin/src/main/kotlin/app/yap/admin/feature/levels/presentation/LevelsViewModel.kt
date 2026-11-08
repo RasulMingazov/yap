@@ -104,7 +104,7 @@ internal class LevelsViewModel(
 
     private fun onSaved(result: SaveLevelsResult.Saved) {
         if (!result.levels.hasEveryLevel()) {
-            endSave(result)
+            dataState.update { state -> state.copy(saveResult = result) }
             load()
             return
         }

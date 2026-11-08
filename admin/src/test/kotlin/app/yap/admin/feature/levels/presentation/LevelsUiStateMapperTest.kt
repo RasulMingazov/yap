@@ -123,7 +123,8 @@ internal class LevelsUiStateMapperTest {
     @Test
     fun `GIVEN a rating from that is not a number WHEN mapping THEN the status names the field and the level`() {
         val result = SaveLevelsResult.UnreadNumber(LevelCode.B2, SaveLevelsResult.NumberField.RATING_FROM)
-        val state = loaded(StubLevel.stubLevels()).copy(saveResult = result)
+        val state = loaded(StubLevel.stubLevels())
+            .copy(saveResult = result)
 
         val uiState = LevelsUiStateMapper(state) as UiState.Content
 
@@ -135,7 +136,8 @@ internal class LevelsUiStateMapperTest {
 
     @Test
     fun `GIVEN No rating without idioms WHEN mapping THEN the status asks to choose its idioms`() {
-        val state = loaded(StubLevel.stubLevels()).copy(saveResult = SaveLevelsResult.NoIdioms(LevelCode.NO_RATING))
+        val state = loaded(StubLevel.stubLevels())
+            .copy(saveResult = SaveLevelsResult.NoIdioms(LevelCode.NO_RATING))
 
         val uiState = LevelsUiStateMapper(state) as UiState.Content
 
@@ -147,7 +149,8 @@ internal class LevelsUiStateMapperTest {
 
     @Test
     fun `GIVEN B1 without a word count WHEN mapping THEN the status asks to type the number`() {
-        val state = loaded(StubLevel.stubLevels()).copy(saveResult = SaveLevelsResult.NoWordCount(LevelCode.B1))
+        val state = loaded(StubLevel.stubLevels())
+            .copy(saveResult = SaveLevelsResult.NoWordCount(LevelCode.B1))
 
         val uiState = LevelsUiStateMapper(state) as UiState.Content
 

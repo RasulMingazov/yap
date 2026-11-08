@@ -23,7 +23,10 @@ internal class DefaultSaveLevelsUseCase(
             .filterIsInstance<Reading.Unread>()
             .firstOrNull()
         if (unread != null) return unread.result
-        return levelRepository.save(readings.filterIsInstance<Reading.Read>().map { reading -> reading.entry })
+        val entries = readings
+            .filterIsInstance<Reading.Read>()
+            .map { reading -> reading.entry }
+        return levelRepository.save(entries)
     }
 
     private fun read(code: LevelCode, input: LevelInput): Reading {
