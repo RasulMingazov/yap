@@ -56,6 +56,17 @@ class DatabaseTopicRepository(
             ?.toTopic(steps = readSteps(topicId.value))
     }
 
+    override suspend fun hasPublishedOn(date: LocalDate, exceptTopicId: TopicId): Boolean = database.transaction {
+        !TopicsTable
+            .selectAll()
+            .where {
+                (TopicsTable.releaseDate eq date) and
+                    (TopicsTable.status eq TopicStatus.PUBLISHED) and
+                    (TopicsTable.topicId neq exceptTopicId.value)
+            }
+            .empty()
+    }
+
     override suspend fun list(): List<Topic> = database.transaction {
         val stepsByTopic = TopicStepsTable
             .selectAll()
@@ -70,56 +81,54 @@ class DatabaseTopicRepository(
             .map { row -> row.toTopic(steps = stepsByTopic[row[TopicsTable.topicId]].orEmpty()) }
     }
 
-    override suspend fun hasPublishedOn(date: LocalDate, exceptTopicId: TopicId): Boolean = database.transaction {
-        !TopicsTable
-            .selectAll()
-            .where {
-                (TopicsTable.releaseDate eq date) and
-                    (TopicsTable.status eq TopicStatus.PUBLISHED) and
-                    (TopicsTable.topicId neq exceptTopicId.value)
-            }
-            .empty()
-    }
-
-    override suspend fun publish(content: TopicContent, topicId: TopicId): TopicWrite = write(
-        topic = Topic(
+    override suspend fun publish(content: TopicContent, topicId: TopicId): TopicPublish {
+        val topic = Topic(
             content = content,
             status = TopicStatus.PUBLISHED,
             topicId = topicId,
-        ),
-        where = TopicsTable.topicId eq topicId.value,
-    )
+        )
+        return writeOrDateTaken(dateTaken = TopicPublish.DateTaken) {
+            if (writeRow(topic, where = TopicsTable.topicId eq topicId.value)) {
+                TopicPublish.Published(topic)
+            } else {
+                TopicPublish.NotFound
+            }
+        }
+    }
 
-    override suspend fun update(topic: Topic): TopicWrite = write(
-        topic = topic,
-        where = (TopicsTable.topicId eq topic.topicId.value) and (TopicsTable.status eq topic.status),
-    )
+    override suspend fun update(topic: Topic): TopicWrite = writeOrDateTaken(dateTaken = TopicWrite.DateTaken) {
+        val where = (TopicsTable.topicId eq topic.topicId.value) and (TopicsTable.status eq topic.status)
+        when {
+            writeRow(topic, where) -> TopicWrite.Written(topic)
+            isStored(topic.topicId.value) -> TopicWrite.StaleStatus
+            else -> TopicWrite.NotFound
+        }
+    }
 
-    private suspend fun write(topic: Topic, where: Op<Boolean>): TopicWrite = try {
+    private suspend fun <T> writeOrDateTaken(dateTaken: T, block: suspend JdbcTransaction.() -> T): T = try {
         database.transaction {
             maxAttempts = 1
-            val updatedRows = TopicsTable.update(where = { where }) { statement ->
-                statement[TopicsTable.status] = topic.status
-                statement.write(topic.content)
-            }
-            when {
-                updatedRows > 0 -> {
-                    TopicStepsTable.deleteWhere { TopicStepsTable.topicId eq topic.topicId.value }
-                    insertSteps(topic)
-                    TopicWrite.Written(topic)
-                }
-
-                isStored(topic.topicId.value) -> TopicWrite.StaleStatus
-                else -> TopicWrite.NotFound
-            }
+            block()
         }
     } catch (exception: ExposedSQLException) {
         if (exception.sqlState != UNIQUE_VIOLATION) throw exception
-        TopicWrite.DateTaken
+        dateTaken
     }
 }
 
 private const val UNIQUE_VIOLATION = "23505"
+
+private fun JdbcTransaction.writeRow(topic: Topic, where: Op<Boolean>): Boolean {
+    val updatedRows = TopicsTable.update(where = { where }) { statement ->
+        statement[TopicsTable.status] = topic.status
+        statement.write(topic.content)
+    }
+    if (updatedRows > 0) {
+        TopicStepsTable.deleteWhere { TopicStepsTable.topicId eq topic.topicId.value }
+        insertSteps(topic)
+    }
+    return updatedRows > 0
+}
 
 private fun JdbcTransaction.isStored(topicId: Uuid): Boolean = !TopicsTable
     .selectAll()

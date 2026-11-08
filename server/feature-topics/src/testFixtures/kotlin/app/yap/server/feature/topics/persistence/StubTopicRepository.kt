@@ -17,7 +17,7 @@ class StubTopicRepository(
     val findCall = StubCall1.returns<TopicId, Topic?>(topic)
     val hasPublishedOnCall = StubCall2.returns<LocalDate, TopicId, Boolean>(false)
     val listCall = StubCall0.returns<List<Topic>>(listOf(topic))
-    val publishCall = StubCall2.returns<TopicContent, TopicId, TopicWrite>(TopicWrite.Written(topic))
+    val publishCall = StubCall2.returns<TopicContent, TopicId, TopicPublish>(TopicPublish.Published(topic))
     val updateCall = StubCall1.returns<Topic, TopicWrite>(TopicWrite.Written(topic))
 
     override suspend fun create(content: TopicContent): Topic = createCall.invoke(content)
@@ -29,7 +29,7 @@ class StubTopicRepository(
 
     override suspend fun list(): List<Topic> = listCall.invoke()
 
-    override suspend fun publish(content: TopicContent, topicId: TopicId): TopicWrite =
+    override suspend fun publish(content: TopicContent, topicId: TopicId): TopicPublish =
         publishCall.invoke(content, topicId)
 
     override suspend fun update(topic: Topic): TopicWrite = updateCall.invoke(topic)
