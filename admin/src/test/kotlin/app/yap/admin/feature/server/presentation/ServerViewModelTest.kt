@@ -32,18 +32,20 @@ internal class ServerViewModelTest {
 
     @Test
     fun `GIVEN saved settings WHEN the screen opens THEN it connects and shows the server`() = runTest(dispatcher) {
+        val savedSettings = StubServerSettings.stubServerSettings()
         val env = Environment(
             connection = ServerConnection.Connected(environment = "staging"),
-            savedSettings = StubServerSettings.stubServerSettings(),
+            savedSettings = savedSettings,
         )
 
         advanceUntilIdle()
 
         assertEquals(expected = "Сервер: staging", actual = env.viewModel.uiState.value.serverLabel)
+        env.connectToServerUseCase.invokeCall.calledWith(savedSettings)
     }
 
     @Test
-    fun `GIVEN an entered address and key WHEN connect is clicked THEN it connects with the trimmed values`() =
+    fun `GIVEN an entered address and key WHEN connect is clicked THEN it connects with the entered values`() =
         runTest(dispatcher) {
             val env = Environment(connection = ServerConnection.Unauthorized, savedSettings = null)
             advanceUntilIdle()
@@ -54,7 +56,7 @@ internal class ServerViewModelTest {
             advanceUntilIdle()
 
             env.connectToServerUseCase.invokeCall.calledWith(
-                ServerSettings(address = "http://staging.yap", key = "staging-key"),
+                ServerSettings(address = " http://staging.yap ", key = " staging-key "),
             )
         }
 
@@ -83,6 +85,37 @@ internal class ServerViewModelTest {
             advanceUntilIdle()
 
             assertEquals(expected = "typed-key", actual = env.viewModel.uiState.value.key)
+            env.connectToServerUseCase.invokeCall.notCalled()
+        }
+
+    @Test
+    fun `GIVEN an address typed before the saved settings load WHEN they load THEN the typed address stays`() =
+        runTest(dispatcher) {
+            val env = Environment(
+                connection = ServerConnection.Connected(environment = "staging"),
+                savedSettings = StubServerSettings.stubServerSettings(),
+            )
+
+            env.viewModel.onEvent(ServerViewModel.Event.AddressChanged("http://typed.yap"))
+            advanceUntilIdle()
+
+            assertEquals(expected = "http://typed.yap", actual = env.viewModel.uiState.value.address)
+            env.connectToServerUseCase.invokeCall.notCalled()
+        }
+
+    @Test
+    fun `GIVEN a key typed and cleared before the saved settings load WHEN they load THEN the key stays empty`() =
+        runTest(dispatcher) {
+            val env = Environment(
+                connection = ServerConnection.Connected(environment = "staging"),
+                savedSettings = StubServerSettings.stubServerSettings(),
+            )
+
+            env.viewModel.onEvent(ServerViewModel.Event.KeyChanged("typed-key"))
+            env.viewModel.onEvent(ServerViewModel.Event.KeyChanged(""))
+            advanceUntilIdle()
+
+            assertEquals(expected = "", actual = env.viewModel.uiState.value.key)
             env.connectToServerUseCase.invokeCall.notCalled()
         }
 
