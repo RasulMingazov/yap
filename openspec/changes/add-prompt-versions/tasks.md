@@ -37,10 +37,11 @@ Starts after the #7 part with the actions slot of `ScreenToolbar` and the #9 par
 
 Slice 1 of this part holds the decisions of the Prompts UX review that change the state:
 `PromptsViewModel.kt` and `PromptsUiStateMapper.kt` in `admin/.../feature/prompts/presentation/`, their tests, and the
-scenarios of these decisions in `specs/prompts/spec.md` (about 330 lines). Slice 2 holds 7.1 without
-the captures. Slice 3 holds `ScreenCaptureTest.kt` and the images.
+scenarios of these decisions in `specs/prompts/spec.md` (about 330 lines). Slice 2a holds the screen with
+the list, the editor text and the navigation (about 340 lines). Slice 2b holds `Chip`, the variables and
+Versions (about 180 lines). Slice 3 holds `ScreenCaptureTest.kt` and the images.
 
-- [ ] 7.1 Add `Chip`, the Prompts screen and Prompts in the sidebar group Rules after Levels. Files: `admin/src/main/kotlin/app/yap/admin/core/design/Chip.kt` (hot), `ap/presentation/ui/PromptsScreen.kt`, `admin/src/main/kotlin/app/yap/admin/Main.kt` (hot), `admin/src/main/kotlin/app/yap/admin/navigation/` (hot), `admin/src/test/kotlin/app/yap/admin/ScreenCaptureTest.kt`. Verify with the navigation view-model test for Prompts, `./gradlew build` and the images of the screen capture
+- [ ] 7.1 Add `Chip`, the Prompts screen and Prompts in the sidebar group Rules after Levels. Files: `admin/src/main/kotlin/app/yap/admin/core/design/Chip.kt` (hot), `admin/src/main/kotlin/app/yap/admin/core/design/AdminTheme.kt` (hot), `ap/presentation/PromptsViewModel.kt` and its test, `ap/presentation/ui/PromptsScreen.kt`, `admin/src/main/kotlin/app/yap/admin/Main.kt` (hot), `admin/src/main/kotlin/app/yap/admin/navigation/` (hot), `admin/src/test/kotlin/app/yap/admin/ScreenCaptureTest.kt`. Verify with the navigation view-model test for Prompts, `./gradlew build` and the images of the screen capture
 - [ ] 7.2 Run the admin app against a server with a database; verify a first save, a second save, a restore and the versions after a server restart
 
 ## 8. Archive

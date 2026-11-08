@@ -50,6 +50,31 @@ internal class PromptsViewModelTest {
     }
 
     @Test
+    fun `GIVEN Prompts was open WHEN it opens again THEN it loads the list again`() = runTest(dispatcher) {
+        val env = Environment()
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+
+        env.getPromptsUseCase.invokeCall.called(times = 2)
+    }
+
+    @Test
+    fun `GIVEN a save in progress WHEN Prompts opens again THEN the list is not loaded again`() = runTest(dispatcher) {
+        val env = Environment()
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.SaveClicked)
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+
+        env.getPromptsUseCase.invokeCall.called(times = 1)
+    }
+
+    @Test
     fun `GIVEN a typed text WHEN the owner returns to the prompt THEN the editor shows it`() = runTest(dispatcher) {
         val env = Environment()
         env.viewModel.onEvent(Event.Opened)
@@ -250,8 +275,8 @@ internal class PromptsViewModelTest {
     @Test
     fun `GIVEN the chosen prompt did not load WHEN Save is clicked THEN nothing is sent`() = runTest(dispatcher) {
         val env = Environment()
-        env.viewModel.onEvent(Event.Opened)
         env.getPromptUseCase.invokeCall.returns(LoadResult.Failed)
+        env.viewModel.onEvent(Event.Opened)
         advanceUntilIdle()
 
         env.viewModel.onEvent(Event.SaveClicked)
@@ -264,8 +289,8 @@ internal class PromptsViewModelTest {
     fun `GIVEN the chosen prompt did not load WHEN Retry is clicked THEN the editor shows it`() =
         runTest(dispatcher) {
             val env = Environment()
-            env.viewModel.onEvent(Event.Opened)
             env.getPromptUseCase.invokeCall.returns(LoadResult.Failed)
+            env.viewModel.onEvent(Event.Opened)
             advanceUntilIdle()
             env.getPromptUseCase.invokeCall.returns(LoadResult.Loaded(StubPrompt.stubPrompt()))
 
@@ -278,8 +303,8 @@ internal class PromptsViewModelTest {
     @Test
     fun `GIVEN the list did not load WHEN Retry is clicked THEN the editor shows the prompt`() = runTest(dispatcher) {
         val env = Environment()
-        env.viewModel.onEvent(Event.Opened)
         env.getPromptsUseCase.invokeCall.returns(LoadResult.Failed)
+        env.viewModel.onEvent(Event.Opened)
         advanceUntilIdle()
         env.getPromptsUseCase.invokeCall.returns(LoadResult.Loaded(StubPrompt.stubPromptSummaries()))
 
