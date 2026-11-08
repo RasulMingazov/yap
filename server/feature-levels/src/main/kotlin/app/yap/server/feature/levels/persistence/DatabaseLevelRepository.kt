@@ -34,7 +34,8 @@ private fun ResultRow.toEntry(): LevelEntry = LevelEntry(
         block = this[LevelsTable.block],
         idioms = this[LevelsTable.idioms],
         maxWords = this[LevelsTable.maxWords],
-        model = this[LevelsTable.model]?.takeIf { model -> ModelCatalog.choiceOf(model) != null },
+        model = this[LevelsTable.model]
+            ?.takeIf { model -> ModelCatalog.choiceOf(model) != null },
         ratingFrom = this[LevelsTable.ratingFrom],
         vocabulary = this[LevelsTable.vocabulary],
     ),

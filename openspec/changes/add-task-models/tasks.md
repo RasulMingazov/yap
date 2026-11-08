@@ -71,7 +71,7 @@ Files: `server/feature-levels/src/main/resources/db/migration/V7__level_model.sq
 `internal val dependsOnLevel`: Character reply and Hints), and their tests.
 
 - [x] 5.1 Add the optional level model: the column, the upsert that also sets it, the read that gives no model for a stored model outside the catalog, the outcome `ModelUnavailable` with 409 for a saved model outside the catalog, and `LevelSettingsDto.model` with the default `null`; verify with the use-case test for an unknown model, the mapper test, the route tests for a level model and for 409, and the PostgreSQL tests for a save with a model, a second save without one, and a stored model outside the catalog that reads as no model (CI runs them)
-- [x] 5.2 Add `GetTaskModelUseCase(task, level)` with `TaskModelChoice` for the task row; verify with the use-case tests for a level without a model, a level model for Character reply and for Hints, a level model that Step check, Review and Calibration ignore, `dependsOnLevel` for the five tasks, a stored task row outside the catalog that gives the default, and a save between two calls that changes the model of the second call
+- [x] 5.2 Add `GetTaskModelUseCase(code, task)` with `TaskModelChoice` for the task row; verify with the use-case tests for a level without a model, a level model for Character reply and for Hints, a level model that Step check, Review and Calibration ignore, `dependsOnLevel` for the five tasks, a stored task row outside the catalog that gives the default, and a save between two calls that changes the model of the second call
 
 ## 6. [6/15] Admin models data layer (about 300 lines)
 

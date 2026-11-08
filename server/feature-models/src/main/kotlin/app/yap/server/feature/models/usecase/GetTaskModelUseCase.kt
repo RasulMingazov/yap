@@ -14,16 +14,16 @@ class GetTaskModelUseCase(
 ) {
 
     suspend operator fun invoke(
-        level: LevelCode,
+        code: LevelCode,
         task: ModelTask,
-    ): ModelChoice = levelChoice(level, task) ?: TaskModelChoice.of(taskModelRepository.list(), task)
+    ): ModelChoice = levelChoice(code, task) ?: TaskModelChoice.of(taskModelRepository.list(), task)
 
     private suspend fun levelChoice(
-        level: LevelCode,
+        code: LevelCode,
         task: ModelTask,
     ): ModelChoice? = if (task.dependsOnLevel) {
         getLevelsUseCase()
-            .find { entry -> entry.code == level }
+            .find { level -> level.code == code }
             ?.settings
             ?.model
             ?.let(ModelCatalog::choiceOf)
