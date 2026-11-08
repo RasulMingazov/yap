@@ -23,7 +23,7 @@ internal class TopicUiStateMapperTest {
 
         assertEquals(expected = "Новая тема", actual = content.title)
         assertEquals(expected = "Ещё не сохранена", actual = content.subtitle)
-        assertEquals(expected = "", actual = content.releaseDateText)
+        assertEquals(expected = null, actual = content.releaseDateText)
         assertEquals(
             expected = "Для черновика нужны название и дата выхода. Остальное можно заполнить позже.",
             actual = content.hint,

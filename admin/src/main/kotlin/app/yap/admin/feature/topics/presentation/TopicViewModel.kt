@@ -169,7 +169,7 @@ internal class TopicViewModel(
             val guestDescription: String?,
             val hint: String?,
             val isSaveEnabled: Boolean,
-            val releaseDateText: String,
+            val releaseDateText: String?,
             val saveStatus: Status?,
             val subtitle: String,
             val title: String,
