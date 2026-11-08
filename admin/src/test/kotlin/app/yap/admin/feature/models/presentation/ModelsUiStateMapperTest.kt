@@ -249,6 +249,19 @@ internal class ModelsUiStateMapperTest {
     }
 
     @Test
+    fun `GIVEN a failed save WHEN mapping THEN no status shows and no Refresh`() {
+        val state = loaded(StubModels.stubModels())
+            .copy(saveResult = SaveModelsResult.Failed)
+
+        val uiState = ModelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = null to false,
+            actual = uiState.saveStatus to uiState.isRefreshShown,
+        )
+    }
+
+    @Test
     fun `GIVEN the models did not load WHEN mapping THEN Models shows the load error`() {
         val uiState = ModelsUiStateMapper(DataState(isLoadFailed = true))
 
