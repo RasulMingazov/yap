@@ -27,8 +27,8 @@ internal object PromptsUiStateMapper : (DataState) -> UiState {
     private fun DataState.toContent(): UiState.Content = UiState.Content(
         editor = editor(),
         groups = groups(),
-        isListEnabled = !isSending && promptLoad != Load.LOADING,
-        isSaveEnabled = !isSending && promptLoad == Load.LOADED,
+        isListEnabled = isListEnabled(),
+        isSaveEnabled = isSaveEnabled(),
         saveStatus = saveStatus(),
     )
 
@@ -42,13 +42,14 @@ internal object PromptsUiStateMapper : (DataState) -> UiState {
         val prompt = prompts.getValue(chosen)
         return UiState.Editor.Loaded(
             isEditable = !isSending,
+            isRestoreEnabled = !isSending,
             isTextError = sendStatus is SendStatus.EmptyText,
             state = prompt.state(),
             text = text,
             title = chosen.title(),
             variables = prompt.variables,
             versions = prompt.versions.map { version -> version.row() },
-            versionsEmpty = prompt.versionsEmpty(),
+            versionsEmptyMessage = prompt.versionsEmptyMessage(),
         )
     }
 
@@ -76,7 +77,7 @@ internal object PromptsUiStateMapper : (DataState) -> UiState {
         Status(text = "архив", tone = Status.Tone.MUTED)
     }
 
-    private fun Prompt.versionsEmpty(): String? = if (versions.isEmpty()) {
+    private fun Prompt.versionsEmptyMessage(): String? = if (versions.isEmpty()) {
         "Версий пока нет. Первая появится после «Сохранить»"
     } else {
         null
@@ -97,6 +98,10 @@ internal object PromptsUiStateMapper : (DataState) -> UiState {
         title = promptKey.title(),
         usage = promptKey.usage(),
     )
+
+    private fun DataState.isListEnabled(): Boolean = !isSending && promptLoad != Load.LOADING
+
+    private fun DataState.isSaveEnabled(): Boolean = !isSending && promptLoad == Load.LOADED
 
     private fun DataState.saveStatus(): Status = when (val status = sendStatus) {
         is SendStatus.EmptyText -> Status(text = "Введите текст промпта", tone = Status.Tone.ERROR)

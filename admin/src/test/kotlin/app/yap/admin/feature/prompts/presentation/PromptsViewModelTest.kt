@@ -234,6 +234,18 @@ internal class PromptsViewModelTest {
         }
 
     @Test
+    fun `GIVEN the chosen prompt did not load WHEN Save is clicked THEN nothing is sent`() = runTest(dispatcher) {
+        val env = Environment()
+        env.getPromptUseCase.invokeCall.returns(LoadResult.Failed)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.savePromptUseCase.invokeCall.notCalled()
+    }
+
+    @Test
     fun `GIVEN the chosen prompt did not load WHEN Retry is clicked THEN the editor shows it`() =
         runTest(dispatcher) {
             val env = Environment()

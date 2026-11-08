@@ -127,7 +127,7 @@ internal class PromptsViewModel(
 
     private fun onSaveClicked() {
         val state = dataState.value
-        if (state.isSending) return
+        if (state.isSending || state.promptLoad != Load.LOADED) return
         startSending(SendStatus.Saving)
         viewModelScope.launch {
             when (val result = savePromptUseCase(state.chosen, state.text)) {
@@ -232,13 +232,14 @@ internal class PromptsViewModel(
 
             data class Loaded(
                 val isEditable: Boolean,
+                val isRestoreEnabled: Boolean,
                 val isTextError: Boolean,
                 val state: String,
                 val text: String,
                 val title: String,
                 val variables: List<String>,
                 val versions: List<Version>,
-                val versionsEmpty: String?,
+                val versionsEmptyMessage: String?,
             ) : Editor
 
             data object Loading : Editor

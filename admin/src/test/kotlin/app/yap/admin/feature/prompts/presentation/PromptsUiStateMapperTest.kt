@@ -48,7 +48,7 @@ internal class PromptsUiStateMapperTest {
 
         val editor = editor(state)
 
-        assertEquals(expected = "Версий пока нет. Первая появится после «Сохранить»", actual = editor.versionsEmpty)
+        assertEquals(expected = "Версий пока нет. Первая появится после «Сохранить»", actual = editor.versionsEmptyMessage)
     }
 
     @Test
@@ -120,6 +120,18 @@ internal class PromptsUiStateMapperTest {
     }
 
     @Test
+    fun `GIVEN a restore in progress WHEN mapping THEN the editor, the list and Restore are disabled`() {
+        val state = loaded().copy(sendStatus = SendStatus.Restoring)
+
+        val uiState = PromptsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Triple(false, false, false),
+            actual = Triple(editor(state).isEditable, uiState.isListEnabled, editor(state).isRestoreEnabled),
+        )
+    }
+
+    @Test
     fun `GIVEN a save WHEN mapping THEN the Saved status shows beside Save`() {
         val state = loaded().copy(sendStatus = SendStatus.Saved)
 
@@ -147,8 +159,8 @@ internal class PromptsUiStateMapperTest {
         val uiState = PromptsUiStateMapper(state) as UiState.Content
 
         assertEquals(
-            expected = UiState.Editor.Loading to false,
-            actual = uiState.editor to uiState.isListEnabled,
+            expected = Triple(UiState.Editor.Loading, false, false),
+            actual = Triple(uiState.editor, uiState.isListEnabled, uiState.isSaveEnabled),
         )
     }
 
