@@ -25,38 +25,45 @@ internal class CharactersViewModel(
     }
 
     private fun onOpened() {
-        val state = dataState.value
-        if (state.isLoading) return
-        if (state.characters !is LoadResult.Loaded) {
-            dataState.update { current -> current.copy(characters = null) }
-        }
+        if (dataState.value.isLoading) return
         load()
     }
 
     private fun onRetryClicked() {
-        if (dataState.value.characters !is LoadResult.Failed) return
-        dataState.update { state -> state.copy(characters = null) }
+        if (!dataState.value.isLoadFailed) return
         load()
     }
 
     private fun load() {
-        dataState.update { state -> state.copy(isLoading = true) }
+        dataState.update { state ->
+            state.copy(
+                isLoadFailed = false,
+                isLoading = true,
+            )
+        }
         viewModelScope.launch {
-            val characters = getCharactersUseCase()
-            dataState.update { state -> state.loaded(characters) }
+            when (val result = getCharactersUseCase()) {
+                is LoadResult.Failed -> dataState.update { state ->
+                    state.copy(
+                        isLoadFailed = true,
+                        isLoading = false,
+                    )
+                }
+                is LoadResult.Loaded -> dataState.update { state ->
+                    state.copy(
+                        characters = result.value,
+                        isLoading = false,
+                    )
+                }
+            }
         }
     }
 
     data class DataState(
-        val characters: LoadResult<List<Character>>? = null,
+        val characters: List<Character>? = null,
+        val isLoadFailed: Boolean = false,
         val isLoading: Boolean = false,
-    ) {
-
-        fun loaded(result: LoadResult<List<Character>>): DataState = copy(
-            characters = if (result is LoadResult.Failed && characters is LoadResult.Loaded) characters else result,
-            isLoading = false,
-        )
-    }
+    )
 
     sealed interface UiState {
 

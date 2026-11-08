@@ -1,10 +1,9 @@
 package app.yap.admin.feature.characters.presentation
 
 import app.yap.admin.core.presentation.Status
+import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.StubCharacter
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.DataState
-import app.yap.admin.feature.characters.presentation.CharacterViewModel.Load
-import app.yap.admin.feature.characters.presentation.CharacterViewModel.SaveStatus
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.UiState
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -35,7 +34,7 @@ internal class CharacterUiStateMapperTest {
         val character = StubCharacter.stubCharacter()
         val state = DataState(characterId = character.characterId)
             .saved(character.profile)
-            .copy(saveStatus = SaveStatus.SAVED)
+            .copy(saveResult = SaveCharacterResult.Saved(character))
 
         val uiState = CharacterUiStateMapper(state)
 
@@ -54,10 +53,31 @@ internal class CharacterUiStateMapperTest {
 
     @Test
     fun `GIVEN the character did not load WHEN mapping THEN the form shows the error`() {
-        val state = DataState(characterId = StubCharacter.stubCharacter().characterId).copy(load = Load.FAILED)
+        val state = DataState(characterId = StubCharacter.stubCharacter().characterId, isLoadFailed = true)
 
         val uiState = CharacterUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить персонажа"), actual = uiState)
+    }
+
+    @Test
+    fun `GIVEN a saved character that is not loaded yet WHEN mapping THEN the form is loading`() {
+        val state = DataState(characterId = StubCharacter.stubCharacter().characterId)
+
+        val uiState = CharacterUiStateMapper(state)
+
+        assertEquals(expected = UiState.Loading, actual = uiState)
+    }
+
+    @Test
+    fun `GIVEN an empty field WHEN mapping THEN the status asks to fill in every field`() {
+        val state = DataState(characterId = null, saveResult = SaveCharacterResult.Invalid)
+
+        val uiState = CharacterUiStateMapper(state)
+
+        assertEquals(
+            expected = Status(text = "Заполните все поля", tone = Status.Tone.ERROR),
+            actual = (uiState as UiState.Content).saveStatus,
+        )
     }
 }

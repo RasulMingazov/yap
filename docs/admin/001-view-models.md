@@ -54,6 +54,12 @@ internal class CharacterViewModel(
   in `viewModelScope`.
 - Keep internal facts in an immutable `DataState` and map it to `UiState` with one mapper object,
   through `mapState`: a `StateFlow` mapping helper that the first view model adds.
+- Keep only raw facts in `DataState`: domain data that is `null` until it loads, busy flags
+  (`isLoading`, `isSaving`), failure flags (`isLoadFailed`), the domain result of the last call
+  when its kind matters, and the user's input. Do not keep a type that names a screen state, such
+  as a `LOADING`/`LOADED`/`FAILED` enum, a `LoadResult`, or a `Saving` status. Do not add derived
+  getters.
+- Let the mapper decide the screen state and every status text from these facts.
 - A `UiState` mapper object implements `(DataState) -> UiState`. Its only public function is
   `override fun invoke(state: DataState): UiState`, and the view model passes the object to
   `mapState`. Every other function of the mapper is `private`. Do not split a mapper into a second

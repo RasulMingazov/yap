@@ -1,16 +1,18 @@
 package app.yap.admin.feature.characters.presentation
 
-import app.yap.admin.core.common.LoadResult
 import app.yap.admin.feature.characters.domain.Character
 import app.yap.admin.feature.characters.presentation.CharactersViewModel.DataState
 import app.yap.admin.feature.characters.presentation.CharactersViewModel.UiState
 
 internal object CharactersUiStateMapper : (DataState) -> UiState {
 
-    override fun invoke(state: DataState): UiState = when (val characters = state.characters) {
-        null -> UiState.Loading
-        is LoadResult.Failed -> UiState.Error(message = "Не удалось загрузить персонажей")
-        is LoadResult.Loaded -> characters.value.toUiState()
+    override fun invoke(state: DataState): UiState {
+        val characters = state.characters
+        return when {
+            characters != null -> characters.toUiState()
+            state.isLoadFailed -> UiState.Error(message = "Не удалось загрузить персонажей")
+            else -> UiState.Loading
+        }
     }
 
     private fun List<Character>.toUiState(): UiState {
