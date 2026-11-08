@@ -10,7 +10,6 @@ import app.yap.server.feature.topics.model.UpdateTopicOutcome
 import app.yap.server.feature.topics.usecase.CreateTopicUseCase
 import app.yap.server.feature.topics.usecase.GetTopicCalendarUseCase
 import app.yap.server.feature.topics.usecase.GetTopicUseCase
-import app.yap.server.feature.topics.usecase.GetTopicsUseCase
 import app.yap.server.feature.topics.usecase.PublishTopicUseCase
 import app.yap.server.feature.topics.usecase.UpdateTopicUseCase
 import io.ktor.http.HttpStatusCode
@@ -29,23 +28,15 @@ fun Route.topicRoutes(
     createTopicUseCase: CreateTopicUseCase,
     getTopicCalendarUseCase: GetTopicCalendarUseCase,
     getTopicUseCase: GetTopicUseCase,
-    getTopicsUseCase: GetTopicsUseCase,
     publishTopicUseCase: PublishTopicUseCase,
     updateTopicUseCase: UpdateTopicUseCase,
 ) {
     route("/admin/topics") {
-        getTopicsRoute(getTopicsUseCase)
         getTopicCalendarRoute(getTopicCalendarUseCase)
         createTopicRoute(createTopicUseCase)
         getTopicRoute(getTopicUseCase)
         updateTopicRoute(updateTopicUseCase)
         publishTopicRoute(publishTopicUseCase)
-    }
-}
-
-private fun Route.getTopicsRoute(getTopicsUseCase: GetTopicsUseCase) {
-    get {
-        call.respond(getTopicsUseCase().map { details -> details.toDto() })
     }
 }
 

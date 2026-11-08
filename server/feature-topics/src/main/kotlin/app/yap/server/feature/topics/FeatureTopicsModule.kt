@@ -11,7 +11,6 @@ import app.yap.server.feature.topics.persistence.TopicRepository
 import app.yap.server.feature.topics.usecase.CreateTopicUseCase
 import app.yap.server.feature.topics.usecase.GetTopicCalendarUseCase
 import app.yap.server.feature.topics.usecase.GetTopicUseCase
-import app.yap.server.feature.topics.usecase.GetTopicsUseCase
 import app.yap.server.feature.topics.usecase.PublishTopicUseCase
 import app.yap.server.feature.topics.usecase.UpdateTopicUseCase
 import java.time.Clock
@@ -29,7 +28,6 @@ fun featureTopicsModule(): Module = module {
     factoryOf(::CreateTopicUseCase)
     factoryOf(::GetTopicCalendarUseCase)
     factoryOf(::GetTopicUseCase)
-    factoryOf(::GetTopicsUseCase)
     factoryOf(::PublishTopicUseCase)
     factoryOf(::TopicCalendarRule)
     factoryOf(::TopicDetailsRule)

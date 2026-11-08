@@ -11,7 +11,6 @@ import app.yap.admin.feature.topics.data.api.createTopicApi
 import app.yap.admin.feature.topics.data.mapper.StubTopicDto
 import app.yap.admin.feature.topics.domain.CalendarRow
 import app.yap.admin.feature.topics.domain.LoadTopicResult
-import app.yap.admin.feature.topics.domain.LoadTopicsResult
 import app.yap.admin.feature.topics.domain.SaveTopicResult
 import app.yap.admin.feature.topics.domain.StubTopic
 import app.yap.admin.feature.topics.domain.StubTopicCalendar
@@ -75,15 +74,6 @@ internal class RemoteTopicRepositoryTest {
         val result = env.repository.calendar()
 
         assertEquals(expected = listOf(LoadResult.Failed, 0), actual = listOf(result, env.engine.requestHistory.size))
-    }
-
-    @Test
-    fun `GIVEN the server lists topics WHEN loading them THEN they are loaded`() = runTest {
-        val env = Environment(answer = answer(content = "[$TOPIC_JSON]"))
-
-        val result = env.repository.list()
-
-        assertEquals(expected = LoadTopicsResult.Loaded(listOf(StubTopic.stubTopic())), actual = result)
     }
 
     @Test

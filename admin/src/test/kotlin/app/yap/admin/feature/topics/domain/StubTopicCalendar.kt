@@ -1,5 +1,7 @@
 package app.yap.admin.feature.topics.domain
 
+import java.time.LocalDate
+
 internal object StubTopicCalendar {
 
     fun stubTopicCalendar(
@@ -8,6 +10,14 @@ internal object StubTopicCalendar {
     ): TopicCalendar = TopicCalendar(
         rows = rows,
         todos = todos,
+    )
+
+    fun stubCalendarRow(
+        date: LocalDate = StubTopic.RELEASE_DATE,
+        topic: CalendarTopic? = stubCalendarTopic(),
+    ): CalendarRow = CalendarRow(
+        date = date,
+        topic = topic,
     )
 
     fun stubCalendarTopic(
