@@ -154,7 +154,7 @@ model of each level with its other values.
 ### Requirement: The notes on the level model
 
 The note below the table SHALL say that the model of a level works for Character reply and Hints,
-and that Default is the model of the task on Models. The Rating of No rating SHALL also say that
+and that Default is the model of the task on Models. The row of No rating SHALL also say that
 the calibration model is set on Models: the level model does not apply to the calibration.
 
 #### Scenario: The table note

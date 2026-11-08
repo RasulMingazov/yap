@@ -85,9 +85,9 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
             label = label,
             maxWordsLabel = "Слов в фразе $label",
             model = chosenModel(form),
+            modelNote = level.code.modelNote(),
             range = level.rangeText(),
             ratingFromLabel = "Рейтинг от $label",
-            ratingNote = level.code.ratingNote(),
             vocabularyLabel = "Лексика $label",
         )
     }
@@ -116,14 +116,14 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
         model = model,
     )
 
+    private fun LevelCode.modelNote(): String? = if (hasRatingFrom) null else "Модель калибровки задаётся в «Моделях»"
+
     private fun Level.rangeText(): String? = when {
         !code.hasRatingFrom -> "и калибровка"
         range == null -> null
         range.to == null -> "${range.from}+"
         else -> "${range.from}–${range.to}"
     }
-
-    private fun LevelCode.ratingNote(): String? = if (hasRatingFrom) null else "Модель калибровки задаётся в «Моделях»"
 
     private fun DataState.saveStatus(): Status? = when {
         isSaving -> Status(text = "Сохранение…", tone = Status.Tone.MUTED)

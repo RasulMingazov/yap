@@ -30,9 +30,9 @@ internal class LevelsUiStateMapperTest {
                 label = "B1",
                 maxWordsLabel = "Слов в фразе B1",
                 model = DEFAULT_MODEL,
+                modelNote = null,
                 range = null,
                 ratingFromLabel = "Рейтинг от B1",
-                ratingNote = null,
                 vocabularyLabel = "Лексика B1",
             ),
             actual = uiState.rows[LevelCode.B1.ordinal],
@@ -243,7 +243,7 @@ internal class LevelsUiStateMapperTest {
 
         assertEquals(
             expected = List(LevelCode.entries.size - 1) { null } + "Модель калибровки задаётся в «Моделях»",
-            actual = uiState.rows.map { row -> row.ratingNote },
+            actual = uiState.rows.map { row -> row.modelNote },
         )
     }
 

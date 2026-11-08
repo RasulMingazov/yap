@@ -259,9 +259,9 @@ internal class LevelsViewModel(
             val label: String,
             val maxWordsLabel: String,
             val model: ModelOption,
+            val modelNote: String?,
             val range: String?,
             val ratingFromLabel: String,
-            val ratingNote: String?,
             val vocabularyLabel: String,
         )
     }

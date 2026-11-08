@@ -21,6 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 
 @Composable
@@ -85,6 +86,8 @@ internal fun PopupButton(
             text = text ?: placeholder,
             color = if (enabled && text != null) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
             style = AdminTheme.Type.body,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
