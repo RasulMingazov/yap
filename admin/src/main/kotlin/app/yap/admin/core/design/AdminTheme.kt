@@ -40,6 +40,7 @@ internal object AdminTheme {
         val contentTopPadding = 24.dp
         val cornerRadius = 6.dp
         val dateColumnWidth = 110.dp
+        val dialogPadding = 24.dp
         val fieldWidth = 360.dp
         val gap = 12.dp
         val hintHorizontalPadding = 14.dp
@@ -47,6 +48,7 @@ internal object AdminTheme {
         val linkUnderlineOffset = 3.dp
         val loader = 20.dp
         val loaderStroke = 2.dp
+        val popupPadding = 8.dp
         val rowMinHeight = 48.dp
         val rowPadding = 12.dp
         val secondaryButtonPadding = 12.dp

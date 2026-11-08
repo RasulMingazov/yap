@@ -64,6 +64,28 @@ internal fun SecondaryButton(
 }
 
 @Composable
+internal fun PopupButton(
+    enabled: Boolean,
+    onClick: () -> Unit,
+    placeholder: String,
+    text: String?,
+) {
+    ButtonBox(
+        background = if (enabled) AdminTheme.Colors.background else AdminTheme.Colors.fill,
+        border = AdminTheme.Colors.lineStrong,
+        enabled = enabled,
+        horizontalPadding = AdminTheme.Sizes.popupPadding,
+        onClick = onClick,
+    ) {
+        Text(
+            text = text ?: placeholder,
+            color = if (enabled && text != null) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
+            style = AdminTheme.Type.body,
+        )
+    }
+}
+
+@Composable
 internal fun LinkButton(
     onClick: () -> Unit,
     text: String,

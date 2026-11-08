@@ -122,6 +122,10 @@ private fun TopicForm(
             content = content,
             onEvent = onEvent,
         )
+        OpeningLineSection(
+            content = content,
+            onEvent = onEvent,
+        )
     }
 }
 
@@ -143,6 +147,18 @@ private fun SceneSection(
             enabled = content.isSaveEnabled,
             modifier = Modifier.fillMaxWidth(),
         )
+        ReleaseDateField(
+            date = form.releaseDate,
+            enabled = content.isSaveEnabled,
+            onDatePick = { date -> onEvent(Event.ReleaseDatePicked(date)) },
+            text = content.releaseDateText,
+        )
+        AdminTextField(
+            label = "Длительность, мин",
+            onValueChange = { text -> onEvent(Event.DurationChanged(text)) },
+            value = form.durationMinutes?.toString().orEmpty(),
+            enabled = content.isSaveEnabled,
+        )
         AdminTextField(
             label = "Описание — одна строка на карточке дня",
             onValueChange = { description -> onEvent(Event.FormChanged(form.copy(description = description))) },
@@ -156,6 +172,39 @@ private fun SceneSection(
             value = form.setting,
             enabled = content.isSaveEnabled,
             minLines = SETTING_LINES,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun OpeningLineSection(
+    content: UiState.Content,
+    onEvent: (Event) -> Unit,
+) {
+    val form = content.form
+    val openingLine = form.openingLine
+    Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap)) {
+        SectionHeader(
+            number = 3,
+            title = "Первая реплика",
+        )
+        AdminTextField(
+            label = "По-английски",
+            onValueChange = { english ->
+                onEvent(Event.FormChanged(form.copy(openingLine = openingLine.copy(english = english))))
+            },
+            value = openingLine.english,
+            enabled = content.isSaveEnabled,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        AdminTextField(
+            label = "Перевод",
+            onValueChange = { translation ->
+                onEvent(Event.FormChanged(form.copy(openingLine = openingLine.copy(translation = translation))))
+            },
+            value = openingLine.translation,
+            enabled = content.isSaveEnabled,
             modifier = Modifier.fillMaxWidth(),
         )
     }
