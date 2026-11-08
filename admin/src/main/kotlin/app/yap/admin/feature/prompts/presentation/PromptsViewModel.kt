@@ -1,12 +1,80 @@
 package app.yap.admin.feature.prompts.presentation
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.presentation.Status
+import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.prompts.domain.Prompt
 import app.yap.admin.feature.prompts.domain.PromptKey
 import app.yap.admin.feature.prompts.domain.PromptSummary
+import app.yap.admin.feature.prompts.domain.usecase.GetPromptUseCase
+import app.yap.admin.feature.prompts.domain.usecase.GetPromptsUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-internal class PromptsViewModel : ViewModel() {
+internal class PromptsViewModel(
+    private val getPromptUseCase: GetPromptUseCase,
+    private val getPromptsUseCase: GetPromptsUseCase,
+) : ViewModel() {
+
+    private val dataState = MutableStateFlow(DataState())
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, PromptsUiStateMapper::map)
+
+    init {
+        load()
+    }
+
+    fun onEvent(event: Event) = when (event) {
+        is Event.PromptClicked -> onPromptClicked(event.promptKey)
+        is Event.RetryClicked -> onRetryClicked()
+        is Event.TextChanged -> onTextChanged(event.text)
+    }
+
+    private fun onPromptClicked(promptKey: PromptKey) {
+        val state = dataState.value
+        if (state.load == Load.LOADING) return
+        val isLoaded = promptKey in state.prompts
+        dataState.update { state ->
+            state.copy(
+                chosen = promptKey,
+                load = if (isLoaded) Load.LOADED else Load.LOADING,
+            )
+        }
+        if (isLoaded) return
+        viewModelScope.launch { loadPrompt(promptKey) }
+    }
+
+    private fun onRetryClicked() {
+        if (dataState.value.load != Load.FAILED) return
+        load()
+    }
+
+    private fun load() {
+        dataState.update { state -> state.copy(load = Load.LOADING) }
+        viewModelScope.launch {
+            when (val result = getPromptsUseCase()) {
+                is LoadResult.Failed -> dataState.update { state -> state.copy(load = Load.FAILED) }
+                is LoadResult.Loaded -> {
+                    dataState.update { state -> state.copy(summaries = result.value) }
+                    loadPrompt(dataState.value.chosen)
+                }
+            }
+        }
+    }
+
+    private suspend fun loadPrompt(promptKey: PromptKey) {
+        when (val result = getPromptUseCase(promptKey)) {
+            is LoadResult.Failed -> dataState.update { state -> state.copy(load = Load.FAILED) }
+            is LoadResult.Loaded -> dataState.update { state -> state.loaded(result.value) }
+        }
+    }
+
+    private fun onTextChanged(text: String) {
+        dataState.update { state -> state.copy(texts = state.texts + (state.chosen to text)) }
+    }
 
     data class DataState(
         val chosen: PromptKey = PromptKey.TOPIC_REPLY,
@@ -20,6 +88,11 @@ internal class PromptsViewModel : ViewModel() {
 
         val text: String
             get() = texts[chosen] ?: prompts.getValue(chosen).text.orEmpty()
+
+        fun loaded(prompt: Prompt): DataState = copy(
+            load = Load.LOADED,
+            prompts = prompts + (prompt.promptKey to prompt),
+        )
     }
 
     enum class Load {
@@ -69,5 +142,14 @@ internal class PromptsViewModel : ViewModel() {
             val savedAt: String,
             val state: String,
         )
+    }
+
+    sealed interface Event {
+
+        data class PromptClicked(val promptKey: PromptKey) : Event
+
+        data object RetryClicked : Event
+
+        data class TextChanged(val text: String) : Event
     }
 }
