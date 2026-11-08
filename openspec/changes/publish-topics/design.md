@@ -27,10 +27,12 @@ keeps the owner's drafts. It matches the example in `docs/testing/003-backend-in
 PostgreSQL enforces a partial unique index only for the rows that match its predicate [1].
 
 After a unique violation, PostgreSQL aborts the transaction, and Exposed retries a failed
-transaction by default. So a write that can hit the index sets `maxAttempts = 1` in its
-transaction and runs no statement after the write. The repository catches the
-`ExposedSQLException` with SQLState `23505` [2] outside the transaction block and returns a typed
-`DateTaken`. A PostgreSQL test publishes two drafts of one date at once, with a latch, and checks
+transaction by default. So the update and the publish set `maxAttempts = 1` in their
+transaction. The `topics` row is the first write of each; the steps are deleted and inserted after
+it. Nothing inside the transaction block catches the exception, so a failed transaction stops at
+that first statement and rolls back. The repository catches the `ExposedSQLException` with
+SQLState `23505` [2] outside the transaction block and returns a typed `DateTaken`. The update
+result has `DateTaken` from [3/18], the part that adds the index. A PostgreSQL test publishes two drafts of one date at once, with a latch, and checks
 that exactly one is published and the other keeps its stored fields.
 
 ### `V5__topic_status.sql`
