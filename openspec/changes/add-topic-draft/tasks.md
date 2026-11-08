@@ -74,7 +74,7 @@ captures and the full-height Topic capture in `docs/testing/004-screen-capture.m
 `StepsSection`, the `note` of `SectionHeader`, `enabled` of `LinkButton`, and five steps in the guest
 capture.
 
-- [ ] 15.1 Add the two sections and the step events of `TopicViewModel` (from [13/16]); verify with the view model tests for Add step and a step edit, `./gradlew build` and the capture of Guest and five steps
+- [x] 15.1 Add the two sections and the step events of `TopicViewModel` (from [13/16]); verify with the view model tests for Add step and a step edit, `./gradlew build` and the capture of Guest and five steps
 - [ ] 15.2 Run the admin app against a server with a database; verify a create, an edit with Add step and Guest, and the topic after a restart
 
 ## 16. [16/16] The archive · `openspec/`
