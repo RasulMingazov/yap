@@ -37,16 +37,11 @@ internal class GetCharacterSummariesUseCaseTest {
         counts: Map<CharacterId, Int>,
     ) {
 
-        val characterRepository = StubCharacterRepository()
-        val characterTopicCounts = StubCharacterTopicCounts()
+        val characterRepository = StubCharacterRepository().apply { listCall.returns(characters) }
+        val characterTopicCounts = StubCharacterTopicCounts(counts = counts)
         val useCase = GetCharacterSummariesUseCase(
             characterRepository = characterRepository,
             characterTopicCounts = characterTopicCounts,
         )
-
-        init {
-            characterRepository.listCall.returns(characters)
-            characterTopicCounts.byCharacterCall.returns(counts)
-        }
     }
 }

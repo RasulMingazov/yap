@@ -10,11 +10,13 @@ class GetCharacterSummariesUseCase(
 
     suspend operator fun invoke(): List<CharacterSummary> {
         val counts = characterTopicCounts.byCharacter()
-        return characterRepository.list().map { character ->
-            CharacterSummary(
-                character = character,
-                topicCount = counts[character.characterId] ?: 0,
-            )
-        }
+        return characterRepository
+            .list()
+            .map { character ->
+                CharacterSummary(
+                    character = character,
+                    topicCount = counts[character.characterId] ?: 0,
+                )
+            }
     }
 }

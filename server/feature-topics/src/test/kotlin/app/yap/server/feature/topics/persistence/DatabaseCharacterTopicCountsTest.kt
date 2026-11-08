@@ -6,10 +6,8 @@ import app.yap.server.feature.characters.model.StubCharacter
 import app.yap.server.feature.characters.persistence.DatabaseCharacterRepository
 import app.yap.server.feature.topics.model.Interlocutor
 import app.yap.server.feature.topics.model.StubTopic
-import app.yap.server.feature.topics.model.TopicContent
 import app.yap.server.feature.topics.model.TopicId
 import app.yap.server.feature.topics.model.TopicStatus
-import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
@@ -25,16 +23,17 @@ internal class DatabaseCharacterTopicCountsTest {
                 val sam = database.createCast(name = "Sam")
                 database.createCast(name = "Mia")
                 val topics = DatabaseTopicRepository(database)
-                topics.create(stubContent(interlocutor = sam, releaseDate = StubTopic.RELEASE_DATE))
-                val first = topics.create(stubContent(interlocutor = sam, releaseDate = StubTopic.RELEASE_DATE))
+                topics.create(StubTopic.stubContent(interlocutor = sam))
+                val first = topics.create(StubTopic.stubContent(interlocutor = sam))
                 val second = topics.create(
-                    stubContent(interlocutor = sam, releaseDate = StubTopic.RELEASE_DATE.plusDays(1)),
+                    StubTopic.stubContent(interlocutor = sam, releaseDate = StubTopic.RELEASE_DATE.plusDays(1)),
                 )
-                topics.create(stubContent(interlocutor = Interlocutor.Guest(description = "A tourist")))
+                topics.create(StubTopic.stubContent(interlocutor = Interlocutor.Guest(description = "A tourist")))
                 database.publish(first.topicId)
                 database.publish(second.topicId)
+                val topicCounts = DatabaseCharacterTopicCounts(database)
 
-                val counts = DatabaseCharacterTopicCounts(database).byCharacter()
+                val counts = topicCounts.byCharacter()
 
                 assertEquals(expected = mapOf(sam.characterId to 3), actual = counts)
             }
@@ -42,7 +41,8 @@ internal class DatabaseCharacterTopicCountsTest {
 }
 
 private suspend fun Database.createCast(name: String): Interlocutor.Cast {
-    val character = DatabaseCharacterRepository(this).create(StubCharacter.stubProfile(name = name))
+    val characters = DatabaseCharacterRepository(this)
+    val character = characters.create(StubCharacter.stubProfile(name = name))
     return Interlocutor.Cast(characterId = character.characterId)
 }
 
@@ -53,11 +53,3 @@ private suspend fun Database.publish(topicId: TopicId) {
         }
     }
 }
-
-private fun stubContent(
-    interlocutor: Interlocutor,
-    releaseDate: LocalDate = StubTopic.RELEASE_DATE,
-): TopicContent = StubTopic.stubContent(
-    interlocutor = interlocutor,
-    releaseDate = releaseDate,
-)
