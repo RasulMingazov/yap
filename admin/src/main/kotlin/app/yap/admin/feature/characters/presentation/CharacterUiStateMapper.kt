@@ -1,34 +1,36 @@
 package app.yap.admin.feature.characters.presentation
 
 import app.yap.admin.core.presentation.Status
+import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.DataState
-import app.yap.admin.feature.characters.presentation.CharacterViewModel.Load
-import app.yap.admin.feature.characters.presentation.CharacterViewModel.SaveStatus
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.UiState
 
 internal object CharacterUiStateMapper : (DataState) -> UiState {
 
-    override fun invoke(state: DataState): UiState = when (state.load) {
-        Load.FAILED -> UiState.Error(message = "Не удалось загрузить персонажа")
-        Load.LOADED -> state.toContent()
-        Load.LOADING -> UiState.Loading
+    override fun invoke(state: DataState): UiState = when {
+        state.isLoadFailed -> UiState.Error(message = "Не удалось загрузить персонажа")
+        state.characterId != null && state.savedProfile == null -> UiState.Loading
+        else -> state.toContent()
     }
 
     private fun DataState.toContent(): UiState.Content = UiState.Content(
         form = form,
         hint = hint(),
         isSaveEnabled = !isSaving,
-        saveStatus = saveStatus?.status(),
+        saveStatus = saveResult?.status(),
         subtitle = subtitle(),
-        title = savedName ?: "Новый персонаж",
+        title = title(),
     )
 
-    private fun DataState.hint(): String? = if (savedName == null) "Заполните поля и нажмите «Сохранить»." else null
+    private fun DataState.hint(): String? = if (savedProfile == null) "Заполните поля и нажмите «Сохранить»." else null
 
-    private fun SaveStatus.status(): Status = when (this) {
-        SaveStatus.EMPTY_FIELD -> Status(text = "Заполните все поля", tone = Status.Tone.ERROR)
-        SaveStatus.SAVED -> Status(text = "Сохранено", tone = Status.Tone.SUCCESS)
+    private fun SaveCharacterResult.status(): Status? = when (this) {
+        is SaveCharacterResult.Failed -> null
+        is SaveCharacterResult.Invalid -> Status(text = "Заполните все поля", tone = Status.Tone.ERROR)
+        is SaveCharacterResult.Saved -> Status(text = "Сохранено", tone = Status.Tone.SUCCESS)
     }
 
-    private fun DataState.subtitle(): String = if (savedName == null) "Ещё не сохранён" else "Постоянный герой"
+    private fun DataState.subtitle(): String = if (savedProfile == null) "Ещё не сохранён" else "Постоянный герой"
+
+    private fun DataState.title(): String = savedProfile?.name ?: "Новый персонаж"
 }

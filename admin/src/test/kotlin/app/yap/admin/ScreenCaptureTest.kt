@@ -7,11 +7,11 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.design.AdminMaterialTheme
 import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.core.design.ToolbarBack
 import app.yap.admin.feature.characters.domain.CharacterId
+import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.StubCharacter
 import app.yap.admin.feature.characters.presentation.CharacterUiStateMapper
 import app.yap.admin.feature.characters.presentation.CharacterViewModel
@@ -138,9 +138,9 @@ internal class ScreenCaptureTest {
     fun `GIVEN every state of Characters WHEN capturing THEN each state has an image`() {
         val states = mapOf(
             "loading" to CharactersViewModel.DataState(),
-            "empty" to CharactersViewModel.DataState(characters = LoadResult.Loaded(emptyList())),
-            "error" to CharactersViewModel.DataState(characters = LoadResult.Failed),
-            "content" to CharactersViewModel.DataState(characters = LoadResult.Loaded(CAST)),
+            "empty" to CharactersViewModel.DataState(characters = emptyList()),
+            "error" to CharactersViewModel.DataState(isLoadFailed = true),
+            "content" to CharactersViewModel.DataState(characters = CAST),
         )
 
         val images = states.map { (state, dataState) ->
@@ -162,15 +162,15 @@ internal class ScreenCaptureTest {
         val saved = CharacterViewModel.DataState(characterId = CHARACTER_ID).saved(StubCharacter.stubProfile())
         val states = mapOf(
             "loading" to CharacterViewModel.DataState(characterId = CHARACTER_ID),
-            "error" to CharacterViewModel.DataState(characterId = CHARACTER_ID).copy(load = CharacterViewModel.Load.FAILED),
+            "error" to CharacterViewModel.DataState(characterId = CHARACTER_ID, isLoadFailed = true),
             "new" to CharacterViewModel.DataState(characterId = null),
             "opened" to saved,
             "empty-field" to CharacterViewModel.DataState(characterId = null).copy(
                 form = StubCharacter.stubProfile(manner = ""),
-                saveStatus = CharacterViewModel.SaveStatus.EMPTY_FIELD,
+                saveResult = SaveCharacterResult.Invalid,
             ),
             "saving" to saved.copy(isSaving = true),
-            "saved" to saved.copy(saveStatus = CharacterViewModel.SaveStatus.SAVED),
+            "saved" to saved.copy(saveResult = SaveCharacterResult.Saved(StubCharacter.stubCharacter())),
         )
 
         val images = states.map { (state, dataState) ->

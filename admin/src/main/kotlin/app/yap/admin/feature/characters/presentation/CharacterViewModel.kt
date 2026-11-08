@@ -38,7 +38,7 @@ internal class CharacterViewModel(
         is Event.FormChanged -> dataState.update { state ->
             state.copy(
                 form = event.form,
-                saveStatus = null,
+                saveResult = null,
             )
         }
         is Event.RetryClicked -> onRetryClicked()
@@ -53,15 +53,15 @@ internal class CharacterViewModel(
     private fun onRetryClicked() {
         val state = dataState.value
         val characterId = state.characterId
-        if (state.load != Load.FAILED || characterId == null) return
+        if (!state.isLoadFailed || characterId == null) return
         load(characterId)
     }
 
     private fun load(characterId: CharacterId) {
-        dataState.update { state -> state.copy(load = Load.LOADING) }
+        dataState.update { state -> state.copy(isLoadFailed = false) }
         viewModelScope.launch {
             when (val result = getCharacterUseCase(characterId)) {
-                is LoadResult.Failed -> dataState.update { state -> state.copy(load = Load.FAILED) }
+                is LoadResult.Failed -> dataState.update { state -> state.copy(isLoadFailed = true) }
                 is LoadResult.Loaded -> dataState.update { state -> state.saved(result.value.profile) }
             }
         }
@@ -73,16 +73,16 @@ internal class CharacterViewModel(
         dataState.update { current ->
             current.copy(
                 isSaving = true,
-                saveStatus = null,
+                saveResult = null,
             )
         }
         viewModelScope.launch {
             when (val result = saveCharacterUseCase(state.characterId, state.form)) {
-                is SaveCharacterResult.Failed -> onSaveFailed()
+                is SaveCharacterResult.Failed -> onSaveFailed(result)
                 is SaveCharacterResult.Invalid -> dataState.update { current ->
                     current.copy(
                         isSaving = false,
-                        saveStatus = SaveStatus.EMPTY_FIELD,
+                        saveResult = result,
                     )
                 }
                 is SaveCharacterResult.Saved -> dataState.update { current ->
@@ -90,44 +90,37 @@ internal class CharacterViewModel(
                         .saved(result.character.profile)
                         .copy(
                             characterId = result.character.characterId,
-                            saveStatus = SaveStatus.SAVED,
+                            saveResult = result,
                         )
                 }
             }
         }
     }
 
-    private suspend fun onSaveFailed() {
-        dataState.update { state -> state.copy(isSaving = false) }
+    private suspend fun onSaveFailed(result: SaveCharacterResult.Failed) {
+        dataState.update { state ->
+            state.copy(
+                isSaving = false,
+                saveResult = result,
+            )
+        }
         newsChannel.send(News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."))
     }
 
     data class DataState(
         val characterId: CharacterId?,
         val form: CharacterProfile = EMPTY_PROFILE,
+        val isLoadFailed: Boolean = false,
         val isSaving: Boolean = false,
-        val load: Load = if (characterId == null) Load.LOADED else Load.LOADING,
-        val saveStatus: SaveStatus? = null,
-        val savedName: String? = null,
+        val saveResult: SaveCharacterResult? = null,
+        val savedProfile: CharacterProfile? = null,
     ) {
 
         fun saved(profile: CharacterProfile): DataState = copy(
             form = profile,
             isSaving = false,
-            load = Load.LOADED,
-            savedName = profile.name,
+            savedProfile = profile,
         )
-    }
-
-    enum class Load {
-        FAILED,
-        LOADED,
-        LOADING,
-    }
-
-    enum class SaveStatus {
-        EMPTY_FIELD,
-        SAVED,
     }
 
     sealed interface UiState {
