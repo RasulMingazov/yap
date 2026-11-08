@@ -119,13 +119,13 @@ Create opens a new topic without a date until [17/26].
 
 - [x] 18.1 Capture Topics with every status, an empty day, 2 of 5, a draft with the steps 3–5, nothing to do, the reload banner, loading and the error; moved from [16/26] (reviews of PR 166): the titles in To do and All topics take weight 500 from Inter Medium and a theme style, not a literal `FontWeight.Medium` (ux 6), and the status in the All topics table has the 14 px size of the other cells, not 13 px (ui-review); verify with the images
 
-## 19. [19/26] The admin publish domain · ~220 · `T/domain/` (`Topic` with the release state and the gaps, `SaveTopicResult` with the gaps and `DateTaken`, `PublishTopicResult`), `T/data/mapper/TopicMapper.kt`, `T/presentation/TopicViewModel.kt` (compile only)
+## 19. [19/26] The admin publish domain · ~220 · `T/domain/` (`Topic` with the release state and the gaps, `SaveTopicResult` with the gaps and `DateTaken`, `PublishTopicResult`), `T/data/mapper/TopicMapper.kt`, `T/data/mapper/TopicCalendarMapper.kt` (the status and gap mappers become `internal`), `T/data/repository/RemoteTopicRepository.kt` and its test, `T/domain/repository/TopicRepository.kt` (`update(topicId, content)`), `T/domain/usecase/SaveTopicUseCase.kt`, the test stubs of the topic and its repository, `T/presentation/TopicViewModel.kt` (compile only)
 
-- [ ] 19.1 Add the domain and the mapper; verify with the mapper tests for each status and each gap
+- [x] 19.1 Add the domain and the mapper, and read the 400 body and 409 of the save; verify with the mapper tests for each status and each gap, and the mock engine tests for PUT 400 with the gaps, 400 with an empty body and 409
 
 ## 20. [20/26] The admin publish call · ~220 · `T/data/api/TopicApi.kt`, `T/data/repository/RemoteTopicRepository.kt`, `T/domain/repository/`, `T/domain/usecase/PublishTopicUseCase.kt`, `T/FeatureTopicsModule.kt`
 
-- [ ] 20.1 Add the publish call and the use case, and read the 400 body and 409 of the save; verify with the mock engine tests for publish 200, 400 with the gaps, 404, 409 and a failed call, and PUT 400 with the gaps and 409
+- [ ] 20.1 Add the publish call and the use case; verify with the mock engine tests for publish 200, 400 with the gaps, 404, 409 and a failed call
 
 ## 21. [21/26] The Topic view model · three slices
 

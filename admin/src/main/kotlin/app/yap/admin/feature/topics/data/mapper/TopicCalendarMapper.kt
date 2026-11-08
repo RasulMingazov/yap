@@ -43,7 +43,7 @@ private fun LedByDto.toDomain(): LedBy = when (this) {
     is LedByDto.GuestDto -> LedBy.Guest
 }
 
-private fun TopicStatusDto.toDomain(): ReleaseState = when (this) {
+internal fun TopicStatusDto.toDomain(): ReleaseState = when (this) {
     TopicStatusDto.DRAFT -> ReleaseState.DRAFT
     TopicStatusDto.PUBLISHED -> ReleaseState.PUBLISHED
     TopicStatusDto.TODAY -> ReleaseState.TODAY
@@ -60,7 +60,7 @@ private fun TodoDto.toDomain(): Todo = when (this) {
     is TodoDto.EmptyDayDto -> Todo.EmptyDay(date = LocalDate.parse(date))
 }
 
-private fun TopicGapDto.toDomain(): TopicGap = when (this) {
+internal fun TopicGapDto.toDomain(): TopicGap = when (this) {
     is TopicGapDto.DateTakenDto -> TopicGap.DateTaken
     is TopicGapDto.IncompleteStepsDto -> TopicGap.IncompleteSteps(numbers = numbers)
     is TopicGapDto.MissingDto -> TopicGap.Missing(field = field.toDomain())

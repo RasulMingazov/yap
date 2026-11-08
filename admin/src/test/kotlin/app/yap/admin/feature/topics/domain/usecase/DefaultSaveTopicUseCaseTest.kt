@@ -23,7 +23,7 @@ internal class DefaultSaveTopicUseCaseTest {
 
         env.useCase(topicId = topic.topicId, content = topic.content)
 
-        env.topicRepository.updateCall.calledWith(topic)
+        env.topicRepository.updateCall.calledWith(topic.topicId, topic.content)
     }
 
     private class Environment {

@@ -16,6 +16,8 @@ import java.time.LocalDate
 
 internal fun TopicDto.toDomain(): Topic = Topic(
     content = content.toDomain(),
+    gaps = gaps.map { gap -> gap.toDomain() },
+    state = status.toDomain(),
     topicId = TopicId(topicId),
 )
 

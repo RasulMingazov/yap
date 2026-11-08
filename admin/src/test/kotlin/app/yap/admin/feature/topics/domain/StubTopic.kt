@@ -21,9 +21,13 @@ internal object StubTopic {
 
     fun stubTopic(
         content: TopicContent = stubContent(),
+        gaps: List<TopicGap> = emptyList(),
+        state: ReleaseState = ReleaseState.DRAFT,
         topicId: String = TOPIC_ID,
     ): Topic = Topic(
         content = content,
+        gaps = gaps,
+        state = state,
         topicId = TopicId(topicId),
     )
 

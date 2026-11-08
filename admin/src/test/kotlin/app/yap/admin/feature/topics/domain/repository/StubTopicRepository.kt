@@ -11,6 +11,7 @@ import app.yap.admin.feature.topics.domain.TopicContent
 import app.yap.admin.feature.topics.domain.TopicId
 import io.github.rasulmingazov.stubcall.StubCall0
 import io.github.rasulmingazov.stubcall.StubCall1
+import io.github.rasulmingazov.stubcall.StubCall2
 
 internal class StubTopicRepository(
     topic: Topic = StubTopic.stubTopic(),
@@ -19,7 +20,7 @@ internal class StubTopicRepository(
     val calendarCall = StubCall0.returns<LoadResult<TopicCalendar>>(LoadResult.Loaded(StubTopicCalendar.stubTopicCalendar()))
     val createCall = StubCall1.returns<TopicContent, SaveTopicResult>(SaveTopicResult.Saved(topic))
     val findCall = StubCall1.returns<TopicId, LoadTopicResult>(LoadTopicResult.Loaded(topic))
-    val updateCall = StubCall1.returns<Topic, SaveTopicResult>(SaveTopicResult.Saved(topic))
+    val updateCall = StubCall2.returns<TopicId, TopicContent, SaveTopicResult>(SaveTopicResult.Saved(topic))
 
     override suspend fun calendar(): LoadResult<TopicCalendar> = calendarCall.invoke()
 
@@ -27,5 +28,6 @@ internal class StubTopicRepository(
 
     override suspend fun find(topicId: TopicId): LoadTopicResult = findCall.invoke(topicId)
 
-    override suspend fun update(topic: Topic): SaveTopicResult = updateCall.invoke(topic)
+    override suspend fun update(topicId: TopicId, content: TopicContent): SaveTopicResult =
+        updateCall.invoke(topicId, content)
 }

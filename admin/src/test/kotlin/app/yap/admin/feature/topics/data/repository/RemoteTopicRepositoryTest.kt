@@ -15,6 +15,10 @@ import app.yap.admin.feature.topics.domain.SaveTopicResult
 import app.yap.admin.feature.topics.domain.StubTopic
 import app.yap.admin.feature.topics.domain.StubTopicCalendar
 import app.yap.admin.feature.topics.domain.Todo
+import app.yap.admin.feature.topics.domain.TopicGap
+import app.yap.admin.feature.topics.domain.TopicId
+import app.yap.contract.admin.TopicGapDto
+import app.yap.contract.admin.TopicRejectionDto
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
@@ -133,7 +137,7 @@ internal class RemoteTopicRepositoryTest {
     fun `GIVEN a saved topic WHEN updating it THEN the server gets a PUT at its address`() = runTest {
         val env = Environment(answer = answer(content = TOPIC_JSON))
 
-        val result = env.repository.update(StubTopic.stubTopic())
+        val result = env.update()
 
         val request = env.engine.requestHistory.single()
         assertEquals(
@@ -148,12 +152,40 @@ internal class RemoteTopicRepositoryTest {
     }
 
     @Test
-    fun `GIVEN the server rejects the draft WHEN updating a topic THEN the draft is invalid`() = runTest {
+    fun `GIVEN the server rejects the draft WHEN updating a topic THEN the result holds the gaps`() = runTest {
+        val env = Environment(
+            answer = answer(
+                content = Json.encodeToString(
+                    TopicRejectionDto(gaps = listOf(TopicGapDto.PastDateDto, TopicGapDto.DateTakenDto)),
+                ),
+                status = HttpStatusCode.BadRequest,
+            ),
+        )
+
+        val result = env.update()
+
+        assertEquals(
+            expected = SaveTopicResult.Invalid(gaps = listOf(TopicGap.PastDate, TopicGap.DateTaken)),
+            actual = result,
+        )
+    }
+
+    @Test
+    fun `GIVEN the server rejects the draft with no body WHEN updating a topic THEN the result has no gaps`() = runTest {
         val env = Environment(answer = answer(content = "", status = HttpStatusCode.BadRequest))
 
-        val result = env.repository.update(StubTopic.stubTopic())
+        val result = env.update()
 
-        assertEquals(expected = SaveTopicResult.Invalid, actual = result)
+        assertEquals(expected = SaveTopicResult.Invalid(gaps = emptyList()), actual = result)
+    }
+
+    @Test
+    fun `GIVEN the date is taken WHEN updating a topic THEN the date is taken`() = runTest {
+        val env = Environment(answer = answer(content = "", status = HttpStatusCode.Conflict))
+
+        val result = env.update()
+
+        assertEquals(expected = SaveTopicResult.DateTaken, actual = result)
     }
 
     @Test
@@ -178,6 +210,11 @@ internal class RemoteTopicRepositoryTest {
         val repository = RemoteTopicRepository(
             serverSettingsRepository = serverSettingsRepository,
             topicApi = ktorfit.createTopicApi(),
+        )
+
+        suspend fun update(): SaveTopicResult = repository.update(
+            content = StubTopic.stubContent(),
+            topicId = TopicId(StubTopic.TOPIC_ID),
         )
     }
 
