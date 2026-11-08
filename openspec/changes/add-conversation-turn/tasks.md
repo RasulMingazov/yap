@@ -19,8 +19,8 @@ adds a migration, a route or a DTO. No part changes `contract-admin/`, `Applicat
 
 ## 3. [3/8] The conversation module and its state · ~260 · `settings.gradle.kts` (hot), `CLAUDE.md` (hot: the rows of `server/feature-conversation` and `server/feature-models`), `server/feature-conversation/build.gradle.kts`, `fc/model/` (`Conversation`, `ConversationLine`, `Verdict`), `fc/model/StubConversation.kt` (testFixtures), `fc/model/ConversationTest.kt`
 
-- [ ] 3.1 Add `server/feature-conversation` with the dependencies this part uses (`feature-topics`, `feature-levels`); add its row and the missing row of `server/feature-models` (#11) to the module table of `CLAUDE.md`; verify with `./gradlew build`
-- [ ] 3.2 Add `Conversation.start(topicId, openingLine, level)` (the opening line, step 1) and `answered(answer, verdict, reply, stepCount)`, with the answers of a step and the last interlocutor line; verify with the model tests for the start, `accepted` on step 1 of 3 (step 2), `continue`, `unclear` and `not_accepted` (step 1 stays), `accepted` on the last step (finished), the order answer then reply, the answers of a step after a `continue`, and the last line
+- [x] 3.1 Add `server/feature-conversation` with the dependencies this part uses (`feature-topics`, `feature-levels`); add its row and the missing row of `server/feature-models` (#11) to the module table of `CLAUDE.md`; verify with `./gradlew build`
+- [x] 3.2 Add `Conversation.start(topicId, openingLine, level)` (the opening line, step 1) and `answered(answer, verdict, reply, stepCount)`, with the answers of a step and the last interlocutor line; verify with the model tests for the start, `accepted` on step 1 of 3 (step 2), `continue`, `unclear` and `not_accepted` (step 1 stays), `accepted` on the last step (finished), the order answer then reply, the answers of a step after a `continue`, and the last line
 
 ## 4. [4/8] The prompt fill and the step check request · ~300 · `fp/model/PromptFill.kt` and its test, `server/feature-conversation/build.gradle.kts` (`feature-prompts`, `core-llm`), `fc/model/` (`StepCheckRequest`, `StepCheckAnswer`, `Verdict` wire values), their tests
 

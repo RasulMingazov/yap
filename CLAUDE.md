@@ -8,7 +8,9 @@ Gradle monorepo for Yap, an app for English speaking practice.
 | `server/core-database` | PostgreSQL connection and Flyway migrations. |
 | `server/core-llm` | Model provider interface and its adapters. Only DeepSeek for now. |
 | `server/feature-characters` | The cast of recurring characters: the model, its storage and the admin routes. |
+| `server/feature-conversation` | The conversation engine: the step check and the character reply of a turn. |
 | `server/feature-levels` | The rating levels: the model, its storage and the admin routes. |
+| `server/feature-models` | The model of each task and level: the model, its storage and the admin routes. |
 | `server/feature-prompts` | The model prompts and their versions: the model, its storage and the admin routes. |
 | `server/feature-topics` | The daily topics: the model, its storage and the admin routes. |
 | `admin` | Compose Desktop app for the owner. Talks only to the server; holds no keys. |
