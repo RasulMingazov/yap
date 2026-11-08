@@ -25,7 +25,7 @@ Starts after the #9 part with `V3__levels.sql` merges. That part starts after th
 ## 5. Admin data layer and use cases (about 380 lines)
 
 - [x] 5.1 Add the admin prompts repository and its mapper. Files: `ap/domain/`, `ap/domain/repository/PromptRepository.kt`, `ap/data/repository/RemotePromptRepository.kt`, `ap/data/mapper/PromptMapper.kt`. Verify with mock engine tests for 200, 201, 400, 404, a call without saved settings and a failed call
-- [ ] 5.2 Add `GetPromptsUseCase`, `GetPromptUseCase`, `SavePromptUseCase` and `RestorePromptUseCase`. Files: `ap/domain/usecase/`. Verify with a use-case test that a 400 on save gives the result for an empty text
+- [x] 5.2 Add `GetPromptsUseCase`, `GetPromptUseCase`, `SavePromptUseCase` and `RestorePromptUseCase`. Files: `ap/domain/usecase/`. No use-case test: the use cases only delegate. `RemotePromptRepositoryTest` (5.1) covers the 400 that gives `EmptyText`
 
 ## 6. Admin view model (about 380 lines)
 
