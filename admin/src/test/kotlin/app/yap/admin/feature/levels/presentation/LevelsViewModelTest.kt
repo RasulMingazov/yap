@@ -114,7 +114,7 @@ internal class LevelsViewModelTest {
             advanceUntilIdle()
 
             assertEquals(
-                expected = "Заполните все уровни, рейтинг должен расти от A1 к C2",
+                expected = "Сервер не принял уровни: заполните все поля, числа больше нуля, рейтинг растёт от A1 к C2",
                 actual = env.content().saveStatus?.text,
             )
         }
@@ -213,6 +213,23 @@ internal class LevelsViewModelTest {
             actual = env.viewModel.uiState.value,
         )
     }
+
+    @Test
+    fun `GIVEN a server answer without C2 WHEN Retry is clicked THEN the table shows every level`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            val levels = StubLevel
+                .stubLevels()
+                .filterNot { level -> level.code == LevelCode.C2 }
+            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(levels))
+            advanceUntilIdle()
+            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(StubLevel.stubLevels()))
+
+            env.viewModel.onEvent(Event.RetryClicked)
+            advanceUntilIdle()
+
+            assertEquals(expected = LevelCode.entries, actual = env.content().rows.map { row -> row.code })
+        }
 
     private class Environment(
         saveResult: SaveLevelsResult = SaveLevelsResult.Saved(StubLevel.stubLevels()),

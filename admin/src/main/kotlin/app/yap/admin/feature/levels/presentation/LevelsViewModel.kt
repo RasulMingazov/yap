@@ -61,17 +61,13 @@ internal class LevelsViewModel(
     }
 
     private fun onRetryClicked() {
-        if (!dataState.value.isLoadFailed) return
+        val state = dataState.value
+        if (!state.isLoadFailed && state.levels?.hasEveryLevel() != false) return
         load()
     }
 
     private fun load() {
-        dataState.update { state ->
-            state.copy(
-                isLoadFailed = false,
-                levels = null,
-            )
-        }
+        dataState.update { state -> state.copy(isLoadFailed = false) }
         viewModelScope.launch {
             when (val result = getLevelsUseCase()) {
                 is LoadResult.Failed -> dataState.update { state -> state.copy(isLoadFailed = true) }

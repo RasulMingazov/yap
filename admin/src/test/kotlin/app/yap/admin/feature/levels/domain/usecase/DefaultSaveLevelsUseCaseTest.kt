@@ -37,6 +37,15 @@ internal class DefaultSaveLevelsUseCaseTest {
     }
 
     @Test
+    fun `GIVEN B1 with an empty block WHEN saving THEN the empty block is sent`() = runTest {
+        val env = Environment()
+
+        env.useCase(mapOf(LevelCode.B1 to StubLevel.stubInput(block = "")))
+
+        env.levelRepository.saveCall.calledWith(listOf(StubLevel.stubEntry(settings = StubLevel.stubSettings(block = ""))))
+    }
+
+    @Test
     fun `GIVEN a rating from that is not a number WHEN saving THEN it names the level and sends nothing`() =
         runTest {
             val env = Environment()

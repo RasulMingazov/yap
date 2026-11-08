@@ -25,8 +25,8 @@ levels that the server returns and a Saved status.
 #### Scenario: The server rejects the save
 
 - **WHEN** the server rejects the levels
-- **THEN** the admin app shows an error beside Save that asks to fill every level with growing
-  ratings, and keeps the form as it is
+- **THEN** the admin app shows an error beside Save that asks to fill every level with numbers above
+  zero and growing ratings, and keeps the form as it is
 
 #### Scenario: A number that is not a number
 

@@ -86,7 +86,7 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
     private fun SaveLevelsResult.status(): Status? = when (this) {
         is SaveLevelsResult.Failed -> null
         is SaveLevelsResult.Invalid -> Status(
-            text = "Заполните все уровни, рейтинг должен расти от A1 к C2",
+            text = "Сервер не принял уровни: заполните все поля, числа больше нуля, рейтинг растёт от A1 к C2",
             tone = Status.Tone.ERROR,
         )
         is SaveLevelsResult.NoIdioms -> Status(text = "Выберите идиомы: ${code.label()}", tone = Status.Tone.ERROR)
