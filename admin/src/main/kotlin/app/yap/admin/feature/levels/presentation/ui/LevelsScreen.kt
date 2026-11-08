@@ -253,7 +253,6 @@ private fun LevelRow(
                         modifier = Modifier.width(AdminTheme.Sizes.cellFieldWidth),
                     )
                 }
-                row.ratingNote?.let { note -> Note(text = note) }
             }
         }
         TableCell(modifier = Modifier.width(AdminTheme.Sizes.levelColumnWidth)) {
@@ -285,14 +284,17 @@ private fun LevelRow(
             )
         }
         TableCell(modifier = Modifier.weight(1f)) {
-            AdminSelect(
-                enabled = content.isModelChoiceEnabled,
-                label = { option -> option.label },
-                onSelect = { option -> onFormChange(form.copy(model = option.model)) },
-                options = content.models,
-                placeholder = "Выберите",
-                value = row.model,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.sectionInnerGap)) {
+                AdminSelect(
+                    enabled = content.isModelChoiceEnabled,
+                    label = { option -> option.label },
+                    onSelect = { option -> onFormChange(form.copy(model = option.model)) },
+                    options = content.models,
+                    placeholder = "Выберите",
+                    value = row.model,
+                )
+                row.modelNote?.let { note -> Note(text = note) }
+            }
         }
     }
 }

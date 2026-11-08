@@ -254,6 +254,10 @@ internal class ScreenCaptureTest {
                 code = LevelCode.C1,
                 field = SaveLevelsResult.NumberField.MAX_WORDS,
             ) { form -> form.copy(maxWords = "twenty") },
+            "models-loading" to saved.copy(isModelsLoading = true, models = null),
+            "models-error" to saved.copy(isModelsLoadFailed = true),
+            "refreshing" to saved.copy(isLoading = true),
+            "model-unavailable" to saved.copy(saveResult = SaveLevelsResult.ModelUnavailable),
         )
 
         val images = states.map { (state, dataState) ->
@@ -269,15 +273,22 @@ internal class ScreenCaptureTest {
     }
 
     @Test
-    fun `GIVEN the idioms select WHEN clicking it THEN the open select has an image`() {
-        val image = capture(name = "levels-idioms-open", current = Screen.Levels, click = IDIOMS_SELECT) {
-            LevelsContent(
-                onEvent = {},
-                uiState = LevelsUiStateMapper(levelsDataState(LEVELS)),
-            )
+    fun `GIVEN the selects of Levels WHEN clicking each THEN the open select has an image`() {
+        val selects = mapOf(
+            "idioms" to IDIOMS_SELECT,
+            "model" to MODEL_SELECT,
+        )
+
+        val images = selects.map { (select, click) ->
+            capture(name = "levels-$select-open", current = Screen.Levels, click = click) {
+                LevelsContent(
+                    onEvent = {},
+                    uiState = LevelsUiStateMapper(levelsDataState(LEVELS)),
+                )
+            }
         }
 
-        assertTrue(image.length() > 0)
+        assertTrue(images.all { image -> image.length() > 0 })
     }
 
     @Test
@@ -398,6 +409,7 @@ internal class ScreenCaptureTest {
     private fun levelsDataState(levels: List<Level>): LevelsViewModel.DataState = LevelsViewModel.DataState(
         forms = levels.toInputs(),
         levels = levels,
+        models = MODELS,
     )
 
     private fun LevelsViewModel.DataState.unread(
@@ -502,6 +514,7 @@ internal class ScreenCaptureTest {
                 from = 1050,
                 idioms = Idioms.RARELY,
                 maxWords = 16,
+                model = "deepseek-v4-pro",
                 to = 1199,
             ),
             savedLevel(
@@ -516,6 +529,7 @@ internal class ScreenCaptureTest {
                 from = 1400,
                 idioms = Idioms.FREELY,
                 maxWords = 25,
+                model = "other-large-2025-long-context",
                 to = 1599,
             ),
             savedLevel(
@@ -535,6 +549,7 @@ internal class ScreenCaptureTest {
         )
         val LEVELS_HEIGHT = 1000.dp
         val MODELS = modelsOf(connected = true)
+        val MODEL_SELECT = Offset(878f, 328f)
         val NEW_PROMPT = StubPrompt.stubPrompt(
             promptKey = PromptKey.TOPIC_HINTS,
             text = null,
@@ -647,6 +662,7 @@ internal class ScreenCaptureTest {
             from: Int?,
             idioms: Idioms,
             maxWords: Int,
+            model: String? = null,
             to: Int?,
         ): Level {
             val vocabulary = if (code == LevelCode.NO_RATING) "A2–B1, слова темы" else code.name
@@ -660,6 +676,7 @@ internal class ScreenCaptureTest {
                         "Ask one question at a time and wait for the answer.",
                     idioms = idioms,
                     maxWords = maxWords,
+                    model = model,
                     ratingFrom = from,
                     vocabulary = vocabulary,
                 ),
