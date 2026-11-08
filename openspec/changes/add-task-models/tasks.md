@@ -175,7 +175,7 @@ and their tests `LevelsUiStateMapperTest` and `LevelsViewModelTest`.
 Files: `admin/src/test/kotlin/app/yap/admin/ScreenCaptureTest.kt` (the Models states) and the
 images, as `docs/testing/004-screen-capture.md` says.
 
-- [ ] 13.1 Capture Models in the loading, loaded, Not connected, saving, Saved, rejected, catalog-changed and load error states; verify with the images, then run `ui-review` against the canvas Models screen
+- [x] 13.1 Capture Models in the loading, loaded, Not connected, saving, Saved, rejected, catalog-changed and load error states; verify with the images, then run `ui-review` against the canvas Models screen
 
 ## 14. [14/15] Levels Model column captures
 

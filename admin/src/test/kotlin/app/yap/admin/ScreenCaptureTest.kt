@@ -30,6 +30,13 @@ import app.yap.admin.feature.levels.presentation.LevelsUiStateMapper
 import app.yap.admin.feature.levels.presentation.LevelsViewModel
 import app.yap.admin.feature.levels.presentation.toInputs
 import app.yap.admin.feature.levels.presentation.ui.LevelsContent
+import app.yap.admin.feature.models.domain.ModelTask
+import app.yap.admin.feature.models.domain.Models
+import app.yap.admin.feature.models.domain.SaveModelsResult
+import app.yap.admin.feature.models.domain.StubModels
+import app.yap.admin.feature.models.presentation.ModelsUiStateMapper
+import app.yap.admin.feature.models.presentation.ModelsViewModel
+import app.yap.admin.feature.models.presentation.ui.ModelsContent
 import app.yap.admin.feature.prompts.domain.PromptKey
 import app.yap.admin.feature.prompts.domain.PromptVersion
 import app.yap.admin.feature.prompts.domain.SavePromptResult
@@ -322,6 +329,32 @@ internal class ScreenCaptureTest {
         assertTrue(images.all { image -> image.length() > 0 })
     }
 
+    @Test
+    fun `GIVEN every state of Models WHEN capturing THEN each state has an image`() {
+        val loaded = modelsDataState(MODELS)
+        val states = mapOf(
+            "loading" to ModelsViewModel.DataState(),
+            "error" to ModelsViewModel.DataState(isLoadFailed = true),
+            "loaded" to loaded,
+            "not-connected" to modelsDataState(NOT_CONNECTED_MODELS),
+            "saving" to loaded.copy(isSaving = true),
+            "saved" to loaded.copy(saveResult = SaveModelsResult.Saved(MODELS)),
+            "rejected" to loaded.copy(saveResult = SaveModelsResult.Invalid),
+            "catalog-changed" to loaded.copy(saveResult = SaveModelsResult.CatalogChanged),
+        )
+
+        val images = states.map { (state, dataState) ->
+            capture(name = "models-$state", current = Screen.Models) {
+                ModelsContent(
+                    onEvent = {},
+                    uiState = ModelsUiStateMapper(dataState),
+                )
+            }
+        }
+
+        assertTrue(images.all { image -> image.length() > 0 })
+    }
+
     private fun capture(
         name: String,
         current: Screen,
@@ -360,6 +393,11 @@ internal class ScreenCaptureTest {
             writeBytes(png.bytes)
         }
     }
+
+    private fun modelsDataState(models: Models): ModelsViewModel.DataState = ModelsViewModel.DataState(
+        choices = models.tasks.associate { taskModel -> taskModel.task to taskModel.choice },
+        models = models,
+    )
 
     private fun levelsDataState(levels: List<Level>): LevelsViewModel.DataState = LevelsViewModel.DataState(
         forms = levels.toInputs(),
@@ -495,12 +533,14 @@ internal class ScreenCaptureTest {
             ),
         )
         val LEVELS_HEIGHT = 1000.dp
+        val MODELS = modelsOf(connected = true)
         val NEW_PROMPT = StubPrompt.stubPrompt(
             promptKey = PromptKey.TOPIC_HINTS,
             text = null,
             variables = listOf("{step.task}", "{topic.setting}", "{level.rules}", "{hint.level}"),
             versions = emptyList(),
         )
+        val NOT_CONNECTED_MODELS = modelsOf(connected = false)
         val PROMPTS_HEIGHT = 1400.dp
         val REPLY_PROMPT = StubPrompt.stubPrompt(
             text = listOf(
@@ -563,6 +603,31 @@ internal class ScreenCaptureTest {
             ),
         )
         val TOPIC_FORM_HEIGHT = 1800.dp
+
+        fun modelsOf(connected: Boolean): Models {
+            val other = StubModels.stubProvider(
+                code = "OTHER",
+                connected = connected,
+                keySetting = "OTHER_API_KEY",
+                models = listOf("other-mini", "other-large-2025-long-context"),
+                name = "Other",
+            )
+            val chosen = mapOf(
+                ModelTask.TOPIC_CHECK to StubModels.stubTask(
+                    task = ModelTask.TOPIC_CHECK,
+                    model = "other-mini",
+                    provider = other.code,
+                ),
+                ModelTask.TOPIC_REVIEW to StubModels.stubTask(
+                    task = ModelTask.TOPIC_REVIEW,
+                    model = "deepseek-v4-pro",
+                ),
+            )
+            return StubModels.stubModels(
+                providers = listOf(StubModels.stubProvider(), other),
+                tasks = StubModels.stubTasks().map { taskModel -> chosen[taskModel.task] ?: taskModel },
+            )
+        }
 
         fun replyVersions(current: Int): List<PromptVersion> = (REPLY_VERSIONS downTo 1).map { number ->
             StubPrompt.stubPromptVersion(
