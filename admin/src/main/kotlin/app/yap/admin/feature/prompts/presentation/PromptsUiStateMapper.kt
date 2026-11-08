@@ -28,7 +28,7 @@ internal object PromptsUiStateMapper {
         val prompt = prompts.getValue(chosen)
         return UiState.Content(
             groups = groups(),
-            isSaveEnabled = !isSaving,
+            isSaveEnabled = !isSending,
             saveStatus = saveStatus?.status(),
             state = prompt.state(),
             text = text,
