@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 internal fun TableHeaderCell(
@@ -18,6 +19,8 @@ internal fun TableHeaderCell(
         style = AdminTheme.Type.tableHeader,
         fontWeight = FontWeight.Medium,
         maxLines = 1,
+        overflow = TextOverflow.Visible,
+        softWrap = false,
         modifier = modifier.padding(
             top = AdminTheme.Sizes.tableHeaderPadding,
             end = AdminTheme.Sizes.tableCellEndPadding,

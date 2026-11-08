@@ -2,6 +2,8 @@ package app.yap.admin
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ImageComposeScene
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -17,6 +19,13 @@ import app.yap.admin.feature.characters.presentation.CharactersUiStateMapper
 import app.yap.admin.feature.characters.presentation.CharactersViewModel
 import app.yap.admin.feature.characters.presentation.ui.CharacterContent
 import app.yap.admin.feature.characters.presentation.ui.CharactersContent
+import app.yap.admin.feature.levels.domain.Idioms
+import app.yap.admin.feature.levels.domain.Level
+import app.yap.admin.feature.levels.domain.LevelCode
+import app.yap.admin.feature.levels.domain.StubLevel
+import app.yap.admin.feature.levels.presentation.LevelsUiStateMapper
+import app.yap.admin.feature.levels.presentation.LevelsViewModel
+import app.yap.admin.feature.levels.presentation.ui.LevelsContent
 import app.yap.admin.feature.server.domain.ServerConnection
 import app.yap.admin.feature.server.presentation.ServerUiStateMapper
 import app.yap.admin.feature.server.presentation.ServerViewModel
@@ -200,9 +209,56 @@ internal class ScreenCaptureTest {
         assertTrue(images.all { image -> image.length() > 0 })
     }
 
+    @Test
+    fun `GIVEN every state of Levels WHEN capturing THEN each state has an image`() {
+        val new = LevelsViewModel.DataState().loaded(StubLevel.stubLevels(range = null, settings = null))
+        val saved = LevelsViewModel.DataState().loaded(LEVELS)
+        val states = mapOf(
+            "loading" to LevelsViewModel.DataState(),
+            "error" to LevelsViewModel.DataState(load = LevelsViewModel.Load.FAILED),
+            "new" to new,
+            "saved" to saved.copy(saveStatus = LevelsViewModel.SaveStatus.Saved),
+            "chosen-b2" to saved.copy(chosen = LevelCode.B2),
+            "saving" to saved.copy(isSaving = true),
+            "invalid" to new.copy(saveStatus = LevelsViewModel.SaveStatus.Invalid),
+            "unread-rating-from" to saved.unread(
+                code = LevelCode.B2,
+                field = LevelsViewModel.NumberField.RATING_FROM,
+            ) { form -> form.copy(ratingFrom = "12OO") },
+            "unread-max-words" to saved.unread(
+                code = LevelCode.C1,
+                field = LevelsViewModel.NumberField.MAX_WORDS,
+            ) { form -> form.copy(maxWords = "twenty") },
+        )
+
+        val images = states.map { (state, dataState) ->
+            capture(name = "levels-$state", current = Screen.Levels, height = LEVELS_HEIGHT) {
+                LevelsContent(
+                    onEvent = {},
+                    uiState = LevelsUiStateMapper.map(dataState),
+                )
+            }
+        }
+
+        assertTrue(images.all { image -> image.length() > 0 })
+    }
+
+    @Test
+    fun `GIVEN the idioms select WHEN clicking it THEN the open select has an image`() {
+        val image = capture(name = "levels-idioms-open", current = Screen.Levels, click = IDIOMS_SELECT) {
+            LevelsContent(
+                onEvent = {},
+                uiState = LevelsUiStateMapper.map(LevelsViewModel.DataState().loaded(LEVELS)),
+            )
+        }
+
+        assertTrue(image.length() > 0)
+    }
+
     private fun capture(
         name: String,
         current: Screen,
+        click: Offset? = null,
         height: Dp = AdminTheme.Sizes.windowHeight,
         serverLabel: String = CONNECTED_LABEL,
         content: @Composable () -> Unit,
@@ -223,8 +279,11 @@ internal class ScreenCaptureTest {
         }
         val image = try {
             scene.render()
-            scene.render(SETTLED_NANOS)
-            scene.render(2 * SETTLED_NANOS)
+            click?.let { position ->
+                scene.sendPointerEvent(PointerEventType.Press, position)
+                scene.sendPointerEvent(PointerEventType.Release, position)
+            }
+            (1..SETTLED_FRAMES).map { frame -> scene.render(frame * SETTLED_NANOS) }.last()
         } finally {
             scene.close()
         }
@@ -235,9 +294,22 @@ internal class ScreenCaptureTest {
         }
     }
 
+    private fun LevelsViewModel.DataState.unread(
+        code: LevelCode,
+        field: LevelsViewModel.NumberField,
+        change: (LevelsViewModel.LevelForm) -> LevelsViewModel.LevelForm,
+    ): LevelsViewModel.DataState = copy(
+        forms = forms + (code to change(forms.getValue(code))),
+        saveStatus = LevelsViewModel.SaveStatus.UnreadNumber(
+            code = code,
+            field = field,
+        ),
+    )
+
     private companion object {
 
         const val LONG_ADDRESS = "https://staging.yap-admin.example.com"
+        const val SETTLED_FRAMES = 5
         const val SETTLED_NANOS = 1_000_000_000L
         val CHARACTER_ID = CharacterId(StubCharacter.CHARACTER_ID)
         val CAST = listOf(
@@ -283,6 +355,59 @@ internal class ScreenCaptureTest {
                 },
             ),
         )
+        val IDIOMS_SELECT = Offset(731f, 328f)
+        val LEVELS = listOf(
+            savedLevel(
+                code = LevelCode.A1,
+                from = 0,
+                idioms = Idioms.NEVER,
+                maxWords = 8,
+                to = 849,
+            ),
+            savedLevel(
+                code = LevelCode.A2,
+                from = 850,
+                idioms = Idioms.NEVER,
+                maxWords = 12,
+                to = 1049,
+            ),
+            savedLevel(
+                code = LevelCode.B1,
+                from = 1050,
+                idioms = Idioms.RARELY,
+                maxWords = 16,
+                to = 1199,
+            ),
+            savedLevel(
+                code = LevelCode.B2,
+                from = 1200,
+                idioms = Idioms.SOMETIMES,
+                maxWords = 20,
+                to = 1399,
+            ),
+            savedLevel(
+                code = LevelCode.C1,
+                from = 1400,
+                idioms = Idioms.FREELY,
+                maxWords = 25,
+                to = 1599,
+            ),
+            savedLevel(
+                code = LevelCode.C2,
+                from = 1600,
+                idioms = Idioms.FREELY,
+                maxWords = 30,
+                to = null,
+            ),
+            savedLevel(
+                code = LevelCode.NO_RATING,
+                from = null,
+                idioms = Idioms.RARELY,
+                maxWords = 14,
+                to = null,
+            ),
+        )
+        val LEVELS_HEIGHT = 1000.dp
         val SAVED_TOPIC = StubTopic.stubTopic(
             content = StubTopic.stubContent(
                 setting = "Evening at the airport. The learner gets into a taxi to the Hilton on Park Street. The " +
@@ -315,5 +440,29 @@ internal class ScreenCaptureTest {
             onClick = {},
         )
         val TOPIC_FORM_HEIGHT = 1800.dp
+
+        fun savedLevel(
+            code: LevelCode,
+            from: Int?,
+            idioms: Idioms,
+            maxWords: Int,
+            to: Int?,
+        ): Level {
+            val vocabulary = if (code == LevelCode.NO_RATING) "A2–B1, слова темы" else code.name
+            return StubLevel.stubLevel(
+                code = code,
+                range = from?.let { start -> StubLevel.stubRange(from = start, to = to) },
+                settings = StubLevel.stubSettings(
+                    block = "Speak in short sentences of up to $maxWords words.\n" +
+                        "Use $vocabulary words. Explain a rare word in a few simple words.\n" +
+                        "Idioms: ${idioms.name.lowercase()}.\n" +
+                        "Ask one question at a time and wait for the answer.",
+                    idioms = idioms,
+                    maxWords = maxWords,
+                    ratingFrom = from,
+                    vocabulary = vocabulary,
+                ),
+            )
+        }
     }
 }
