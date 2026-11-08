@@ -33,6 +33,16 @@ object StubTopic {
         topicId = topicId,
     )
 
+    fun stubDetails(
+        gaps: Set<TopicGap> = emptySet(),
+        state: ReleaseState = ReleaseState.DRAFT,
+        topic: Topic = stubTopic(),
+    ): TopicDetails = TopicDetails(
+        gaps = gaps,
+        state = state,
+        topic = topic,
+    )
+
     fun stubContent(
         description: String = DESCRIPTION,
         durationMinutes: Int? = DURATION_MINUTES,

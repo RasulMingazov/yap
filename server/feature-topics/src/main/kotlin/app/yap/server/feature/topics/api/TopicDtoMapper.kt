@@ -5,20 +5,28 @@ import app.yap.contract.admin.OpeningLineDto
 import app.yap.contract.admin.StepDto
 import app.yap.contract.admin.TopicContentDto
 import app.yap.contract.admin.TopicDto
+import app.yap.contract.admin.TopicFieldDto
+import app.yap.contract.admin.TopicGapDto
+import app.yap.contract.admin.TopicStatusDto
 import app.yap.server.feature.characters.model.CharacterId
 import app.yap.server.feature.topics.model.Interlocutor
 import app.yap.server.feature.topics.model.OpeningLine
+import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.Step
-import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
+import app.yap.server.feature.topics.model.TopicDetails
+import app.yap.server.feature.topics.model.TopicField
+import app.yap.server.feature.topics.model.TopicGap
 import io.ktor.server.plugins.BadRequestException
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 import kotlin.uuid.Uuid
 
-internal fun Topic.toDto(): TopicDto = TopicDto(
-    content = content.toDto(),
-    topicId = topicId.value.toString(),
+internal fun TopicDetails.toDto(): TopicDto = TopicDto(
+    content = topic.content.toDto(),
+    gaps = gaps.toDto(),
+    status = state.toDto(),
+    topicId = topic.topicId.value.toString(),
 )
 
 private fun TopicContent.toDto(): TopicContentDto = TopicContentDto(
@@ -48,6 +56,35 @@ private fun Step.toDto(): StepDto = StepDto(
     passWhen = passWhen,
     task = task,
 )
+
+private fun Set<TopicGap>.toDto(): List<TopicGapDto> = map { gap -> gap.toDto() }
+
+private fun TopicGap.toDto(): TopicGapDto = when (this) {
+    is TopicGap.DateTaken -> TopicGapDto.DateTakenDto
+    is TopicGap.IncompleteSteps -> TopicGapDto.IncompleteStepsDto(numbers = numbers)
+    is TopicGap.Missing -> TopicGapDto.MissingDto(field = field.toDto())
+    is TopicGap.PastDate -> TopicGapDto.PastDateDto
+}
+
+private fun TopicField.toDto(): TopicFieldDto = when (this) {
+    TopicField.TITLE -> TopicFieldDto.TITLE
+    TopicField.RELEASE_DATE -> TopicFieldDto.RELEASE_DATE
+    TopicField.DURATION -> TopicFieldDto.DURATION
+    TopicField.DESCRIPTION -> TopicFieldDto.DESCRIPTION
+    TopicField.SETTING -> TopicFieldDto.SETTING
+    TopicField.INTERLOCUTOR -> TopicFieldDto.INTERLOCUTOR
+    TopicField.ROLE -> TopicFieldDto.ROLE
+    TopicField.OPENING_LINE -> TopicFieldDto.OPENING_LINE
+    TopicField.TRANSLATION -> TopicFieldDto.TRANSLATION
+    TopicField.STEPS -> TopicFieldDto.STEPS
+}
+
+private fun ReleaseState.toDto(): TopicStatusDto = when (this) {
+    ReleaseState.DRAFT -> TopicStatusDto.DRAFT
+    ReleaseState.PUBLISHED -> TopicStatusDto.PUBLISHED
+    ReleaseState.TODAY -> TopicStatusDto.TODAY
+    ReleaseState.OUT -> TopicStatusDto.OUT
+}
 
 internal fun TopicContentDto.toModel(): TopicContent = TopicContent(
     description = description,
