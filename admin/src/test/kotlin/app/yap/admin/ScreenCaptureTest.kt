@@ -268,6 +268,19 @@ internal class ScreenCaptureTest {
                         "does not chat.",
                 ),
                 role = "Taxi driver",
+                steps = listOf(
+                    "Name the Hilton on Park Street" to "The driver knows where to go.",
+                    "Ask how long the ride takes" to "The ride takes about 20 minutes.",
+                    "Ask the price" to "The ride costs about 30 dollars.",
+                    "Ask the driver to turn the music down; it does not have to be polite" to "The music is quieter.",
+                    "Pay and say goodbye" to "You are at the hotel.",
+                ).map { (task, outcome) ->
+                    StubTopic.stubStep(
+                        outcome = outcome,
+                        passWhen = "The learner does the task in English, in any words.",
+                        task = task,
+                    )
+                },
             ),
         )
         val SAVED_TOPIC = StubTopic.stubTopic(
