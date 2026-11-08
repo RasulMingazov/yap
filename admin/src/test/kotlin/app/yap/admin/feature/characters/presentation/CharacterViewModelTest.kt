@@ -15,6 +15,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -92,6 +93,18 @@ internal class CharacterViewModelTest {
         advanceUntilIdle()
 
         assertEquals(expected = "Sam" to Status(text = "Сохранено", tone = Status.Tone.SUCCESS), actual = env.content().title to env.content().saveStatus)
+    }
+
+    @Test
+    fun `GIVEN a saved status WHEN a field is edited THEN the status clears`() = runTest(dispatcher) {
+        val env = Environment(characterId = null)
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.NameChanged(StubCharacter.NAME))
+        advanceUntilIdle()
+
+        assertNull(env.content().saveStatus)
     }
 
     @Test
