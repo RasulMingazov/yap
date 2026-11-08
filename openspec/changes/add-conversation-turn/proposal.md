@@ -57,7 +57,7 @@ None. The prompts, levels and task models keep their requirements; this change u
 
 - A new module `server/feature-conversation`. It uses the use cases of `feature-topics`,
   `feature-characters`, `feature-levels`, `feature-models` and `feature-prompts`, as
-  `docs/server/001-structure.md` allows. The owner reviews this dependency (`design.md`).
+  `docs/server/001-structure.md` allows. The owner allowed these direct dependencies (`design.md`).
 - `server/core-llm` gets `ModelProviders`: the call of a model by `ModelChoice`, and the DeepSeek
   adapter in Koin.
 - `server/feature-prompts` gets the rule that fills the variables of a prompt.

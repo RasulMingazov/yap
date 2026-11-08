@@ -66,7 +66,7 @@ So the reserved Flyway `V8` is not used. The orchestrator can give it to the nex
 The turn reads the topic at each turn, so an edit of a draft applies to the next turn of a trial.
 A step that the edit removed gives the reason "no current step".
 
-### The module `server/feature-conversation` [owner-review]
+### The module `server/feature-conversation` (owner decision, 2026-11-08: allow direct dependencies)
 
 The engine uses five features. It goes into its own module, `feature-conversation`, which depends on
 `feature-topics`, `feature-characters`, `feature-levels`, `feature-models` and `feature-prompts`.
@@ -78,12 +78,13 @@ module.
 - The precedents on the server: `feature-topics -> feature-characters` (#7) and
   `feature-models -> feature-levels` (#11).
 - The owner rule "no feature depends on another" (2026-11-08) was said for the admin app features.
-  The owner decides if it holds for the server too. Part 2 does not depend on the answer; part 3 and
-  later wait for it.
+  Asked for the server, the owner decided on 2026-11-08: allow direct dependencies. So
+  `feature-conversation` depends on `feature-topics`, `feature-characters`, `feature-levels`,
+  `feature-models`, `feature-prompts` and `core-llm`.
 
 | Option | Cost | Choice |
 | --- | --- | --- |
-| Direct dependencies on the five features, through their public use cases | none: the use cases exist and are public | yes, unless the owner says otherwise |
+| Direct dependencies on the five features, through their public use cases | none: the use cases exist and are public | yes (owner decision) |
 | Ports in `feature-conversation/usecase/` (topic, interlocutor, prompt text, level rules, task model), and adapters in `app` that call each feature's use case | about 5 adapters and their tests in `app`, ~150 lines and one more part; `app` then holds glue code that `docs/server/001-structure.md:8-9` does not give it | no |
 | Ports in each provider feature | each of them then depends on `feature-conversation`: a cycle | no |
 | The engine in `feature-topics` | `feature-topics` then depends on prompts, levels and models; the topic content and the dialogue are two slices | no |

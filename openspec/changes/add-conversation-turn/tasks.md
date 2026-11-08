@@ -8,9 +8,6 @@ The tests use the fake provider `StubModelProvider` of `core-llm` inside `ModelP
 adds a migration, a route or a DTO. No part changes `contract-admin/`, `Application.kt`,
 `gradle/libs.versions.toml` or `docs/`.
 
-Part 3 and later wait for the owner answer on the module dependencies (`design.md`, «The module
-`server/feature-conversation`»). Part 2 does not depend on it.
-
 ## 1. [1/8] The plan · this PR
 
 - [x] 1.1 Write the change; verify with `openspec validate add-conversation-turn --strict`
@@ -38,11 +35,11 @@ Part 3 and later wait for the owner answer on the module dependencies (`design.m
 ## 6. [6/8] The turn and the turns that do not run · ~350 · `server/feature-conversation/build.gradle.kts` (`feature-models`, the test fixtures of the five features and `core-llm`), `fc/model/` (`TurnOutcome`, `TurnGap`), `fc/usecase/TakeTurnUseCase.kt`, `fc/usecase/TakeTurnUseCaseTest.kt`
 
 - [ ] 6.1 Add `TakeTurnUseCase(conversation, answer)`: it trims the answer, reads the topic, the interlocutor, both prompts, the level block, both models and their connection (`ProviderConnections`) before any call, runs the check and then the reply, and returns `Answered(conversation, verdict)`, or `Failed` with the unchanged conversation when a call fails; verify with the use case tests with the fake provider for each verdict: `accepted` (step 2 is current), `continue`, `unclear` and `not_accepted` (step 1 stays), and `accepted` on the last step (finished, the reply is still called)
-- [ ] 6.2 Return `NotRun` with its `TurnGap`, and call no model, for an empty answer, a finished conversation, an unknown topic, no interlocutor, an incomplete scene (an empty setting, role, English opening line or guest description), no current step, a step without a task, a step without Pass when, each prompt without a saved text, a level without a block, and a provider without a key; verify with a test for each that also checks that the fake provider got no call
+- [ ] 6.2 Return `NotRun` with its `TurnGap`, and call no model, for an empty answer, a finished conversation, an unknown topic, no interlocutor, an incomplete scene (an empty setting, role, English opening line or guest description), no current step, a step without a task, a step without Pass when, each prompt without a saved text, a level without a block, and a provider without a key; verify with a test for each that also checks that the fake provider got no call; and return `Failed` for a failed check; verify with the test that the reply is not called and the conversation stays as it was
 
 ## 7. [7/8] The turn: failures, models and the level block · ~250 · `fc/usecase/TakeTurnUseCaseTest.kt`
 
-- [ ] 7.1 Failures change nothing; verify with the tests for a failed check (the reply is not called), a failed reply after `accepted`, and a check that answers `maybe`: each returns `Failed`, and the conversation stays as it was
+- [ ] 7.1 Failures change nothing; verify with the tests for a failed reply after `accepted` and a check that answers `maybe`: each returns `Failed`, and the conversation stays as it was
 - [ ] 7.2 Use `TOPIC_CHECK` and `TOPIC_REPLY` for the level; verify with the test: B1 with `deepseek-v4-pro` and both tasks with `deepseek-flash` check with `deepseek-flash` and reply with `deepseek-v4-pro`
 - [ ] 7.3 The end-to-end check of #9; verify with the test of two turns at B1 with a new block saved between them (the stub level repository returns the new block): the first reply system message holds the old block, the second the new one; and with the test that a check at A2 and at C1 gets the same message
 
