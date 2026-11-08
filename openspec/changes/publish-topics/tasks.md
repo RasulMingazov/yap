@@ -78,7 +78,7 @@ the 400 body and 409, as two PRs.
 
 - [x] 9.1 Add `TopicRejectionDto`, `GET /admin/topics/calendar`, `POST /admin/topics/{topicId}/publish`, the 400 body and 409; keep `GET /admin/topics` until [14/26]; verify with the route tests for the calendar with a fixed clock, publish 200, a publish of a published topic, 400 with the gaps and a past date, 401, 404 and 409, a GET of a draft with a taken date, and a PUT of a published topic with 400 and 409
 
-## 10. [10/26] The admin topic counts · ~260 · `H/domain/` (`CharacterSummary`, the repository, `GetCharactersUseCase`), `H/data/`, `H/presentation/` (`CharactersViewModel`, `CharactersUiStateMapper`, `TopicCountText`), `H/presentation/ui/CharactersScreen.kt` (the count on the right), `T/presentation/` (`TopicViewModel`, `TopicUiStateMapper`), `A/ScreenCaptureTest.kt` (compile only)
+## 10. [10/26] The admin topic counts · ~260 · `H/domain/` (`CharacterSummary`, the repository, `GetCharactersUseCase`), `H/data/`, `H/presentation/` (`CharactersViewModel`, `CharactersUiStateMapper`, `TopicCountText`), `H/presentation/ui/CharactersScreen.kt` (the count on the right), `T/presentation/` (`TopicViewModel`, `TopicUiStateMapper`), `T/presentation/ui/CastRadioRow.kt`, `A/ScreenCaptureTest.kt` (compile only)
 
 - [x] 10.1 Add the count to the list domain, the Characters rows and the interlocutor choice; verify with the mapper tests for 0, 1, 2, 5, 11, 12 and 21 topics, the view model tests of both screens, and `./gradlew build`
 

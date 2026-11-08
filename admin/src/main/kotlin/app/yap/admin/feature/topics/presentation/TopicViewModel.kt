@@ -206,7 +206,7 @@ internal class TopicViewModel(
             data class Choice(
                 val interlocutor: Interlocutor,
                 val isSelected: Boolean,
-                val meta: String?,
+                val meta: String,
                 val name: String,
             )
         }
