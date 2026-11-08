@@ -19,9 +19,9 @@ internal object TopicsUiStateMapper : (DataState) -> UiState {
     }
 
     private fun TopicCalendar.toUiState(): UiState {
-        val rows = rows.mapNotNull { row -> row.toRow() }
-        if (rows.isEmpty()) return UiState.Empty(message = "Тем пока нет")
-        return UiState.Content(rows = rows)
+        val topicRows = rows.mapNotNull { row -> row.toRow() }
+        if (topicRows.isEmpty()) return UiState.Empty(message = "Тем пока нет")
+        return UiState.Content(rows = topicRows)
     }
 
     private fun CalendarRow.toRow(): UiState.Content.Row? = topic?.toRow(date)

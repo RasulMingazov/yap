@@ -92,12 +92,19 @@ internal class TopicsViewModelTest {
         val env = Environment(calendar = LoadResult.Failed)
         env.viewModel.onEvent(Event.Opened)
         advanceUntilIdle()
+        val states = mutableListOf<UiState>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            env.viewModel.uiState.collect { state -> states += state }
+        }
         env.getTopicCalendarUseCase.invokeCall.returns(LoadResult.Loaded(ONE_DAY))
 
         env.viewModel.onEvent(Event.RetryClicked)
         advanceUntilIdle()
 
-        assertIs<UiState.Content>(env.viewModel.uiState.value)
+        assertEquals(
+            expected = listOf(UiState.Error::class, UiState.Loading::class, UiState.Content::class),
+            actual = states.map { state -> state::class },
+        )
     }
 
     @Test
