@@ -1,17 +1,25 @@
 package app.yap.server.feature.topics.api
 
+import app.yap.server.feature.characters.model.StubCharacter
 import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import app.yap.server.feature.characters.usecase.GetCharacterUseCase
+import app.yap.server.feature.characters.usecase.GetCharactersUseCase
 import app.yap.server.feature.topics.model.Interlocutor
 import app.yap.server.feature.topics.model.StubTopic
+import app.yap.server.feature.topics.model.Topic
+import app.yap.server.feature.topics.model.TopicCalendarRule
 import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicPublishRule
+import app.yap.server.feature.topics.model.TopicStatus
 import app.yap.server.feature.topics.persistence.StubTopicRepository
+import app.yap.server.feature.topics.persistence.TopicPublish
 import app.yap.server.feature.topics.persistence.TopicWrite
 import app.yap.server.feature.topics.usecase.CreateTopicUseCase
+import app.yap.server.feature.topics.usecase.GetTopicCalendarUseCase
 import app.yap.server.feature.topics.usecase.GetTopicUseCase
 import app.yap.server.feature.topics.usecase.GetTopicsUseCase
+import app.yap.server.feature.topics.usecase.PublishTopicUseCase
 import app.yap.server.feature.topics.usecase.UpdateTopicUseCase
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -32,6 +40,9 @@ import io.ktor.server.testing.testApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
 internal class TopicRoutesTest {
@@ -244,16 +255,161 @@ internal class TopicRoutesTest {
         assertEquals(expected = HttpStatusCode.Conflict, actual = response.status)
     }
 
-    private class Environment {
+    @Test
+    fun `GIVEN a topic WHEN reading the calendar THEN the server answers with the rows and To do`() = testApplication {
+        application { Environment().install(this) }
+
+        val response = client.get("/admin/topics/calendar")
+
+        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        assertEquals(
+            expected = listOf(
+                HttpStatusCode.OK,
+                14,
+                Json.parseToJsonElement(
+                    """
+                    {
+                      "date": "${StubTopicDto.RELEASE_DATE}",
+                      "topic": {
+                        "completeSteps": 1,
+                        "ledBy": {"type": "character", "name": "${StubCharacter.NAME}"},
+                        "status": "DRAFT",
+                        "steps": 1,
+                        "title": "${StubTopic.TITLE}",
+                        "topicId": "${StubTopicDto.TOPIC_ID}"
+                      }
+                    }
+                    """,
+                ),
+                Json.parseToJsonElement(
+                    """
+                    [
+                      {"type": "emptyDay", "date": "2026-10-23"},
+                      {"type": "draft", "date": "${StubTopicDto.RELEASE_DATE}", "gaps": [], "title": "${StubTopic.TITLE}", "topicId": "${StubTopicDto.TOPIC_ID}"}
+                    ]
+                    """,
+                ),
+            ),
+            actual = listOf(
+                response.status,
+                body.getValue("rows").jsonArray.size,
+                body.getValue("rows").jsonArray[1],
+                JsonArray(body.getValue("todos").jsonArray.take(2)),
+            ),
+        )
+    }
+
+    @Test
+    fun `GIVEN a title of spaces WHEN creating a topic THEN the server answers 400 with the missing title`() =
+        testApplication {
+            application { Environment().install(this) }
+
+            val response = postTopic(Json.encodeToString(StubTopicDto.stubContentDto(title = "  ")))
+
+            assertEquals(
+                expected = HttpStatusCode.BadRequest to Json.parseToJsonElement(
+                    """{"gaps": [{"type": "missing", "field": "TITLE"}]}""",
+                ),
+                actual = response.status to Json.parseToJsonElement(response.bodyAsText()),
+            )
+        }
+
+    @Test
+    fun `GIVEN a published topic with a past date WHEN updating it THEN the server answers 400 with the gaps`() =
+        testApplication {
+            application { Environment(StubTopic.stubTopic(status = TopicStatus.PUBLISHED)).install(this) }
+
+            val response = putTopic(
+                Json.encodeToString(StubTopicDto.stubContentDto(releaseDate = PAST_DATE, setting = "")),
+            )
+
+            assertEquals(expected = HttpStatusCode.BadRequest to REJECTION, actual = response.status to response.json())
+        }
+
+    @Test
+    fun `GIVEN a published topic WHEN updating it to a taken date THEN the server answers 409`() = testApplication {
+        val env = Environment(StubTopic.stubTopic(status = TopicStatus.PUBLISHED))
+        env.topicRepository.updateCall.returns(TopicWrite.DateTaken)
+        application { env.install(this) }
+
+        val response = putTopic(contentJson())
+
+        assertEquals(expected = HttpStatusCode.Conflict, actual = response.status)
+    }
+
+    @Test
+    fun `GIVEN a filled draft WHEN publishing it THEN the server answers with the published topic`() = testApplication {
+        val env = Environment()
+        env.topicRepository.publishCall.returns(
+            TopicPublish.Published(StubTopic.stubTopic(status = TopicStatus.PUBLISHED)),
+        )
+        application { env.install(this) }
+
+        val response = publishTopic(contentJson())
+
+        assertEquals(
+            expected = HttpStatusCode.OK to Json.parseToJsonElement(topicJson(status = "PUBLISHED")),
+            actual = response.status to response.json(),
+        )
+    }
+
+    @Test
+    fun `GIVEN a published topic WHEN publishing it THEN the server answers with it`() = testApplication {
+        application { Environment(StubTopic.stubTopic(status = TopicStatus.PUBLISHED)).install(this) }
+
+        val response = publishTopic(contentJson())
+
+        assertEquals(
+            expected = HttpStatusCode.OK to Json.parseToJsonElement(topicJson(status = "PUBLISHED")),
+            actual = response.status to response.json(),
+        )
+    }
+
+    @Test
+    fun `GIVEN a draft with gaps and a past date WHEN publishing it THEN the server answers 400 with the gaps`() =
+        testApplication {
+            application { Environment().install(this) }
+
+            val response = publishTopic(
+                Json.encodeToString(StubTopicDto.stubContentDto(releaseDate = PAST_DATE, setting = "")),
+            )
+
+            assertEquals(expected = HttpStatusCode.BadRequest to REJECTION, actual = response.status to response.json())
+        }
+
+    @Test
+    fun `GIVEN an unknown topic WHEN publishing it THEN the server answers 404`() = testApplication {
+        val env = Environment()
+        env.topicRepository.findCall.returns(null)
+        application { env.install(this) }
+
+        val response = publishTopic(contentJson())
+
+        assertEquals(expected = HttpStatusCode.NotFound, actual = response.status)
+    }
+
+    @Test
+    fun `GIVEN a date with a published topic WHEN publishing a draft THEN the server answers 409`() = testApplication {
+        val env = Environment()
+        env.topicRepository.publishCall.returns(TopicPublish.DateTaken)
+        application { env.install(this) }
+
+        val response = publishTopic(contentJson())
+
+        assertEquals(expected = HttpStatusCode.Conflict, actual = response.status)
+    }
+
+    private class Environment(topic: Topic = StubTopic.stubTopic()) {
 
         val characterRepository = StubCharacterRepository()
-        val topicRepository = StubTopicRepository()
+        val topicRepository = StubTopicRepository(topic)
 
         fun install(application: Application) {
             val topicDraftRule = TopicDraftRule(
                 getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
             )
             val topicPublishRule = TopicPublishRule(topicDraftRule = topicDraftRule)
+            val topicCalendarRule = TopicCalendarRule(topicPublishRule = topicPublishRule)
             val topicDetailsRule = TopicDetailsRule(topicPublishRule = topicPublishRule)
             application.install(ContentNegotiation) {
                 json()
@@ -266,6 +422,12 @@ internal class TopicRoutesTest {
                         topicDraftRule = topicDraftRule,
                         topicRepository = topicRepository,
                     ),
+                    getTopicCalendarUseCase = GetTopicCalendarUseCase(
+                        clock = StubTopic.CLOCK,
+                        getCharactersUseCase = GetCharactersUseCase(characterRepository = characterRepository),
+                        topicCalendarRule = topicCalendarRule,
+                        topicRepository = topicRepository,
+                    ),
                     getTopicUseCase = GetTopicUseCase(
                         clock = StubTopic.CLOCK,
                         topicDetailsRule = topicDetailsRule,
@@ -274,6 +436,12 @@ internal class TopicRoutesTest {
                     getTopicsUseCase = GetTopicsUseCase(
                         clock = StubTopic.CLOCK,
                         topicDetailsRule = topicDetailsRule,
+                        topicRepository = topicRepository,
+                    ),
+                    publishTopicUseCase = PublishTopicUseCase(
+                        clock = StubTopic.CLOCK,
+                        topicDetailsRule = topicDetailsRule,
+                        topicPublishRule = topicPublishRule,
                         topicRepository = topicRepository,
                     ),
                     updateTopicUseCase = UpdateTopicUseCase(
@@ -292,7 +460,12 @@ internal class TopicRoutesTest {
 
         const val CAST_JSON = """{"type": "character", "characterId": "${StubTopicDto.CHARACTER_ID}"}"""
         const val GUEST_DESCRIPTION = "A tourist who asks for directions."
+        const val PAST_DATE = "2026-10-17"
         const val GUEST_JSON = """{"type": "guest", "description": "$GUEST_DESCRIPTION"}"""
+
+        val REJECTION = Json.parseToJsonElement(
+            """{"gaps": [{"type": "missing", "field": "SETTING"}, {"type": "pastDate"}]}""",
+        )
 
         fun contentJson(interlocutor: String = CAST_JSON): String = """
             {
@@ -308,11 +481,14 @@ internal class TopicRoutesTest {
             }
         """
 
-        fun topicJson(interlocutor: String = CAST_JSON): String = """
+        fun topicJson(
+            interlocutor: String = CAST_JSON,
+            status: String = "DRAFT",
+        ): String = """
             {
               "content": ${contentJson(interlocutor)},
               "gaps": [],
-              "status": "DRAFT",
+              "status": "$status",
               "topicId": "${StubTopicDto.TOPIC_ID}"
             }
         """
@@ -329,3 +505,11 @@ private suspend fun ApplicationTestBuilder.putTopic(body: String): HttpResponse 
         contentType(ContentType.Application.Json)
         setBody(body)
     }
+
+private suspend fun ApplicationTestBuilder.publishTopic(body: String): HttpResponse =
+    client.post("/admin/topics/${StubTopicDto.TOPIC_ID}/publish") {
+        contentType(ContentType.Application.Json)
+        setBody(body)
+    }
+
+private suspend fun HttpResponse.json(): JsonElement = Json.parseToJsonElement(bodyAsText())
