@@ -8,12 +8,14 @@ import org.koin.dsl.onClose
 
 fun coreLlmModule(config: LlmConfig): Module = module {
     single { config }
-    singleOf(::ProviderConnections)
     single(createdAtStart = true) {
         ModelProviders(
-            providers = listOfNotNull(
-                config.deepSeek?.let { deepSeek -> ModelProviderId.DEEPSEEK to DeepSeekModelProvider(deepSeek) },
-            ).toMap(),
+            providers = buildMap {
+                config.deepSeek?.let { deepSeek ->
+                    put(ModelProviderId.DEEPSEEK, DeepSeekModelProvider(deepSeek))
+                }
+            },
         )
     } onClose { providers -> providers?.close() }
+    singleOf(::ProviderConnections)
 }

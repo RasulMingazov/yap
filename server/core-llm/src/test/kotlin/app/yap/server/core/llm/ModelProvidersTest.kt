@@ -2,7 +2,6 @@ package app.yap.server.core.llm
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -31,19 +30,27 @@ internal class ModelProvidersTest {
         val answer = ModelReply.Answered(JsonObject(mapOf("verdict" to JsonPrimitive("accepted"))))
         val providers = ModelProviders(mapOf(ModelProviderId.DEEPSEEK to StubModelProvider(json = answer)))
 
-        assertEquals(expected = answer, actual = providers.json(choice, messages))
+        val reply = providers.json(choice, messages)
+
+        assertEquals(expected = answer, actual = reply)
     }
 
     @Test
     fun `GIVEN a provider that fails WHEN asking for JSON THEN the failure comes back as it is`() = runTest {
         val providers = ModelProviders(mapOf(ModelProviderId.DEEPSEEK to StubModelProvider(json = ModelReply.Failed)))
 
-        assertEquals(expected = ModelReply.Failed, actual = providers.json(choice, messages))
+        val reply = providers.json(choice, messages)
+
+        assertEquals(expected = ModelReply.Failed, actual = reply)
     }
 
     @Test
     fun `GIVEN a provider that is not in the map WHEN asking for JSON THEN it fails`() = runTest {
-        assertEquals(expected = ModelReply.Failed, actual = ModelProviders(emptyMap()).json(choice, messages))
+        val providers = ModelProviders(emptyMap())
+
+        val reply = providers.json(choice, messages)
+
+        assertEquals(expected = ModelReply.Failed, actual = reply)
     }
 
     @Test
@@ -51,21 +58,20 @@ internal class ModelProvidersTest {
         val koin = koinApplication {
             modules(coreLlmModule(StubLlmConfig.stubLlmConfig(deepSeek = null)))
         }.koin
+        val providers = koin.get<ModelProviders>()
 
-        assertEquals(expected = ModelReply.Failed, actual = koin.get<ModelProviders>().json(choice, messages))
+        val reply = providers.json(choice, messages)
+
+        assertEquals(expected = ModelReply.Failed, actual = reply)
     }
 
     @Test
     fun `GIVEN a provider that is closeable WHEN closing THEN it is closed`() {
-        var closed = false
-        val provider = object : ModelProvider by StubModelProvider(), AutoCloseable {
-            override fun close() {
-                closed = true
-            }
-        }
+        val provider = StubCloseableModelProvider()
+        val providers = ModelProviders(mapOf(ModelProviderId.DEEPSEEK to provider))
 
-        ModelProviders(mapOf(ModelProviderId.DEEPSEEK to provider)).close()
+        providers.close()
 
-        assertTrue(closed)
+        provider.closeCall.called()
     }
 }
