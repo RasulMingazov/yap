@@ -34,6 +34,27 @@ internal class CreateTopicUseCaseTest {
     }
 
     @Test
+    fun `GIVEN a draft on a date with a published topic WHEN creating THEN the details name the taken date`() =
+        runTest {
+            val env = Environment()
+            env.topicRepository.hasPublishedOnCall.returns(true)
+
+            val outcome = env.useCase(StubTopic.stubContent())
+
+            env.topicRepository.hasPublishedOnCall.calledWith(StubTopic.RELEASE_DATE, StubTopic.TOPIC_ID)
+            assertEquals(
+                expected = CreateTopicOutcome.Created(
+                    TopicDetails(
+                        gaps = setOf(TopicGap.DateTaken),
+                        state = ReleaseState.DRAFT,
+                        topic = StubTopic.stubTopic(),
+                    ),
+                ),
+                actual = outcome,
+            )
+        }
+
+    @Test
     fun `GIVEN a character that does not exist WHEN creating THEN nothing is stored`() = runTest {
         val env = Environment()
         env.characterRepository.findCall.returns(null)
@@ -55,10 +76,9 @@ internal class CreateTopicUseCaseTest {
             getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
         )
         val useCase = CreateTopicUseCase(
+            clock = StubTopic.CLOCK,
             topicDetailsRule = TopicDetailsRule(
-                clock = StubTopic.CLOCK,
                 topicPublishRule = TopicPublishRule(topicDraftRule = topicDraftRule),
-                topicRepository = topicRepository,
             ),
             topicDraftRule = topicDraftRule,
             topicRepository = topicRepository,

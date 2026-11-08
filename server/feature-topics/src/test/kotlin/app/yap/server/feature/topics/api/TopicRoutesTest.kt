@@ -220,22 +220,20 @@ internal class TopicRoutesTest {
                 getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
             )
             val topicPublishRule = TopicPublishRule(topicDraftRule = topicDraftRule)
-            val topicDetailsRule = TopicDetailsRule(
-                clock = StubTopic.CLOCK,
-                topicPublishRule = topicPublishRule,
-                topicRepository = topicRepository,
-            )
+            val topicDetailsRule = TopicDetailsRule(topicPublishRule = topicPublishRule)
             application.install(ContentNegotiation) {
                 json()
             }
             application.routing {
                 topicRoutes(
                     createTopicUseCase = CreateTopicUseCase(
+                        clock = StubTopic.CLOCK,
                         topicDetailsRule = topicDetailsRule,
                         topicDraftRule = topicDraftRule,
                         topicRepository = topicRepository,
                     ),
                     getTopicUseCase = GetTopicUseCase(
+                        clock = StubTopic.CLOCK,
                         topicDetailsRule = topicDetailsRule,
                         topicRepository = topicRepository,
                     ),

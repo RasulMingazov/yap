@@ -24,6 +24,27 @@ import kotlinx.coroutines.test.runTest
 internal class UpdateTopicUseCaseTest {
 
     @Test
+    fun `GIVEN a draft on a date with a published topic WHEN updating THEN the details name the taken date`() =
+        runTest {
+            val env = Environment()
+            env.topicRepository.hasPublishedOnCall.returns(true)
+
+            val outcome = env.useCase(content = StubTopic.stubContent(), topicId = StubTopic.TOPIC_ID)
+
+            env.topicRepository.hasPublishedOnCall.calledWith(StubTopic.RELEASE_DATE, StubTopic.TOPIC_ID)
+            assertEquals(
+                expected = UpdateTopicOutcome.Updated(
+                    TopicDetails(
+                        gaps = setOf(TopicGap.DateTaken),
+                        state = ReleaseState.DRAFT,
+                        topic = StubTopic.stubTopic(),
+                    ),
+                ),
+                actual = outcome,
+            )
+        }
+
+    @Test
     fun `GIVEN a draft that is ready WHEN updating THEN the topic is stored with its details`() = runTest {
         val env = Environment()
 
@@ -178,11 +199,7 @@ internal class UpdateTopicUseCaseTest {
         val topicPublishRule = TopicPublishRule(topicDraftRule = topicDraftRule)
         val useCase = UpdateTopicUseCase(
             clock = StubTopic.CLOCK,
-            topicDetailsRule = TopicDetailsRule(
-                clock = StubTopic.CLOCK,
-                topicPublishRule = topicPublishRule,
-                topicRepository = topicRepository,
-            ),
+            topicDetailsRule = TopicDetailsRule(topicPublishRule = topicPublishRule),
             topicDraftRule = topicDraftRule,
             topicPublishRule = topicPublishRule,
             topicRepository = wrap(topicRepository),

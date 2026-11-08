@@ -64,24 +64,24 @@ internal class PublishTopicUseCaseTest {
     }
 
     @Test
-    fun `GIVEN a published topic that is out WHEN publishing it with the same date THEN it acts as a save`() = runTest {
-        val env = Environment()
-        val date = LocalDate.of(2026, 10, 22)
-        val content = StubTopic.stubContent(releaseDate = date)
-        val out = StubTopic.stubTopic(content = content, status = TopicStatus.PUBLISHED)
-        env.topicRepository.findCall.returns(out)
-        env.topicRepository.publishCall.returns(TopicPublish.Published(out))
+    fun `GIVEN a published topic that is out WHEN publishing it with the same date THEN it acts as a save`() =
+        runTest {
+            val env = Environment()
+            val content = StubTopic.stubContent(releaseDate = LocalDate.of(2026, 10, 22))
+            val out = StubTopic.stubTopic(content = content, status = TopicStatus.PUBLISHED)
+            env.topicRepository.findCall.returns(out)
+            env.topicRepository.publishCall.returns(TopicPublish.Published(out))
 
-        val outcome = env.useCase(content = content, topicId = StubTopic.TOPIC_ID)
+            val outcome = env.useCase(content = content, topicId = StubTopic.TOPIC_ID)
 
-        env.topicRepository.publishCall.calledWith(content, StubTopic.TOPIC_ID)
-        assertEquals(
-            expected = PublishTopicOutcome.Published(
-                TopicDetails(gaps = emptySet(), state = ReleaseState.OUT, topic = out),
-            ),
-            actual = outcome,
-        )
-    }
+            env.topicRepository.publishCall.calledWith(content, StubTopic.TOPIC_ID)
+            assertEquals(
+                expected = PublishTopicOutcome.Published(
+                    TopicDetails(gaps = emptySet(), state = ReleaseState.OUT, topic = out),
+                ),
+                actual = outcome,
+            )
+        }
 
     @Test
     fun `GIVEN an unknown topic WHEN publishing it THEN it is not found`() = runTest {
@@ -124,11 +124,7 @@ internal class PublishTopicUseCaseTest {
         )
         val useCase = PublishTopicUseCase(
             clock = StubTopic.CLOCK,
-            topicDetailsRule = TopicDetailsRule(
-                clock = StubTopic.CLOCK,
-                topicPublishRule = topicPublishRule,
-                topicRepository = topicRepository,
-            ),
+            topicDetailsRule = TopicDetailsRule(topicPublishRule = topicPublishRule),
             topicPublishRule = topicPublishRule,
             topicRepository = topicRepository,
         )

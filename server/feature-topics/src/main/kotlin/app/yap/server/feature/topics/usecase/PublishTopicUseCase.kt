@@ -4,6 +4,7 @@ import app.yap.server.feature.topics.model.PublishTopicOutcome
 import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
+import app.yap.server.feature.topics.model.TopicDetails
 import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicId
 import app.yap.server.feature.topics.model.TopicPublishRule
@@ -43,6 +44,12 @@ class PublishTopicUseCase(
     private suspend fun TopicPublish.toOutcome(): PublishTopicOutcome = when (this) {
         is TopicPublish.DateTaken -> PublishTopicOutcome.DateTaken
         is TopicPublish.NotFound -> PublishTopicOutcome.NotFound
-        is TopicPublish.Published -> PublishTopicOutcome.Published(topicDetailsRule.details(topic))
+        is TopicPublish.Published -> PublishTopicOutcome.Published(details(topic))
     }
+
+    private suspend fun details(topic: Topic): TopicDetails = topicDetailsRule.details(
+        isDateTaken = topicRepository.hasPublishedOn(topic.date, topic.topicId),
+        today = ReleaseState.today(clock),
+        topic = topic,
+    )
 }
