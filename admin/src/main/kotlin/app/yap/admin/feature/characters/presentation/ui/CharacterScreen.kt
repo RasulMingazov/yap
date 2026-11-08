@@ -111,15 +111,15 @@ private fun CharacterForm(
             SectionHeader(title = "Кто это")
             AdminTextField(
                 label = "Имя — как его называют пользователи",
-                onValueChange = { name -> onEvent(Event.FormChanged(content.form.copy(name = name))) },
-                value = content.form.name,
+                onValueChange = { name -> onEvent(Event.NameChanged(name)) },
+                value = content.name,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Например, Mia",
             )
             AdminTextField(
                 label = "История",
-                onValueChange = { history -> onEvent(Event.FormChanged(content.form.copy(history = history))) },
-                value = content.form.history,
+                onValueChange = { history -> onEvent(Event.HistoryChanged(history)) },
+                value = content.history,
                 minLines = PROFILE_LINES,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Кто он, откуда, чем живёт. Если он будет в разных ролях, объясните почему: " +
@@ -127,16 +127,16 @@ private fun CharacterForm(
             )
             AdminTextField(
                 label = "Характер",
-                onValueChange = { personality -> onEvent(Event.FormChanged(content.form.copy(personality = personality))) },
-                value = content.form.personality,
+                onValueChange = { personality -> onEvent(Event.PersonalityChanged(personality)) },
+                value = content.personality,
                 minLines = PROFILE_LINES,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Какой он в разговоре: тёплый, строгий, ворчливый, любопытный.",
             )
             AdminTextField(
                 label = "Манера речи",
-                onValueChange = { manner -> onEvent(Event.FormChanged(content.form.copy(manner = manner))) },
-                value = content.form.manner,
+                onValueChange = { manner -> onEvent(Event.MannerChanged(manner)) },
+                value = content.manner,
                 minLines = PROFILE_LINES,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Британский или американский, длинные или короткие фразы, есть ли сленг.",

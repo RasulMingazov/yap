@@ -19,9 +19,12 @@ internal class CharacterUiStateMapperTest {
 
         assertEquals(
             expected = UiState.Content(
-                form = StubCharacter.stubProfile(history = "", manner = "", name = "", personality = ""),
                 hint = "Заполните поля и нажмите «Сохранить».",
+                history = "",
                 isSaveEnabled = true,
+                manner = "",
+                name = "",
+                personality = "",
                 saveStatus = null,
                 subtitle = "Ещё не сохранён",
                 title = "Новый персонаж",
@@ -41,9 +44,12 @@ internal class CharacterUiStateMapperTest {
 
         assertEquals(
             expected = UiState.Content(
-                form = character.profile,
                 hint = null,
+                history = StubCharacter.HISTORY,
                 isSaveEnabled = true,
+                manner = StubCharacter.MANNER,
+                name = StubCharacter.NAME,
+                personality = StubCharacter.PERSONALITY,
                 saveStatus = Status(text = "Сохранено", tone = Status.Tone.SUCCESS),
                 subtitle = "Постоянный герой",
                 title = "Sam",
