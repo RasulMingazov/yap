@@ -17,7 +17,7 @@ internal object TopicsUiStateMapper : (DataState) -> UiState {
         val calendar = state.calendar
         return when {
             calendar != null -> state.toContent(calendar)
-            state.isLoadFailed -> UiState.Error(message = "Не удалось загрузить темы")
+            state.isLoadFailed && !state.isLoading -> UiState.Error(message = "Не удалось загрузить темы")
             else -> UiState.Loading
         }
     }
@@ -28,7 +28,13 @@ internal object TopicsUiStateMapper : (DataState) -> UiState {
         todo = calendar.todos.toTodoList(),
     )
 
-    private fun DataState.reloadError(): String? = if (isLoadFailed) "Не удалось обновить темы" else null
+    private fun DataState.reloadError(): UiState.ReloadError? {
+        if (!isLoadFailed) return null
+        return UiState.ReloadError(
+            isRetrying = isLoading,
+            message = "Не удалось обновить темы",
+        )
+    }
 
     private fun CalendarRow.toRow(): UiState.Row = when (val topic = topic) {
         null -> UiState.Row.EmptyDay(date = ReleaseDateFormat.short(date))
@@ -83,7 +89,11 @@ internal object TopicsUiStateMapper : (DataState) -> UiState {
             title = title,
             topicId = topicId,
         )
-        is Todo.EmptyDay -> UiState.TodoEntry.EmptyDay(date = ReleaseDateFormat.short(date))
+        is Todo.EmptyDay -> UiState.TodoEntry.EmptyDay(
+            date = ReleaseDateFormat.short(date),
+            note = "В этот день пользователи увидят пустой день.",
+            title = "Темы нет.",
+        )
     }
 
     private fun Todo.Draft.note(): String = if (gaps.isEmpty()) "Черновик. Опубликуйте." else "Дописать ${TopicGapText(gaps)}."

@@ -21,27 +21,13 @@ internal class TopicsViewModel(
     val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicsUiStateMapper)
 
     fun onEvent(event: Event) = when (event) {
-        is Event.Opened -> onOpened()
-        is Event.RetryClicked -> onRetryClicked()
-    }
-
-    private fun onOpened() {
-        if (dataState.value.isLoading) return
-        load()
-    }
-
-    private fun onRetryClicked() {
-        if (!dataState.value.isLoadFailed) return
-        load()
+        is Event.Opened -> load()
+        is Event.RetryClicked -> load()
     }
 
     private fun load() {
-        dataState.update { state ->
-            state.copy(
-                isLoadFailed = false,
-                isLoading = true,
-            )
-        }
+        if (dataState.value.isLoading) return
+        dataState.update { state -> state.copy(isLoading = true) }
         viewModelScope.launch {
             when (val result = getTopicCalendarUseCase()) {
                 is LoadResult.Failed -> dataState.update { state ->
@@ -53,6 +39,7 @@ internal class TopicsViewModel(
                 is LoadResult.Loaded -> dataState.update { state ->
                     state.copy(
                         calendar = result.value,
+                        isLoadFailed = false,
                         isLoading = false,
                     )
                 }
@@ -69,7 +56,7 @@ internal class TopicsViewModel(
     sealed interface UiState {
 
         data class Content(
-            val reloadError: String?,
+            val reloadError: ReloadError?,
             val rows: List<Row>,
             val todo: TodoList,
         ) : UiState
@@ -77,6 +64,11 @@ internal class TopicsViewModel(
         data class Error(val message: String) : UiState
 
         data object Loading : UiState
+
+        data class ReloadError(
+            val isRetrying: Boolean,
+            val message: String,
+        )
 
         sealed interface Row {
 
@@ -101,7 +93,11 @@ internal class TopicsViewModel(
                 val topicId: TopicId,
             ) : TodoEntry
 
-            data class EmptyDay(val date: String) : TodoEntry
+            data class EmptyDay(
+                val date: String,
+                val note: String,
+                val title: String,
+            ) : TodoEntry
         }
 
         sealed interface TodoList {

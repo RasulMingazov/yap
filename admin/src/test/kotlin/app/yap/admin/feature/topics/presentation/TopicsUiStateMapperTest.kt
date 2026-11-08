@@ -67,7 +67,11 @@ internal class TopicsUiStateMapperTest {
                             title = "At the cafe",
                             topicId = TopicId(StubTopic.TOPIC_ID),
                         ),
-                        UiState.TodoEntry.EmptyDay(date = "Сб, 25 окт"),
+                        UiState.TodoEntry.EmptyDay(
+                            date = "Сб, 25 окт",
+                            note = "В этот день пользователи увидят пустой день.",
+                            title = "Темы нет.",
+                        ),
                     ),
                 ),
             ),
@@ -208,11 +212,33 @@ internal class TopicsUiStateMapperTest {
 
         assertEquals(
             expected = UiState.Content(
-                reloadError = "Не удалось обновить темы",
+                reloadError = UiState.ReloadError(
+                    isRetrying = false,
+                    message = "Не удалось обновить темы",
+                ),
                 rows = listOf(UiState.Row.EmptyDay(date = "Пт, 24 окт")),
                 todo = UiState.TodoList.Empty(message = "Всё сделано"),
             ),
             actual = uiState,
+        )
+    }
+
+    @Test
+    fun `GIVEN a kept calendar and a retry after a failed reload WHEN mapping THEN the banner marks the retry`() {
+        val state = DataState(
+            calendar = StubTopicCalendar.stubTopicCalendar(),
+            isLoadFailed = true,
+            isLoading = true,
+        )
+
+        val uiState = assertIs<UiState.Content>(TopicsUiStateMapper(state))
+
+        assertEquals(
+            expected = UiState.ReloadError(
+                isRetrying = true,
+                message = "Не удалось обновить темы",
+            ),
+            actual = uiState.reloadError,
         )
     }
 
@@ -223,6 +249,18 @@ internal class TopicsUiStateMapperTest {
         val uiState = TopicsUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить темы"), actual = uiState)
+    }
+
+    @Test
+    fun `GIVEN no calendar and a retry after a failed load WHEN mapping THEN the screen is loading`() {
+        val state = DataState(
+            isLoadFailed = true,
+            isLoading = true,
+        )
+
+        val uiState = TopicsUiStateMapper(state)
+
+        assertEquals(expected = UiState.Loading, actual = uiState)
     }
 
     @Test

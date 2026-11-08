@@ -108,8 +108,8 @@ the 400 body and 409, as two PRs.
 
 Create opens a new topic without a date until [17/26].
 
-- [ ] 16.1 Build To do, the header All topics, the five columns, the empty day row, the note and the reload banner with Retry from the UI state; verify with `./gradlew build` and the UI state tests of [15/26]
-- [ ] 16.2 Moved from [15/26] (UX review of PR 162, M-1 and M-2): a Retry over a kept calendar keeps the banner and marks the retry (Retry disabled, a progress mark), and keeps one load at a time; an empty day in To do has the title and the note of the canvas (`admin.dc.html:515`): no topic, and users see an empty day; verify with the mapper tests for the banner during a retry and for an empty day, and a view model test for a second Retry during a retry
+- [x] 16.1 Build To do, the header All topics, the five columns, the empty day row, the note and the reload banner with Retry from the UI state; verify with `./gradlew build` and the UI state tests of [15/26]
+- [x] 16.2 Moved from [15/26] (UX review of PR 162, M-1 and M-2): a Retry over a kept calendar keeps the banner and marks the retry (Retry disabled, a progress mark), and keeps one load at a time; an empty day in To do has the title and the note of the canvas (`admin.dc.html:515`): no topic, and users see an empty day; verify with the mapper tests for the banner during a retry and for an empty day, and a view model test for a second Retry during a retry
 
 ## 17. [17/26] Create on an empty day · ~150 · `A/Main.kt`, `A/navigation/` (`Screen.Topic` with the date), `T/FeatureTopicsModule.kt`, `T/presentation/TopicViewModel.kt`, `T/presentation/ui/TopicsScreen.kt`
 
