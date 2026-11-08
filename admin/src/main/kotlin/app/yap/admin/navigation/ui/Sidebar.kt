@@ -149,8 +149,7 @@ private fun SidebarItem(
     Text(
         text = label,
         color = if (isCurrent) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
-        style = AdminTheme.Type.body,
-        fontWeight = FontWeight.Medium,
+        style = AdminTheme.Type.bodyMedium,
         modifier = Modifier
             .fillMaxWidth()
             .height(AdminTheme.Sizes.sideItemHeight)

@@ -21,7 +21,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminSelect
 import app.yap.admin.core.design.AdminTheme
@@ -202,8 +201,7 @@ private fun TaskRow(
                 Text(
                     text = row.title,
                     color = AdminTheme.Colors.ink,
-                    fontWeight = FontWeight.Medium,
-                    style = AdminTheme.Type.tableCell,
+                    style = AdminTheme.Type.tableCellMedium,
                 )
                 Text(
                     text = row.usage,
@@ -254,8 +252,7 @@ private fun ProviderRow(provider: UiState.ProviderRow) {
             Text(
                 text = provider.name,
                 color = AdminTheme.Colors.ink,
-                fontWeight = FontWeight.Medium,
-                style = AdminTheme.Type.body,
+                style = AdminTheme.Type.bodyMedium,
             )
             Text(
                 text = provider.models,

@@ -117,7 +117,7 @@ Create opens a new topic without a date until [17/26].
 
 ## 18. [18/26] The captures of Topics · ~130 · `A/core/design/` (`AdminTheme.Type`: Inter Medium and a medium body style; the status text size of a table cell), `admin/src/main/resources/font/` (Inter Medium), `A/ScreenCaptureTest.kt`, `T/presentation/ui/TopicsScreen.kt`
 
-- [ ] 18.1 Capture Topics with every status, an empty day, 2 of 5, a draft with the steps 3–5, nothing to do, the reload banner, loading and the error; moved from [16/26] (reviews of PR 166): the titles in To do and All topics take weight 500 from Inter Medium and a theme style, not a literal `FontWeight.Medium` (ux 6), and the status in the All topics table has the 14 px size of the other cells, not 13 px (ui-review); verify with the images
+- [x] 18.1 Capture Topics with every status, an empty day, 2 of 5, a draft with the steps 3–5, nothing to do, the reload banner, loading and the error; moved from [16/26] (reviews of PR 166): the titles in To do and All topics take weight 500 from Inter Medium and a theme style, not a literal `FontWeight.Medium` (ux 6), and the status in the All topics table has the 14 px size of the other cells, not 13 px (ui-review); verify with the images
 
 ## 19. [19/26] The admin publish domain · ~220 · `T/domain/` (`Topic` with the release state and the gaps, `SaveTopicResult` with the gaps and `DateTaken`, `PublishTopicResult`), `T/data/mapper/TopicMapper.kt`, `T/presentation/TopicViewModel.kt` (compile only)
 

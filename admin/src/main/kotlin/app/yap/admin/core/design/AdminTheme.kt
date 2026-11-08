@@ -62,6 +62,7 @@ internal object AdminTheme {
         val levelColumnWidth = 110.dp
         val levelWordsColumnWidth = 130.dp
         val linkUnderlineOffset = 3.dp
+        val listSectionGap = 20.dp
         val loader = 20.dp
         val loaderStroke = 2.dp
         val modelColumnWidth = 240.dp
@@ -91,7 +92,7 @@ internal object AdminTheme {
         val sideItemPadding = 10.dp
         val sidePadding = 12.dp
         val sideWidth = 200.dp
-        val statusColumnWidth = 110.dp
+        val statusColumnWidth = 120.dp
         val stepNumberTopPadding = 24.dp
         val stepNumberWidth = 28.dp
         val stepsColumnWidth = 90.dp
@@ -113,6 +114,7 @@ internal object AdminTheme {
 
         private val inter = FontFamily(
             Font(resource = "font/inter_regular.ttf", weight = FontWeight.Normal),
+            Font(resource = "font/inter_medium.ttf", weight = FontWeight.Medium),
             Font(resource = "font/inter_semibold.ttf", weight = FontWeight.SemiBold),
         )
 
@@ -124,11 +126,13 @@ internal object AdminTheme {
         )
 
         val body = TextStyle(fontFamily = inter, fontSize = 14.sp, lineHeight = 20.sp)
+        val bodyMedium = body.copy(fontWeight = FontWeight.Medium)
         val heading = TextStyle(fontFamily = inter, fontSize = 15.sp, lineHeight = 20.sp)
         val mono = TextStyle(fontFamily = jetBrainsMono, fontSize = 12.sp, lineHeight = 19.sp)
         val small = TextStyle(fontFamily = inter, fontSize = 12.sp, lineHeight = 16.sp)
         val sub = TextStyle(fontFamily = inter, fontSize = 13.sp, lineHeight = 18.sp)
         val tableCell = body.copy(lineHeightStyle = fullLineHeight)
+        val tableCellMedium = tableCell.copy(fontWeight = FontWeight.Medium)
         val tableHeader = small.copy(
             lineHeight = 20.sp,
             lineHeightStyle = fullLineHeight,

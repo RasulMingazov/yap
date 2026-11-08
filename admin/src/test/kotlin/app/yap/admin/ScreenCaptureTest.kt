@@ -49,8 +49,12 @@ import app.yap.admin.feature.server.presentation.ServerUiStateMapper
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ui.ServerContent
 import app.yap.admin.feature.topics.domain.Interlocutor
+import app.yap.admin.feature.topics.domain.LedBy
+import app.yap.admin.feature.topics.domain.ReleaseState
 import app.yap.admin.feature.topics.domain.StubTopic
 import app.yap.admin.feature.topics.domain.StubTopicCalendar
+import app.yap.admin.feature.topics.domain.Todo
+import app.yap.admin.feature.topics.domain.TopicGap
 import app.yap.admin.feature.topics.presentation.TopicUiStateMapper
 import app.yap.admin.feature.topics.presentation.TopicViewModel
 import app.yap.admin.feature.topics.presentation.TopicsUiStateMapper
@@ -72,11 +76,15 @@ internal class ScreenCaptureTest {
 
     @Test
     fun `GIVEN every state of Topics WHEN capturing THEN each state has an image`() {
+        val content = TopicsViewModel.DataState(calendar = TOPICS_CALENDAR)
+        val reloadFailed = content.copy(isLoadFailed = true)
         val states = mapOf(
             "loading" to TopicsViewModel.DataState(),
-            "empty" to TopicsViewModel.DataState(calendar = StubTopicCalendar.stubTopicCalendar()),
             "error" to TopicsViewModel.DataState(isLoadFailed = true),
-            "content" to TopicsViewModel.DataState(calendar = TOPICS_CALENDAR),
+            "content" to content,
+            "nothing-to-do" to TopicsViewModel.DataState(calendar = TOPICS_CALENDAR.copy(todos = emptyList())),
+            "reload-error" to reloadFailed,
+            "reload-retrying" to reloadFailed.copy(isLoading = true),
         )
 
         val images = states.map { (state, dataState) ->
@@ -432,6 +440,8 @@ internal class ScreenCaptureTest {
     private companion object {
 
         const val LONG_ADDRESS = "https://staging.yap-admin.example.com"
+        const val LONG_TOPIC_TITLE = "A visit to a pharmacy late at night to ask about a cough syrup, a plaster " +
+            "and something for a headache"
         const val REPLY_VERSIONS = 7
         const val RESTORED_NUMBER = 5
         const val SETTLED_FRAMES = 5
@@ -600,21 +610,67 @@ internal class ScreenCaptureTest {
         )
         val TOPICS_CALENDAR = StubTopicCalendar.stubTopicCalendar(
             rows = listOf(
-                StubTopicCalendar.stubCalendarRow(),
+                StubTopicCalendar.stubCalendarRow(
+                    date = LocalDate.of(2025, 10, 22),
+                    topic = StubTopicCalendar.stubCalendarTopic(
+                        completeSteps = 5,
+                        ledBy = LedBy.Cast(name = "Сэм"),
+                        state = ReleaseState.OUT,
+                        steps = 5,
+                    ),
+                ),
+                StubTopicCalendar.stubCalendarRow(
+                    date = LocalDate.of(2025, 10, 23),
+                    topic = StubTopicCalendar.stubCalendarTopic(
+                        completeSteps = 6,
+                        ledBy = LedBy.Cast(name = "Сэм"),
+                        state = ReleaseState.TODAY,
+                        steps = 6,
+                        title = "Check-in and luggage",
+                    ),
+                ),
+                StubTopicCalendar.stubCalendarRow(
+                    topic = StubTopicCalendar.stubCalendarTopic(
+                        completeSteps = 5,
+                        ledBy = LedBy.Cast(name = "Мия"),
+                        state = ReleaseState.PUBLISHED,
+                        steps = 5,
+                        title = "A taxi to the hotel",
+                    ),
+                ),
                 StubTopicCalendar.stubCalendarRow(
                     date = LocalDate.of(2025, 10, 25),
                     topic = StubTopicCalendar.stubCalendarTopic(
-                        title = "A job interview for a junior designer role at a small studio that makes posters, " +
-                            "books and signs for museums, theatres, concert halls and the city libraries of the north",
-                        topicId = "5a4b3c2d-1e0f-4a9b-8c7d-6e5f4a3b2c1d",
+                        completeSteps = 2,
+                        ledBy = LedBy.Cast(name = "Александра-Мария"),
+                        steps = 5,
+                        title = LONG_TOPIC_TITLE,
                     ),
                 ),
                 StubTopicCalendar.stubCalendarRow(
                     date = LocalDate.of(2025, 10, 26),
+                    topic = null,
+                ),
+                StubTopicCalendar.stubCalendarRow(
+                    date = LocalDate.of(2025, 10, 27),
                     topic = StubTopicCalendar.stubCalendarTopic(
+                        completeSteps = 3,
+                        ledBy = LedBy.Guest,
+                        steps = 3,
                         title = "Small talk with a neighbour",
-                        topicId = "3c2b1a0f-9e8d-4c7b-a6f5-4e3d2c1b0a9f",
                     ),
+                ),
+            ),
+            todos = listOf(
+                StubTopicCalendar.stubTodoDraft(
+                    date = LocalDate.of(2025, 10, 25),
+                    gaps = listOf(TopicGap.IncompleteSteps(numbers = listOf(3, 4, 5))),
+                    title = LONG_TOPIC_TITLE,
+                ),
+                Todo.EmptyDay(date = LocalDate.of(2025, 10, 26)),
+                StubTopicCalendar.stubTodoDraft(
+                    date = LocalDate.of(2025, 10, 27),
+                    title = "Small talk with a neighbour",
                 ),
             ),
         )

@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 
@@ -102,8 +101,7 @@ internal fun LinkButton(
     Text(
         text = text,
         color = if (enabled) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
-        style = AdminTheme.Type.body,
-        fontWeight = FontWeight.Medium,
+        style = AdminTheme.Type.bodyMedium,
         onTextLayout = { layout -> baseline = layout.firstBaseline },
         modifier = Modifier
             .clickable(
@@ -164,7 +162,6 @@ private fun ButtonText(
     Text(
         text = text,
         color = color,
-        style = AdminTheme.Type.body,
-        fontWeight = FontWeight.Medium,
+        style = AdminTheme.Type.bodyMedium,
     )
 }
