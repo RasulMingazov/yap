@@ -119,14 +119,14 @@ Refresh, `StubSaveModelsUseCase` and the save use case in the module, in the sam
 
 ## 9. [9/15] Admin Models screen and the sidebar (about 300 lines)
 
-This part uses the state of parts 7 and 8 and does not change it. Part 13 holds the captures.
+This part changes the state of parts 7 and 8 only for a reload (the PR 156 UX review). Part 13 holds the captures.
 
 Files: `am/presentation/ui/ModelsScreen.kt`, `admin/src/main/kotlin/app/yap/admin/Main.kt` (hot),
 `admin/src/main/kotlin/app/yap/admin/navigation/NavigationViewModel.kt` (hot, `Screen.Models`),
 `navigation/NavigationUiStateMapper.kt` (hot), `navigation/ui/Sidebar.kt` (hot, Models in Settings),
 `navigation/ui/AdminShell.kt` (hot),
-`admin/src/main/kotlin/app/yap/admin/core/design/AdminTheme.kt` (the column widths and the width of Models),
-and the navigation tests. #10 changed the same navigation files.
+`core/design/AdminTheme.kt` and `core/design/AdminSelect.kt` (sizes), `am/presentation/ModelsViewModel.kt` and
+`am/presentation/ModelsUiStateMapper.kt` (reload), their tests, and the navigation tests. #10 changed the same navigation files.
 
 - [x] 9.1 Add the Models screen with the sections Who does what and Providers, the loader, the statuses beside Save with Refresh, and Models in the sidebar group Settings after Server; verify with the navigation view-model test for Models and `./gradlew build`
 - [ ] 9.2 Owner check: run the admin app against a server with a database, with a DeepSeek key and without one; verify a first save, Connected and Not connected, and the choices after a server restart

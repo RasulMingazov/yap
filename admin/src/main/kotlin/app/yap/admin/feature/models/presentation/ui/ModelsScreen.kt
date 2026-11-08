@@ -142,7 +142,15 @@ private fun ModelsForm(
         }
         Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.sectionInnerGap)) {
             SectionHeader(title = "Провайдеры")
-            ProviderList(providers = content.providers)
+            Column {
+                HorizontalDivider(color = AdminTheme.Colors.line)
+                content.providers.forEach { provider ->
+                    key(provider.name) {
+                        ProviderRow(provider = provider)
+                        HorizontalDivider(color = AdminTheme.Colors.line)
+                    }
+                }
+            }
             Note(text = PROVIDERS_NOTE)
         }
     }
@@ -213,6 +221,7 @@ private fun TaskRow(
                     options = content.providerOptions,
                     placeholder = "Выберите",
                     value = row.provider,
+                    height = AdminTheme.Sizes.buttonHeight,
                 )
                 row.mark?.let { mark -> StatusText(status = mark) }
             }
@@ -225,20 +234,8 @@ private fun TaskRow(
                 options = row.models,
                 placeholder = "Выберите",
                 value = row.model,
+                height = AdminTheme.Sizes.buttonHeight,
             )
-        }
-    }
-}
-
-@Composable
-private fun ProviderList(providers: List<UiState.ProviderRow>) {
-    Column {
-        HorizontalDivider(color = AdminTheme.Colors.line)
-        providers.forEach { provider ->
-            key(provider.name) {
-                ProviderRow(provider = provider)
-                HorizontalDivider(color = AdminTheme.Colors.line)
-            }
         }
     }
 }

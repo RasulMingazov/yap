@@ -35,7 +35,7 @@ internal class ModelsViewModel(
         is Event.ModelChanged -> onModelChanged(event)
         is Event.Opened -> onOpened()
         is Event.ProviderChanged -> onProviderChanged(event)
-        is Event.RefreshClicked -> onRefreshClicked()
+        is Event.RefreshClicked -> load()
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
     }
@@ -85,11 +85,6 @@ internal class ModelsViewModel(
         }
     }
 
-    private fun onRefreshClicked() {
-        dataState.update { state -> state.copy(saveResult = null) }
-        load()
-    }
-
     private fun onRetryClicked() {
         val state = dataState.value
         if (!state.isLoadFailed && state.models?.hasEveryTask() != false) return
@@ -97,11 +92,21 @@ internal class ModelsViewModel(
     }
 
     private fun load() {
-        dataState.update { state -> state.copy(isLoadFailed = false) }
+        dataState.update { state ->
+            state.copy(
+                isLoadFailed = false,
+                isLoading = true,
+                saveResult = null,
+            )
+        }
         viewModelScope.launch {
-            when (val result = getModelsUseCase()) {
-                is LoadResult.Failed -> dataState.update { state -> state.copy(isLoadFailed = true) }
-                is LoadResult.Loaded -> dataState.update { state -> state.loaded(result.value) }
+            val result = getModelsUseCase()
+            dataState.update { state ->
+                val answered = state.copy(isLoading = false)
+                when (result) {
+                    is LoadResult.Failed -> answered.copy(isLoadFailed = true)
+                    is LoadResult.Loaded -> answered.loaded(result.value)
+                }
             }
         }
     }
@@ -162,6 +167,7 @@ internal class ModelsViewModel(
     data class DataState(
         val choices: Map<ModelTask, ModelChoice> = emptyMap(),
         val isLoadFailed: Boolean = false,
+        val isLoading: Boolean = false,
         val isSaving: Boolean = false,
         val models: Models? = null,
         val saveResult: SaveModelsResult? = null,

@@ -2,8 +2,10 @@ package app.yap.admin.feature.models.presentation
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.feature.models.domain.ModelTask
+import app.yap.admin.feature.models.domain.Models
 import app.yap.admin.feature.models.domain.SaveModelsResult
 import app.yap.admin.feature.models.domain.StubModels
+import app.yap.admin.feature.models.domain.usecase.GetModelsUseCase
 import app.yap.admin.feature.models.domain.usecase.StubGetModelsUseCase
 import app.yap.admin.feature.models.domain.usecase.StubSaveModelsUseCase
 import app.yap.admin.feature.models.presentation.ModelsViewModel.Event
@@ -14,6 +16,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -306,6 +309,47 @@ internal class ModelsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(expected = ModelTask.entries, actual = env.content().tasks.map { row -> row.task })
+    }
+
+    @Test
+    fun `GIVEN the models WHEN Refresh is clicked THEN Updating shows over a disabled form`() = runTest(dispatcher) {
+        val env = HeldEnvironment()
+        env.viewModel.onEvent(Event.Opened)
+        env.answers.send(LoadResult.Loaded(StubModels.stubModels()))
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.RefreshClicked)
+        advanceUntilIdle()
+
+        val content = env.viewModel.uiState.value as UiState.Content
+        assertEquals(
+            expected = "Обновление…" to false,
+            actual = content.saveStatus?.text to content.isFormEnabled,
+        )
+    }
+
+    @Test
+    fun `GIVEN the Saved status WHEN Models opens again THEN the status goes away`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+
+        assertEquals(expected = null, actual = env.content().saveStatus)
+    }
+
+    private class HeldEnvironment {
+
+        val answers = Channel<LoadResult<Models>>(Channel.UNLIMITED)
+        val viewModel = ModelsViewModel(
+            getModelsUseCase = object : GetModelsUseCase {
+                override suspend fun invoke(): LoadResult<Models> = answers.receive()
+            },
+            saveModelsUseCase = StubSaveModelsUseCase(),
+        )
     }
 
     private class Environment(

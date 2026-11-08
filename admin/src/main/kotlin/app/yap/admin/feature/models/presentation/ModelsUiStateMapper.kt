@@ -17,6 +17,11 @@ internal object ModelsUiStateMapper : (DataState) -> UiState {
         tone = Status.Tone.SUCCESS,
     )
 
+    private val LOADING = Status(
+        text = "Обновление…",
+        tone = Status.Tone.MUTED,
+    )
+
     private val NOT_CONNECTED = Status(
         text = "Не подключён",
         tone = Status.Tone.WARNING,
@@ -32,13 +37,14 @@ internal object ModelsUiStateMapper : (DataState) -> UiState {
         return when {
             state.isLoadFailed -> UiState.Error(message = LOAD_ERROR)
             models == null -> UiState.Loading
-            !models.hasEveryTask() -> UiState.Error(message = LOAD_ERROR)
-            else -> state.toContent(models)
+            models.hasEveryTask() -> state.toContent(models)
+            state.isLoading -> UiState.Loading
+            else -> UiState.Error(message = LOAD_ERROR)
         }
     }
 
     private fun DataState.toContent(models: Models): UiState.Content = UiState.Content(
-        isFormEnabled = !isSaving,
+        isFormEnabled = !isSaving && !isLoading,
         isRefreshShown = saveResult is SaveModelsResult.CatalogChanged,
         providerOptions = models.providers.map { provider -> provider.option() },
         providers = models.providers.map { provider -> provider.row() },
@@ -62,7 +68,11 @@ internal object ModelsUiStateMapper : (DataState) -> UiState {
 
     private fun Provider.step(): String? = if (connected) null else "Добавьте ключ $keySetting в настройки сервера"
 
-    private fun DataState.saveStatus(): Status? = if (isSaving) SAVING else saveResult?.status()
+    private fun DataState.saveStatus(): Status? = when {
+        isSaving -> SAVING
+        isLoading -> LOADING
+        else -> saveResult?.status()
+    }
 
     private fun SaveModelsResult.status(): Status? = when (this) {
         is SaveModelsResult.CatalogChanged -> Status(
