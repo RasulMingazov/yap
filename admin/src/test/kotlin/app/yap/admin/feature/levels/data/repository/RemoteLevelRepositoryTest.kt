@@ -123,6 +123,7 @@ internal class RemoteLevelRepositoryTest {
               "block": "${StubLevel.BLOCK}",
               "idioms": "RARELY",
               "maxWords": ${StubLevel.MAX_WORDS},
+              "model": null,
               "ratingFrom": ${StubLevel.RANGE_FROM},
               "vocabulary": "${StubLevel.VOCABULARY}"
             }
