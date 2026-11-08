@@ -36,8 +36,8 @@ before the screen. The captures come in their own part.
 
 ## 6. [6/26] The calendar on the server · ~340 · `S/model/` (`TopicCalendar`, its rows, `LedBy`, `Todo`), `S/usecase/GetTopicCalendarUseCase.kt`, `S/FeatureTopicsModule.kt` (the `Clock`)
 
-- [ ] 6.1 Add `TopicCalendar` with the 14 days from today, the rows, the complete steps and To do with the gaps of each draft; verify with the model tests for the scenarios The rows, No topics yet, To do, A draft on a date with a published topic, The steps of a row, and a draft with the steps 3–5 incomplete, the title order on one date, and both interlocutors
-- [ ] 6.2 Add the use case with the clock and `GetCharactersUseCase` for the names; verify with a stub test with a fixed clock and the character names
+- [x] 6.1 Add `TopicCalendar` with the 14 days from today, the rows, the complete steps and To do with the gaps of each draft; verify with the model tests for the scenarios The rows, No topics yet, To do, A draft on a date with a published topic, The steps of a row, and a draft with the steps 3–5 incomplete, the title order on one date, and both interlocutors
+- [x] 6.2 Add the use case with the clock and `GetCharactersUseCase` for the names; verify with a stub test with a fixed clock and the character names
 
 ## 7. [7/26] Publish and save · ~340 · `S/usecase/` (`PublishTopicUseCase`, `UpdateTopicUseCase`, `CreateTopicUseCase`, `GetTopicUseCase`), `S/model/` (the outcomes, `TopicDetails`), `S/FeatureTopicsModule.kt`, `S/api/` (`TopicRoutes`, `TopicDtoMapper`: compile only)
 
