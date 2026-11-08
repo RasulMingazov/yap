@@ -39,11 +39,13 @@ keeps its stored fields.
 ### `V5__topic_status.sql`
 
 ```sql
-alter table topics add column status text not null default 'draft'
-    check (status in ('draft', 'published'));
+alter table topics add column status text not null default 'DRAFT'
+    check (status in ('DRAFT', 'PUBLISHED'));
 create unique index topics_published_release_date on topics (release_date)
-    where status = 'published';
+    where status = 'PUBLISHED';
 ```
+
+The column holds the enum names, as the levels and prompts tables do.
 
 V2 to V4 stay as they are. `docs/server/002-persistence.md` says to edit a migration in place
 until launch, but then the reset flag clears the database, and `yap_prod` holds the owner's drafts.

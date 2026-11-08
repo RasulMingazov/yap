@@ -2,7 +2,6 @@ package app.yap.server.feature.topics.api
 
 import app.yap.contract.admin.TopicContentDto
 import app.yap.server.feature.topics.model.CreateTopicOutcome
-import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicId
 import app.yap.server.feature.topics.model.UpdateTopicOutcome
 import app.yap.server.feature.topics.usecase.CreateTopicUseCase
@@ -63,13 +62,15 @@ private fun Route.getTopicRoute(getTopicUseCase: GetTopicUseCase) {
 
 private fun Route.updateTopicRoute(updateTopicUseCase: UpdateTopicUseCase) {
     put("/{topicId}") {
-        val topic = Topic(
-            content = call.receive<TopicContentDto>().toModel(),
+        val content = call.receive<TopicContentDto>().toModel()
+        val outcome = updateTopicUseCase(
+            content = content,
             topicId = call.topicId(),
         )
-        when (val outcome = updateTopicUseCase(topic)) {
+        when (outcome) {
             is UpdateTopicOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
             is UpdateTopicOutcome.NotFound -> call.respond(HttpStatusCode.NotFound)
+            is UpdateTopicOutcome.DateTaken, is UpdateTopicOutcome.StaleStatus -> call.respond(HttpStatusCode.Conflict)
             is UpdateTopicOutcome.Updated -> call.respond(outcome.topic.toDto())
         }
     }

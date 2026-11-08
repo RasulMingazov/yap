@@ -188,7 +188,7 @@ internal class TopicRoutesTest {
     @Test
     fun `GIVEN an unknown topic WHEN updating it THEN the server answers 404`() = testApplication {
         val env = Environment()
-        env.topicRepository.updateCall.returns(false)
+        env.topicRepository.findCall.returns(null)
         application { env.install(this) }
 
         val response = putTopic(contentJson())

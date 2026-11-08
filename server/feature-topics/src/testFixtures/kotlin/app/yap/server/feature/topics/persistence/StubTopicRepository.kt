@@ -4,6 +4,7 @@ import app.yap.server.feature.topics.model.StubTopic
 import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
 import app.yap.server.feature.topics.model.TopicId
+import app.yap.server.feature.topics.model.UpdateTopicOutcome
 import io.github.rasulmingazov.stubcall.StubCall0
 import io.github.rasulmingazov.stubcall.StubCall1
 
@@ -14,7 +15,7 @@ class StubTopicRepository(
     val createCall = StubCall1.returns<TopicContent, Topic>(topic)
     val findCall = StubCall1.returns<TopicId, Topic?>(topic)
     val listCall = StubCall0.returns<List<Topic>>(listOf(topic))
-    val updateCall = StubCall1.returns<Topic, Boolean>(true)
+    val updateCall = StubCall1.returns<Topic, UpdateTopicOutcome>(UpdateTopicOutcome.Updated(topic))
 
     override suspend fun create(content: TopicContent): Topic = createCall.invoke(content)
 
@@ -22,5 +23,5 @@ class StubTopicRepository(
 
     override suspend fun list(): List<Topic> = listCall.invoke()
 
-    override suspend fun update(topic: Topic): Boolean = updateCall.invoke(topic)
+    override suspend fun update(topic: Topic): UpdateTopicOutcome = updateCall.invoke(topic)
 }

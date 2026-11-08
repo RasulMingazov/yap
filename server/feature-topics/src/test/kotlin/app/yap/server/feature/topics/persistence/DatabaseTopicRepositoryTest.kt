@@ -1,6 +1,7 @@
 package app.yap.server.feature.topics.persistence
 
 import app.yap.server.core.database.Database
+import app.yap.server.core.database.withRestartableDatabase
 import app.yap.server.core.database.withTestDatabase
 import app.yap.server.feature.characters.model.CharacterProfile
 import app.yap.server.feature.characters.persistence.DatabaseCharacterRepository
@@ -8,11 +9,16 @@ import app.yap.server.feature.topics.model.Interlocutor
 import app.yap.server.feature.topics.model.Step
 import app.yap.server.feature.topics.model.StubTopic
 import app.yap.server.feature.topics.model.TopicContent
+import app.yap.server.feature.topics.model.TopicId
+import app.yap.server.feature.topics.model.TopicStatus
+import app.yap.server.feature.topics.model.UpdateTopicOutcome
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.update
 
 internal class DatabaseTopicRepositoryTest {
 
@@ -60,9 +66,12 @@ internal class DatabaseTopicRepositoryTest {
                 val topic = repository.create(stubContent(steps = stubSteps("a", "b", "c")))
                 val changed = topic.copy(content = topic.content.copy(steps = stubSteps("z"), title = "Changed"))
 
-                val updated = repository.update(changed)
+                val outcome = repository.update(changed)
 
-                assertEquals(expected = true to changed, actual = updated to repository.find(topic.topicId))
+                assertEquals(
+                    expected = UpdateTopicOutcome.Updated(changed) to changed,
+                    actual = outcome to repository.find(topic.topicId),
+                )
             }
         }
 
@@ -71,11 +80,99 @@ internal class DatabaseTopicRepositoryTest {
         runTest {
             val repository = DatabaseTopicRepository(database)
 
-            val updated = repository.update(StubTopic.stubTopic())
+            val outcome = repository.update(StubTopic.stubTopic())
 
-            assertEquals(expected = false to emptyList(), actual = updated to repository.list())
+            assertEquals(expected = UpdateTopicOutcome.NotFound to emptyList(), actual = outcome to repository.list())
         }
     }
+
+    @Test
+    fun `GIVEN a created draft WHEN the database restarts THEN the topic is still a draft`() =
+        withRestartableDatabase { open ->
+            runTest {
+                val topic = open().use { database -> DatabaseTopicRepository(database).create(stubContent()) }
+
+                val found = open().use { database -> DatabaseTopicRepository(database).find(topic.topicId) }
+
+                assertEquals(expected = TopicStatus.DRAFT to topic, actual = found?.status to found)
+            }
+        }
+
+    @Test
+    fun `GIVEN a draft WHEN another draft takes the same date THEN both are stored`() = withTestDatabase { database ->
+        runTest {
+            val repository = DatabaseTopicRepository(database)
+            val first = repository.create(stubContent(title = "First"))
+            val second = repository.create(stubContent(title = "Second"))
+
+            val topics = repository.list()
+
+            assertEquals(expected = listOf(first, second), actual = topics)
+        }
+    }
+
+    @Test
+    fun `GIVEN a published topic WHEN updating its content THEN it stays published`() = withTestDatabase { database ->
+        runTest {
+            val repository = DatabaseTopicRepository(database)
+            val topic = repository.create(stubContent())
+            database.publish(topic.topicId)
+            val changed = topic.copy(
+                content = topic.content.copy(title = "Changed"),
+                status = TopicStatus.PUBLISHED,
+            )
+
+            val outcome = repository.update(changed)
+
+            assertEquals(
+                expected = UpdateTopicOutcome.Updated(changed) to changed,
+                actual = outcome to repository.find(topic.topicId),
+            )
+        }
+    }
+
+    @Test
+    fun `GIVEN a topic published after it was read WHEN updating it as a draft THEN nothing is written`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseTopicRepository(database)
+                val topic = repository.create(stubContent(steps = stubSteps("a", "b")))
+                database.publish(topic.topicId)
+                val changed = topic.copy(content = topic.content.copy(steps = stubSteps("z"), title = "Changed"))
+
+                val outcome = repository.update(changed)
+
+                assertEquals(
+                    expected = UpdateTopicOutcome.StaleStatus to topic.copy(status = TopicStatus.PUBLISHED),
+                    actual = outcome to repository.find(topic.topicId),
+                )
+            }
+        }
+
+    @Test
+    fun `GIVEN a date with a published topic WHEN moving another published topic onto it THEN nothing is written`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseTopicRepository(database)
+                val taken = repository.create(stubContent(title = "Taken"))
+                val other = repository.create(
+                    stubContent(releaseDate = StubTopic.RELEASE_DATE.plusDays(1), steps = stubSteps("a", "b")),
+                )
+                database.publish(taken.topicId)
+                database.publish(other.topicId)
+                val moved = other.copy(
+                    content = other.content.copy(releaseDate = StubTopic.RELEASE_DATE, steps = stubSteps("z")),
+                    status = TopicStatus.PUBLISHED,
+                )
+
+                val outcome = repository.update(moved)
+
+                assertEquals(
+                    expected = UpdateTopicOutcome.DateTaken to other.copy(status = TopicStatus.PUBLISHED),
+                    actual = outcome to repository.find(other.topicId),
+                )
+            }
+        }
 
     @Test
     fun `GIVEN topics with steps WHEN listing them THEN they come by date and title, each with its own steps`() =
@@ -133,6 +230,14 @@ internal class DatabaseTopicRepositoryTest {
                 assertEquals(expected = topic, actual = found)
             }
         }
+}
+
+private suspend fun Database.publish(topicId: TopicId) {
+    transaction {
+        TopicsTable.update(where = { TopicsTable.topicId eq topicId.value }) { statement ->
+            statement[TopicsTable.status] = TopicStatus.PUBLISHED
+        }
+    }
 }
 
 private suspend fun Database.createCast(): Interlocutor.Cast {

@@ -5,17 +5,22 @@ import org.testcontainers.DockerClientFactory
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 
-fun <T> withTestDatabase(block: (Database) -> T): T = withPostgres { container ->
-    openDatabase(
-        DatabaseConfig(
-            password = container.password,
-            poolSize = 2,
-            resetOnMigrationChange = false,
-            url = container.jdbcUrl,
-            user = container.username,
-        ),
-    )
-        .use(block)
+fun <T> withTestDatabase(block: (Database) -> T): T = withRestartableDatabase { open ->
+    open().use(block)
+}
+
+fun <T> withRestartableDatabase(block: (open: () -> Database) -> T): T = withPostgres { container ->
+    block {
+        openDatabase(
+            DatabaseConfig(
+                password = container.password,
+                poolSize = 2,
+                resetOnMigrationChange = false,
+                url = container.jdbcUrl,
+                user = container.username,
+            ),
+        )
+    }
 }
 
 fun <T> withPostgres(block: (PostgreSQLContainer<*>) -> T): T {
