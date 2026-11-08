@@ -25,6 +25,7 @@ internal object AdminTheme {
         val selected = Color(0xFFEDEDF0)
         val side = Color(0xFFFAFAFA)
         val transparent = Color.Transparent
+        val warn = Color(0xFF9A5200)
     }
 
     object Sizes {
