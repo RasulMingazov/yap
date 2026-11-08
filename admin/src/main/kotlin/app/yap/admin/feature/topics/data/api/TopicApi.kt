@@ -11,6 +11,9 @@ import io.ktor.client.statement.HttpResponse
 
 internal interface TopicApi {
 
+    @GET("admin/topics/calendar")
+    suspend fun calendar(): HttpResponse
+
     @Headers("Content-Type: application/json")
     @POST("admin/topics")
     suspend fun create(@Body content: TopicContentDto): HttpResponse

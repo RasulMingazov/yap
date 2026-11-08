@@ -90,9 +90,9 @@ the 400 body and 409, as two PRs.
 
 - [x] 12.1 Add the domain and the DTO mapper; verify with the mapper tests for each status, each gap, both interlocutors, both To do entries and an empty day
 
-## 13. [13/26] The admin calendar call · ~200 · `T/data/api/TopicApi.kt`, `T/data/repository/`, `T/domain/repository/`, `T/domain/usecase/GetTopicCalendarUseCase.kt`, `T/FeatureTopicsModule.kt`
+## 13. [13/26] The admin calendar call · ~200 · `T/data/api/TopicApi.kt`, `T/data/repository/`, `T/domain/repository/`, `T/domain/usecase/GetTopicCalendarUseCase.kt`, `T/FeatureTopicsModule.kt`, tests: `RemoteTopicRepositoryTest`, `StubTopicRepository`
 
-- [ ] 13.1 Add the API call, the repository call and the use case; they return the shared `LoadResult<TopicCalendar>` (`A/core/common/LoadResult.kt`), with no topic-only load result; verify with the mock engine tests for 200, a failed call and a call without saved settings
+- [x] 13.1 Add the API call, the repository call and the use case; they return the shared `LoadResult<TopicCalendar>` (`A/core/common/LoadResult.kt`), with no topic-only load result; verify with the mock engine tests for 200, a failed call and a call without saved settings
 
 ## 14. [14/26] The Topics view model on the calendar · ~250 · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `T/presentation/` (`TopicsViewModel`, `TopicsUiStateMapper`: the rows of Date and Topic only), `A/ScreenCaptureTest.kt` (the Topics `DataState`), removals: `T/domain/usecase/GetTopicsUseCase.kt`, `T/domain/LoadTopicsResult.kt`, the admin `list`, `GET /admin/topics` in `S/api/TopicRoutes.kt` and its test, and `S/usecase/GetTopicsUseCase.kt`
 

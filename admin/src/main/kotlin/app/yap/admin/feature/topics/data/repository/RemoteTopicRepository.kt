@@ -1,7 +1,9 @@
 package app.yap.admin.feature.topics.data.repository
 
+import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.callServer
 import app.yap.admin.core.network.settings.ServerSettingsRepository
+import app.yap.admin.core.network.toLoadResult
 import app.yap.admin.feature.topics.data.api.TopicApi
 import app.yap.admin.feature.topics.data.mapper.toDomain
 import app.yap.admin.feature.topics.data.mapper.toDto
@@ -9,9 +11,11 @@ import app.yap.admin.feature.topics.domain.LoadTopicResult
 import app.yap.admin.feature.topics.domain.LoadTopicsResult
 import app.yap.admin.feature.topics.domain.SaveTopicResult
 import app.yap.admin.feature.topics.domain.Topic
+import app.yap.admin.feature.topics.domain.TopicCalendar
 import app.yap.admin.feature.topics.domain.TopicContent
 import app.yap.admin.feature.topics.domain.TopicId
 import app.yap.admin.feature.topics.domain.repository.TopicRepository
+import app.yap.contract.admin.TopicCalendarDto
 import app.yap.contract.admin.TopicDto
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
@@ -21,6 +25,12 @@ internal class RemoteTopicRepository(
     private val serverSettingsRepository: ServerSettingsRepository,
     private val topicApi: TopicApi,
 ) : TopicRepository {
+
+    override suspend fun calendar(): LoadResult<TopicCalendar> = serverSettingsRepository.callServer(
+        failed = LoadResult.Failed,
+        read = { response -> response.toLoadResult { body<TopicCalendarDto>().toDomain() } },
+        send = { topicApi.calendar() },
+    )
 
     override suspend fun create(content: TopicContent): SaveTopicResult = serverSettingsRepository.callServer(
         failed = SaveTopicResult.Failed,

@@ -1,16 +1,21 @@
 package app.yap.admin.feature.topics.data.repository
 
+import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
 import app.yap.admin.core.network.adminKtorfit
+import app.yap.admin.core.network.settings.ServerSettings
 import app.yap.admin.core.network.settings.StubServerSettings
 import app.yap.admin.core.network.settings.StubServerSettingsRepository
 import app.yap.admin.feature.characters.domain.StubCharacter
 import app.yap.admin.feature.topics.data.api.createTopicApi
 import app.yap.admin.feature.topics.data.mapper.StubTopicDto
+import app.yap.admin.feature.topics.domain.CalendarRow
 import app.yap.admin.feature.topics.domain.LoadTopicResult
 import app.yap.admin.feature.topics.domain.LoadTopicsResult
 import app.yap.admin.feature.topics.domain.SaveTopicResult
 import app.yap.admin.feature.topics.domain.StubTopic
+import app.yap.admin.feature.topics.domain.StubTopicCalendar
+import app.yap.admin.feature.topics.domain.Todo
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
@@ -27,6 +32,46 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 
 internal class RemoteTopicRepositoryTest {
+
+    @Test
+    fun `GIVEN a day with a topic and an empty day WHEN loading the calendar THEN the server gets a GET and the calendar is loaded`() = runTest {
+        val env = Environment(answer = answer(content = CALENDAR_JSON))
+
+        val result = env.repository.calendar()
+
+        val request = env.engine.requestHistory.single()
+        val calendar = StubTopicCalendar.stubTopicCalendar(
+            rows = listOf(
+                CalendarRow(
+                    date = StubTopic.RELEASE_DATE,
+                    topic = StubTopicCalendar.stubCalendarTopic(),
+                ),
+            ),
+            todos = listOf(Todo.EmptyDay(date = StubTopic.RELEASE_DATE)),
+        )
+        assertEquals(
+            expected = listOf(LoadResult.Loaded(calendar), HttpMethod.Get, "${StubServerSettings.ADDRESS}/admin/topics/calendar"),
+            actual = listOf(result, request.method, request.url.toString()),
+        )
+    }
+
+    @Test
+    fun `GIVEN the server fails WHEN loading the calendar THEN loading fails`() = runTest {
+        val env = Environment(answer = answer(content = "", status = HttpStatusCode.InternalServerError))
+
+        val result = env.repository.calendar()
+
+        assertEquals(expected = LoadResult.Failed, actual = result)
+    }
+
+    @Test
+    fun `GIVEN no saved server settings WHEN loading the calendar THEN loading fails and no request goes out`() = runTest {
+        val env = Environment(answer = answer(content = CALENDAR_JSON), settings = null)
+
+        val result = env.repository.calendar()
+
+        assertEquals(expected = listOf(LoadResult.Failed, 0), actual = listOf(result, env.engine.requestHistory.size))
+    }
 
     @Test
     fun `GIVEN the server lists topics WHEN loading them THEN they are loaded`() = runTest {
@@ -126,10 +171,13 @@ internal class RemoteTopicRepositoryTest {
         assertEquals(expected = SaveTopicResult.Failed, actual = result)
     }
 
-    private class Environment(answer: MockRequestHandler) {
+    private class Environment(
+        answer: MockRequestHandler,
+        settings: ServerSettings? = StubServerSettings.stubServerSettings(),
+    ) {
 
         val engine = MockEngine(answer)
-        val serverSettingsRepository = StubServerSettingsRepository(settings = StubServerSettings.stubServerSettings())
+        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
         private val ktorfit = adminKtorfit(
             httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
         )
@@ -141,6 +189,24 @@ internal class RemoteTopicRepositoryTest {
 
     private companion object {
 
+        const val CALENDAR_JSON = """
+            {
+              "rows": [
+                {
+                  "date": "${StubTopicDto.RELEASE_DATE}",
+                  "topic": {
+                    "completeSteps": 1,
+                    "ledBy": null,
+                    "status": "DRAFT",
+                    "steps": 1,
+                    "title": "${StubTopic.TITLE}",
+                    "topicId": "${StubTopic.TOPIC_ID}"
+                  }
+                }
+              ],
+              "todos": [{"type": "emptyDay", "date": "${StubTopicDto.RELEASE_DATE}"}]
+            }
+        """
         const val CONTENT_JSON = """
             {
               "description": "${StubTopic.DESCRIPTION}",
