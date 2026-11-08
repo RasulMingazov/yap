@@ -11,6 +11,7 @@ import app.yap.admin.feature.topics.data.api.createTopicApi
 import app.yap.admin.feature.topics.data.mapper.StubTopicDto
 import app.yap.admin.feature.topics.domain.CalendarRow
 import app.yap.admin.feature.topics.domain.LoadTopicResult
+import app.yap.admin.feature.topics.domain.PublishTopicResult
 import app.yap.admin.feature.topics.domain.SaveTopicResult
 import app.yap.admin.feature.topics.domain.StubTopic
 import app.yap.admin.feature.topics.domain.StubTopicCalendar
@@ -197,6 +198,79 @@ internal class RemoteTopicRepositoryTest {
         assertEquals(expected = SaveTopicResult.Failed, actual = result)
     }
 
+    @Test
+    fun `GIVEN a draft WHEN publishing it THEN the server gets a POST with the content and the topic is published`() = runTest {
+        val env = Environment(answer = answer(content = TOPIC_JSON))
+
+        val result = env.publish()
+
+        val request = env.engine.requestHistory.single()
+        assertEquals(
+            expected = listOf(
+                PublishTopicResult.Published(StubTopic.stubTopic()),
+                HttpMethod.Post,
+                "${StubServerSettings.ADDRESS}/admin/topics/${StubTopic.TOPIC_ID}/publish",
+                Json.parseToJsonElement(CONTENT_JSON),
+            ),
+            actual = listOf(
+                result,
+                request.method,
+                request.url.toString(),
+                Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
+            ),
+        )
+    }
+
+    @Test
+    fun `GIVEN the server rejects the draft WHEN publishing it THEN the result holds the gaps`() = runTest {
+        val env = Environment(
+            answer = answer(
+                content = Json.encodeToString(TopicRejectionDto(gaps = listOf(TopicGapDto.PastDateDto))),
+                status = HttpStatusCode.BadRequest,
+            ),
+        )
+
+        val result = env.publish()
+
+        assertEquals(expected = PublishTopicResult.Invalid(gaps = listOf(TopicGap.PastDate)), actual = result)
+    }
+
+    @Test
+    fun `GIVEN the server rejects the draft with no body WHEN publishing it THEN the result has no gaps`() = runTest {
+        val env = Environment(answer = answer(content = "", status = HttpStatusCode.BadRequest))
+
+        val result = env.publish()
+
+        assertEquals(expected = PublishTopicResult.Invalid(gaps = emptyList()), actual = result)
+    }
+
+    @Test
+    fun `GIVEN an unknown topic WHEN publishing it THEN the topic is not found`() = runTest {
+        val env = Environment(answer = answer(content = "", status = HttpStatusCode.NotFound))
+
+        val result = env.publish()
+
+        assertEquals(expected = PublishTopicResult.NotFound, actual = result)
+    }
+
+    @Test
+    fun `GIVEN the date is taken WHEN publishing a topic THEN the date is taken`() = runTest {
+        val env = Environment(answer = answer(content = "", status = HttpStatusCode.Conflict))
+
+        val result = env.publish()
+
+        assertEquals(expected = PublishTopicResult.DateTaken, actual = result)
+    }
+
+    @Test
+    fun `GIVEN the server cannot be reached WHEN publishing a topic THEN the publish fails`() = runTest {
+        val env = Environment(answer = { throw IOException("Connection refused") })
+
+        val result = env.publish()
+
+        assertEquals(expected = PublishTopicResult.Failed, actual = result)
+    }
+
     private class Environment(
         answer: MockRequestHandler,
         settings: ServerSettings? = StubServerSettings.stubServerSettings(),
@@ -210,6 +284,11 @@ internal class RemoteTopicRepositoryTest {
         val repository = RemoteTopicRepository(
             serverSettingsRepository = serverSettingsRepository,
             topicApi = ktorfit.createTopicApi(),
+        )
+
+        suspend fun publish(): PublishTopicResult = repository.publish(
+            content = StubTopic.stubContent(),
+            topicId = TopicId(StubTopic.TOPIC_ID),
         )
 
         suspend fun update(): SaveTopicResult = repository.update(

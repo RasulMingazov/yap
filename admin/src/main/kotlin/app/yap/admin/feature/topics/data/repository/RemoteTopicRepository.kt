@@ -9,6 +9,7 @@ import app.yap.admin.feature.topics.data.api.TopicApi
 import app.yap.admin.feature.topics.data.mapper.toDomain
 import app.yap.admin.feature.topics.data.mapper.toDto
 import app.yap.admin.feature.topics.domain.LoadTopicResult
+import app.yap.admin.feature.topics.domain.PublishTopicResult
 import app.yap.admin.feature.topics.domain.SaveTopicResult
 import app.yap.admin.feature.topics.domain.TopicCalendar
 import app.yap.admin.feature.topics.domain.TopicContent
@@ -50,6 +51,18 @@ internal class RemoteTopicRepository(
         send = { topicApi.find(topicId.value) },
     )
 
+    override suspend fun publish(topicId: TopicId, content: TopicContent): PublishTopicResult =
+        serverSettingsRepository.callServer(
+            failed = PublishTopicResult.Failed,
+            read = { response -> response.toPublishResult() },
+            send = {
+                topicApi.publish(
+                    topicId = topicId.value,
+                    content = content.toDto(),
+                )
+            },
+        )
+
     override suspend fun update(topicId: TopicId, content: TopicContent): SaveTopicResult =
         serverSettingsRepository.callServer(
             failed = SaveTopicResult.Failed,
@@ -61,6 +74,14 @@ internal class RemoteTopicRepository(
                 )
             },
         )
+
+    private suspend fun HttpResponse.toPublishResult(): PublishTopicResult = when (status) {
+        HttpStatusCode.OK -> PublishTopicResult.Published(body<TopicDto>().toDomain())
+        HttpStatusCode.BadRequest -> PublishTopicResult.Invalid(gaps = toGaps())
+        HttpStatusCode.Conflict -> PublishTopicResult.DateTaken
+        HttpStatusCode.NotFound -> PublishTopicResult.NotFound
+        else -> PublishTopicResult.Failed
+    }
 
     private suspend fun HttpResponse.toSaveResult(): SaveTopicResult = when (status) {
         HttpStatusCode.OK,

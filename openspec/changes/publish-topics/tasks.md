@@ -125,7 +125,7 @@ Create opens a new topic without a date until [17/26].
 
 ## 20. [20/26] The admin publish call · ~220 · `T/data/api/TopicApi.kt`, `T/data/repository/RemoteTopicRepository.kt`, `T/domain/repository/`, `T/domain/usecase/PublishTopicUseCase.kt`, `T/FeatureTopicsModule.kt`
 
-- [ ] 20.1 Add the publish call and the use case; verify with the mock engine tests for publish 200, 400 with the gaps, 404, 409 and a failed call
+- [x] 20.1 Add the publish call and the use case; verify with the mock engine tests for publish 200, 400 with the gaps, 404, 409 and a failed call
 
 ## 21. [21/26] The Topic view model · three slices
 

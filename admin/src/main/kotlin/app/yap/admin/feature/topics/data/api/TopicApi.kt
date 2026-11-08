@@ -22,6 +22,13 @@ internal interface TopicApi {
     suspend fun find(@Path topicId: String): HttpResponse
 
     @Headers("Content-Type: application/json")
+    @POST("admin/topics/{topicId}/publish")
+    suspend fun publish(
+        @Path topicId: String,
+        @Body content: TopicContentDto,
+    ): HttpResponse
+
+    @Headers("Content-Type: application/json")
     @PUT("admin/topics/{topicId}")
     suspend fun update(
         @Path topicId: String,
