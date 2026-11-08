@@ -182,11 +182,12 @@ images, as `docs/testing/004-screen-capture.md` says.
 Files: `admin/src/test/kotlin/app/yap/admin/ScreenCaptureTest.kt` (the Levels states) and the
 images; for 14.2 `al/presentation/ui/LevelsScreen.kt`, `al/presentation/LevelsUiStateMapper.kt`,
 `al/presentation/LevelsViewModel.kt` (`Row.modelNote`), `LevelsUiStateMapperTest` and the delta
-spec `specs/rating-levels/spec.md`; for 14.3 `core/design/Buttons.kt` (`PopupButton`, hot).
+spec `specs/rating-levels/spec.md`; for 14.3 `core/design/Buttons.kt` (`PopupButton`, hot) and
+`core/design/AdminTheme.kt` (`modelColumnWidth`, hot).
 
 - [x] 14.1 Capture Levels with the Model column, the models error and the level-model-unavailable status; verify with the images, then run `ui-review` against the canvas Levels screen
-- [x] 14.2 Move the calibration note of No rating from the Rating cell to below the Model select of its row: in the 110 dp Rating cell it wraps to 4 lines; verify with the mapper test of the note and the Levels images
-- [x] 14.3 Show the text of `PopupButton` on one line with an ellipsis: a long model name wrapped to two lines and was cut; verify with the Models and Levels images that show `other-large-2025-long-context`
+- [x] 14.2 Move the calibration note of No rating from the Rating cell to below the Model select of its row: in the 110 dp Rating cell it wraps to 4 lines. The select stays on the centre line of the row; verify with the mapper test of the note and the Levels images
+- [x] 14.3 Show the text of `PopupButton` on one line with an ellipsis: a long model name wrapped to two lines and was cut, and widen the Model column of Models so that the longest catalog name shows in full; verify with the Models and Levels images that show `other-large-2025-long-context`
 
 ## 15. [15/15] Archive
 

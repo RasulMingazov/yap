@@ -64,7 +64,7 @@ internal object AdminTheme {
         val linkUnderlineOffset = 3.dp
         val loader = 20.dp
         val loaderStroke = 2.dp
-        val modelColumnWidth = 190.dp
+        val modelColumnWidth = 240.dp
         val modelProviderColumnWidth = 150.dp
         val modelsMaxWidth = 960.dp
         val popupPadding = 8.dp

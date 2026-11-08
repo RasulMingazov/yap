@@ -22,6 +22,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -284,7 +285,7 @@ private fun LevelRow(
             )
         }
         TableCell(modifier = Modifier.weight(1f)) {
-            Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.sectionInnerGap)) {
+            CentredWithNote(note = row.modelNote) {
                 AdminSelect(
                     enabled = content.isModelChoiceEnabled,
                     label = { option -> option.label },
@@ -293,8 +294,34 @@ private fun LevelRow(
                     placeholder = "Выберите",
                     value = row.model,
                 )
-                row.modelNote?.let { note -> Note(text = note) }
             }
+        }
+    }
+}
+
+@Composable
+private fun CentredWithNote(
+    note: String?,
+    content: @Composable () -> Unit,
+) {
+    Layout(
+        content = {
+            content()
+            note?.let { text -> Note(text = text) }
+        },
+    ) { measurables, constraints ->
+        val looseConstraints = constraints.copy(minHeight = 0)
+        val placeables = measurables.map { measurable -> measurable.measure(looseConstraints) }
+        val centred = placeables.first()
+        val notePlaceable = placeables.getOrNull(1)
+        val gap = AdminTheme.Sizes.sectionInnerGap.roundToPx()
+        val noteSpace = notePlaceable?.let { placeable -> gap + placeable.height } ?: 0
+        layout(
+            width = placeables.maxOf { placeable -> placeable.width },
+            height = centred.height + 2 * noteSpace,
+        ) {
+            centred.place(x = 0, y = noteSpace)
+            notePlaceable?.place(x = 0, y = noteSpace + centred.height + gap)
         }
     }
 }
