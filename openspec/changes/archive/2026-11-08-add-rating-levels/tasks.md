@@ -5,7 +5,7 @@ the module, main or test.
 
 ## 1. [1/7] The plan
 
-- [ ] 1.1 Propose the change; verify with `openspec validate add-rating-levels --strict`
+- [x] 1.1 Propose the change; verify with `openspec validate add-rating-levels --strict`
 
 ## 2. [2/7] Server model and persistence
 
@@ -85,4 +85,4 @@ requirement «The table marks the chosen level» in `specs/rating-levels/spec.md
 
 Files: `openspec/changes/add-rating-levels/`, `openspec/specs/rating-levels/spec.md`.
 
-- [ ] 7.1 Run `/opsx:archive` as the last commit of the last PR for #9, so `openspec/specs/rating-levels/spec.md` updates at the merge; verify with `openspec validate --strict`
+- [x] 7.1 Run `/opsx:archive` as the last commit of the last PR for #9, so `openspec/specs/rating-levels/spec.md` updates at the merge; verify with `openspec validate --strict`
