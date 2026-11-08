@@ -76,12 +76,15 @@ internal class LevelsViewModel(
     private fun onSaveClicked() {
         val state = dataState.value
         if (state.isSaving) return
-        val unreadCode = state.forms.entries.firstOrNull { (code, form) -> form.toEntry(code) == null }?.key
-        if (unreadCode != null) {
-            dataState.update { current -> current.copy(saveStatus = SaveStatus.UnreadNumber(unreadCode)) }
+        val checks = state.forms.map { (code, form) -> form.check(code) }
+        val problem = checks
+            .filterIsInstance<FormCheck.Problem>()
+            .firstOrNull()
+        if (problem != null) {
+            dataState.update { current -> current.copy(saveStatus = problem.status) }
             return
         }
-        save(state.forms.mapNotNull { (code, form) -> form.toEntry(code) })
+        save(checks.filterIsInstance<FormCheck.Ready>().map { ready -> ready.entry })
     }
 
     private fun save(entries: List<LevelEntry>) {
@@ -123,44 +126,58 @@ internal class LevelsViewModel(
         val saveStatus: SaveStatus? = null,
     ) {
 
-        fun loaded(levels: List<Level>): DataState = copy(
-            forms = levels.associate { level -> level.code to (level.settings?.let(LevelForm::of) ?: LevelForm.EMPTY) },
-            isSaving = false,
-            levels = levels,
-            load = Load.LOADED,
-        )
+        fun loaded(levels: List<Level>): DataState {
+            val hasEveryLevel = levels.map { level -> level.code } == LevelCode.entries
+            return copy(
+                forms = levels.associate { level -> level.code to (level.settings?.let(LevelForm::of) ?: LevelForm.EMPTY) },
+                isSaving = false,
+                levels = levels,
+                load = if (hasEveryLevel) Load.LOADED else Load.FAILED,
+            )
+        }
     }
 
     data class LevelForm(
         val block: String,
-        val idioms: Idioms,
+        val idioms: Idioms?,
         val maxWords: String,
         val ratingFrom: String,
         val vocabulary: String,
     ) {
 
-        fun toEntry(code: LevelCode): LevelEntry? {
+        fun check(code: LevelCode): FormCheck {
             val readMaxWords = maxWords.toIntOrNull()
-            val readRatingFrom = ratingFrom.toIntOrNull()
-            val isRatingFromUnread = ratingFrom.isNotBlank() && readRatingFrom == null
-            if (readMaxWords == null || isRatingFromUnread) return null
-            return LevelEntry(
-                code = code,
-                settings = LevelSettings(
-                    block = block,
-                    idioms = idioms,
-                    maxWords = readMaxWords,
-                    ratingFrom = readRatingFrom,
-                    vocabulary = vocabulary,
-                ),
-            )
+            return when {
+                ratingFrom.isUnread() -> FormCheck.Problem(SaveStatus.UnreadNumber(code, NumberField.RATING_FROM))
+                maxWords.isUnread() -> FormCheck.Problem(SaveStatus.UnreadNumber(code, NumberField.MAX_WORDS))
+                readMaxWords == null || idioms == null || isEmpty(code) -> FormCheck.Problem(SaveStatus.Invalid)
+                else -> FormCheck.Ready(
+                    LevelEntry(
+                        code = code,
+                        settings = LevelSettings(
+                            block = block,
+                            idioms = idioms,
+                            maxWords = readMaxWords,
+                            ratingFrom = ratingFrom.toIntOrNull(),
+                            vocabulary = vocabulary,
+                        ),
+                    ),
+                )
+            }
+        }
+
+        private fun String.isUnread(): Boolean = isNotBlank() && toIntOrNull() == null
+
+        private fun isEmpty(code: LevelCode): Boolean {
+            val isRatingFromMissing = code.hasRatingFrom && ratingFrom.isBlank()
+            return isRatingFromMissing || listOf(block, vocabulary).any(String::isBlank)
         }
 
         companion object {
 
             val EMPTY = LevelForm(
                 block = "",
-                idioms = Idioms.NEVER,
+                idioms = null,
                 maxWords = "",
                 ratingFrom = "",
                 vocabulary = "",
@@ -176,10 +193,22 @@ internal class LevelsViewModel(
         }
     }
 
+    sealed interface FormCheck {
+
+        data class Problem(val status: SaveStatus) : FormCheck
+
+        data class Ready(val entry: LevelEntry) : FormCheck
+    }
+
     enum class Load {
         FAILED,
         LOADED,
         LOADING,
+    }
+
+    enum class NumberField {
+        MAX_WORDS,
+        RATING_FROM,
     }
 
     sealed interface SaveStatus {
@@ -188,7 +217,10 @@ internal class LevelsViewModel(
 
         data object Saved : SaveStatus
 
-        data class UnreadNumber(val code: LevelCode) : SaveStatus
+        data class UnreadNumber(
+            val code: LevelCode,
+            val field: NumberField,
+        ) : SaveStatus
     }
 
     sealed interface UiState {
@@ -219,7 +251,9 @@ internal class LevelsViewModel(
         data class Row(
             val code: LevelCode,
             val form: LevelForm,
+            val idioms: IdiomsOption?,
             val isChosen: Boolean,
+            val isRatingFromShown: Boolean,
             val label: String,
             val range: String?,
         )
