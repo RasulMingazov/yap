@@ -66,10 +66,9 @@ internal class TopicViewModel(
     }
 
     private fun edit(transform: (TopicContent) -> TopicContent) = dataState.update { state ->
-        state.copy(
-            form = transform(state.form),
-            saveStatus = state.saveStatus.takeIf { status -> status == SaveStatus.REJECTED },
-        )
+        state
+            .withForm(transform(state.form))
+            .copy(saveStatus = state.saveStatus.takeIf { status -> status == SaveStatus.REJECTED })
     }
 
     private fun onReleaseDatePicked(date: LocalDate) {
@@ -147,17 +146,22 @@ internal class TopicViewModel(
     data class DataState(
         val cast: List<Character> = emptyList(),
         val form: TopicContent = EMPTY_CONTENT,
+        val guestDescription: String = "",
         val isSaving: Boolean = false,
         val load: Load = Load.LOADING,
         val saved: Topic? = null,
         val saveStatus: SaveStatus? = null,
     ) {
 
-        fun saved(topic: Topic): DataState = copy(
-            form = topic.content,
+        fun saved(topic: Topic): DataState = withForm(topic.content).copy(
             isSaving = false,
             load = Load.LOADED,
             saved = topic,
+        )
+
+        fun withForm(form: TopicContent): DataState = copy(
+            form = form,
+            guestDescription = (form.interlocutor as? Interlocutor.Guest)?.description ?: guestDescription,
         )
     }
 
@@ -175,6 +179,7 @@ internal class TopicViewModel(
     sealed interface UiState {
 
         data class Content(
+            val castNote: String?,
             val choices: List<Choice>,
             val form: TopicContent,
             val guestDescription: String?,

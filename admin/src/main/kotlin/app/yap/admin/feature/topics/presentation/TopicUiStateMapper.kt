@@ -18,6 +18,7 @@ internal object TopicUiStateMapper {
     }
 
     private fun DataState.toContent(): UiState.Content = UiState.Content(
+        castNote = if (cast.isEmpty()) "Персонажей пока нет. Добавьте их в разделе «Персонажи»" else null,
         choices = choices(),
         form = form,
         guestDescription = guestDescription(),
@@ -31,7 +32,7 @@ internal object TopicUiStateMapper {
 
     private fun DataState.choices(): List<Choice> {
         val castChoices = cast.map { character -> character.toChoice(form.interlocutor) }
-        return castChoices + guestChoice(form.interlocutor)
+        return castChoices + guestChoice()
     }
 
     private fun Character.toChoice(selected: Interlocutor?): Choice {
@@ -44,15 +45,12 @@ internal object TopicUiStateMapper {
         )
     }
 
-    private fun guestChoice(selected: Interlocutor?): Choice {
-        val guest = selected as? Interlocutor.Guest ?: Interlocutor.Guest(description = "")
-        return Choice(
-            interlocutor = guest,
-            isSelected = selected is Interlocutor.Guest,
-            meta = "Только для этой темы",
-            name = "Гость",
-        )
-    }
+    private fun DataState.guestChoice(): Choice = Choice(
+        interlocutor = Interlocutor.Guest(description = guestDescription),
+        isSelected = form.interlocutor is Interlocutor.Guest,
+        meta = "Только для этой темы",
+        name = "Гость",
+    )
 
     private fun DataState.guestDescription(): String? = (form.interlocutor as? Interlocutor.Guest)?.description
 

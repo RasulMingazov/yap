@@ -178,8 +178,10 @@ shows SHALL change nothing.
 ### Requirement: The Interlocutor and Steps sections
 
 Interlocutor SHALL offer one radio row for each character of the cast, in the order of the server,
-and then Guest with the note Only for this topic. The guest description field SHALL show only when
-Guest is chosen. Role in the scene SHALL be below the choice. Steps SHALL show one row for each
+and then Guest with the note Only for this topic. Without characters, a note above Guest SHALL say
+that there are no characters yet and that the owner adds them in Characters. The guest description
+field SHALL show only when Guest is chosen. A second choice of Guest SHALL bring back the last guest
+description. Role in the scene SHALL be below the choice. Steps SHALL show one row for each
 step with its number, Task on the screen, Pass when and Step outcome, then Add step, and a note
 that the steps and the check are the same for every rating level.
 
@@ -187,6 +189,17 @@ that the steps and the check are the same for every rating level.
 
 - **WHEN** the owner chooses Guest
 - **THEN** the guest description field shows below the choice
+
+#### Scenario: Guest again
+
+- **WHEN** the owner types a guest description, chooses a character, and then chooses Guest again
+- **THEN** the guest description field shows the description that the owner typed
+
+#### Scenario: No characters yet
+
+- **WHEN** the cast has no characters
+- **THEN** Interlocutor shows a note above Guest that there are no characters yet and that the
+  owner adds them in Characters
 
 #### Scenario: Add step
 

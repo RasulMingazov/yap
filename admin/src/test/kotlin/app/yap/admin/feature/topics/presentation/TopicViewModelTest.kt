@@ -174,6 +174,21 @@ internal class TopicViewModelTest {
     }
 
     @Test
+    fun `GIVEN a guest description WHEN a character and Guest again are chosen THEN it comes back`() =
+        runTest(dispatcher) {
+            val env = Environment(topicId = TopicId(StubTopic.TOPIC_ID))
+            advanceUntilIdle()
+            env.viewModel.onEvent(Event.GuestDescriptionChanged("A tourist"))
+            env.viewModel.onEvent(Event.InterlocutorChosen(env.content().choices.first().interlocutor))
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.InterlocutorChosen(env.content().choices.last().interlocutor))
+            advanceUntilIdle()
+
+            assertEquals(expected = "A tourist", actual = env.content().guestDescription)
+        }
+
+    @Test
     fun `GIVEN a new topic WHEN the save succeeds THEN the next save updates the saved topic`() = runTest(dispatcher) {
         val env = Environment(topicId = null)
         advanceUntilIdle()

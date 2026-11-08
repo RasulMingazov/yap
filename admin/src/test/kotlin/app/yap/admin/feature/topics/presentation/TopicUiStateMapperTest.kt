@@ -34,6 +34,14 @@ internal class TopicUiStateMapperTest {
         )
         assertEquals(expected = listOf("Sam", "Гость"), actual = content.choices.map { choice -> choice.name })
         assertEquals(expected = "Только для этой темы", actual = content.choices.last().meta)
+        assertEquals(expected = null, actual = content.castNote)
+    }
+
+    @Test
+    fun `GIVEN an empty cast WHEN mapping THEN a note above Guest says where to add characters`() {
+        val content = contentOf(DataState(load = Load.LOADED))
+
+        assertEquals(expected = "Персонажей пока нет. Добавьте их в разделе «Персонажи»", actual = content.castNote)
     }
 
     @Test

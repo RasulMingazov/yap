@@ -49,6 +49,9 @@ internal object AdminTheme {
         val loader = 20.dp
         val loaderStroke = 2.dp
         val popupPadding = 8.dp
+        val radio = 14.dp
+        val radioInset = 4.dp
+        val rowGap = 16.dp
         val rowMinHeight = 48.dp
         val rowPadding = 12.dp
         val secondaryButtonPadding = 12.dp
