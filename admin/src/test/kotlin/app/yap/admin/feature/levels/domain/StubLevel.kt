@@ -18,6 +18,8 @@ internal object StubLevel {
         settings = settings,
     )
 
+    fun stubLevels(): List<Level> = LevelCode.entries.map { code -> stubLevel(code = code) }
+
     fun stubEntry(
         code: LevelCode = LevelCode.B1,
         settings: LevelSettings = stubSettings(),

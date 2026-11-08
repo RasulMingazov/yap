@@ -44,6 +44,10 @@ files above.
 
 ## 5. [5/7] Admin view model
 
+Slice 1 of this part holds the use cases, the state types nested in `LevelsViewModel`, and
+`LevelsUiStateMapper` with its tests. Slice 2 holds the events and the logic of `LevelsViewModel`,
+the stub use cases, the view-model tests and `featureLevelsModule()` in `AppModules.kt`.
+
 Files: `admin/` `feature/levels/domain/usecase/`, `feature/levels/presentation/`
 (`LevelsViewModel`, `LevelsUiStateMapper`), `feature/levels/di/`, and their tests.
 
