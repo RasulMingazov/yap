@@ -29,7 +29,7 @@ Starts after the #9 part with `V3__levels.sql` merges. That part starts after th
 
 ## 6. Admin view model (about 380 lines)
 
-- [ ] 6.1 Add `PromptsViewModel`, its UI state and its mapper, with the Russian titles of the keys. Files: `ap/presentation/PromptsViewModel.kt`, `ap/presentation/PromptsUiStateMapper.kt`, `ap/presentation/PromptTitles.kt`, stub use cases in the tests. Verify with the mapper and view-model tests for the first open, a prompt without a version, the typed text on a return, the Saved status, the 400 that asks for the text, Restore, the save failure and the load error
+- [x] 6.1 Add `PromptsViewModel`, its UI state and its mapper, with the Russian titles of the keys. Files: `ap/presentation/PromptsViewModel.kt`, `ap/presentation/PromptsUiStateMapper.kt`, `ap/presentation/PromptTitles.kt`, stub use cases in the tests. Verify with the mapper and view-model tests for the first open, a prompt without a version, the typed text on a return, the Saved status, the 400 that asks for the text, Restore, the save failure and the load error
 
 ## 7. Admin Prompts screen (about 350 lines)
 
