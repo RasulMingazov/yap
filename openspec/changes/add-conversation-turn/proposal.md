@@ -25,8 +25,9 @@ turn, so the admin app (Try, #15) and later the mobile app use the same rules.
   strictly. An answer in another format is a failed call.
 - A failed call, or an answer that the server cannot read, changes nothing in the conversation.
 - A turn does not run, and changes nothing, when the answer is empty, the conversation is finished,
-  the topic does not exist, the topic has no interlocutor, the current step has no task or no Pass
-  when, a prompt has no saved text, or the level has no saved block.
+  the topic does not exist, the topic has no interlocutor, the scene of a draft is incomplete, the
+  current step is missing or has no task or no Pass when, a prompt has no saved text, the level has
+  no saved block, or the provider of a call has no key.
 - The server can call a model by its choice: it routes the call to the adapter of the provider. The
   DeepSeek adapter starts when the server has its key.
 - With this change, the note on the Levels screen comes true for Character reply: the server puts
@@ -55,7 +56,8 @@ None. The prompts, levels and task models keep their requirements; this change u
 ## Impact
 
 - A new module `server/feature-conversation`. It uses the use cases of `feature-topics`,
-  `feature-characters`, `feature-levels`, `feature-models` and `feature-prompts`.
+  `feature-characters`, `feature-levels`, `feature-models` and `feature-prompts`, as
+  `docs/server/001-structure.md` allows. The owner reviews this dependency (`design.md`).
 - `server/core-llm` gets `ModelProviders`: the call of a model by `ModelChoice`, and the DeepSeek
   adapter in Koin.
 - `server/feature-prompts` gets the rule that fills the variables of a prompt.

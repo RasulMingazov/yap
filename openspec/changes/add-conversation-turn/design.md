@@ -8,7 +8,7 @@
   to `ModelReply.Failed`. No Koin module binds a `ModelProvider`: #11 left "a router of providers"
   to this change.
 - `feature-prompts` (#10): `PromptKey.TOPIC_CHECK` and `PromptKey.TOPIC_REPLY` with their variables,
-  and `GetPromptUseCase`, which returns the current version or none. The archived design of #10
+  and `GetPromptUseCase`, which returns the `Prompt`; its `current` is null when no text was saved. The archived design of #10
   fixes the values of the variables and how an engine sends a prompt (table below).
 - `feature-levels` (#9): `GetLevelRulesUseCase(code)` returns the saved block or `null`. It has no
   caller yet; this change is its caller.
@@ -66,15 +66,27 @@ So the reserved Flyway `V8` is not used. The orchestrator can give it to the nex
 The turn reads the topic at each turn, so an edit of a draft applies to the next turn of a trial.
 A step that the edit removed gives the reason "no current step".
 
-### The module `server/feature-conversation`
+### The module `server/feature-conversation` [owner-review]
 
 The engine uses five features. It goes into its own module, `feature-conversation`, which depends on
 `feature-topics`, `feature-characters`, `feature-levels`, `feature-models` and `feature-prompts`.
 None of them depends on it, so there is no cycle. #13 (hints) and #14 (review) add to the same
 module.
 
-Alternative: put the engine into `feature-topics`. Rejected: `feature-topics` would then depend on
-prompts, levels and models, and the topic content and the dialogue are two slices.
+- The rule: `docs/server/001-structure.md:15-17` lets a feature use another feature through its use
+  cases, its ports and the model types in their signatures, when the dependency has no cycle.
+- The precedents on the server: `feature-topics -> feature-characters` (#7) and
+  `feature-models -> feature-levels` (#11).
+- The owner rule "no feature depends on another" (2026-11-08) was said for the admin app features.
+  The owner decides if it holds for the server too. Part 2 does not depend on the answer; part 3 and
+  later wait for it.
+
+| Option | Cost | Choice |
+| --- | --- | --- |
+| Direct dependencies on the five features, through their public use cases | none: the use cases exist and are public | yes, unless the owner says otherwise |
+| Ports in `feature-conversation/usecase/` (topic, interlocutor, prompt text, level rules, task model), and adapters in `app` that call each feature's use case | about 5 adapters and their tests in `app`, ~150 lines and one more part; `app` then holds glue code that `docs/server/001-structure.md:8-9` does not give it | no |
+| Ports in each provider feature | each of them then depends on `feature-conversation`: a cycle | no |
+| The engine in `feature-topics` | `feature-topics` then depends on prompts, levels and models; the topic content and the dialogue are two slices | no |
 
 ### `ModelProviders` routes a call by its choice
 
@@ -91,7 +103,9 @@ class ModelProviders(
 - A provider without a key is not in the map: the call logs a warning and returns `Failed`.
 - `coreLlmModule(config)` builds it in a lambda, because no public constructor reads `LlmConfig`:
   the map holds `DeepSeekModelProvider(config.deepSeek)` when the key exists.
-  `createdAtStart = true`, and `onClose` closes each adapter.
+  The adapter opens an HTTP client, a resource, so the definition sets `createdAtStart = true` and
+  closes each adapter in `onClose`, as `docs/server/003-dependency-injection.md` says: a failure
+  stops the start, not the first turn.
 - Tests build `ModelProviders(mapOf(DEEPSEEK to StubModelProvider(...)))`: the fake provider of #5.
 
 Only `json` is added: both calls of this change read JSON. A `text` route comes with its first
@@ -156,22 +170,32 @@ and the owner can remove it.
 
 ```text
 TakeTurnUseCase(conversation, answer) -> TurnOutcome
-  1. trim the answer; empty -> NotRun(EMPTY_ANSWER); finished -> NotRun(FINISHED)
-  2. topic (GetTopicUseCase) -> NotRun(TOPIC_NOT_FOUND); no interlocutor -> NotRun(NO_INTERLOCUTOR)
-     no current step -> NotRun(NO_STEP); empty task or Pass when -> NotRun(STEP_INCOMPLETE)
+  1. trim the answer; empty -> NotRun(EmptyAnswer); finished -> NotRun(Finished)
+  2. topic (GetTopicUseCase) -> NotRun(TopicNotFound); no interlocutor -> NotRun(NoInterlocutor)
+     empty setting, role, opening line (English) or guest description -> NotRun(SceneIncomplete)
+     no current step -> NotRun(NoStep); empty task or Pass when -> NotRun(StepIncomplete)
   3. interlocutor value (GetCharacterUseCase for Cast; a missing character throws: the topic save checks it)
-  4. prompts TOPIC_CHECK and TOPIC_REPLY -> NotRun(PromptMissing(key)); level block -> NotRun(LEVEL_NOT_SAVED)
+  4. prompts TOPIC_CHECK and TOPIC_REPLY -> NotRun(PromptMissing(key)); level block -> NotRun(LevelNotSaved)
   5. models: GetTaskModelUseCase(level, TOPIC_CHECK) and (level, TOPIC_REPLY)
+     a provider without a key (ProviderConnections) -> NotRun(ProviderNotConnected(provider))
   6. check call -> Failed; reply call -> Failed
   7. Answered(conversation.answered(...), verdict)
 
 TurnOutcome = Answered(conversation, verdict) | Failed | NotRun(TurnGap)
-TurnGap = EmptyAnswer | Finished | TopicNotFound | NoInterlocutor | NoStep | StepIncomplete
-        | PromptMissing(promptKey) | LevelNotSaved
+TurnGap = EmptyAnswer | Finished | TopicNotFound | NoInterlocutor | SceneIncomplete | NoStep
+        | StepIncomplete | PromptMissing(promptKey) | LevelNotSaved | ProviderNotConnected(provider)
 ```
 
 No model is called until every input exists, as the spec says. A turn of a topic that is not ready
 costs nothing.
+
+- A draft can have an empty setting, role, opening line or guest description: `TopicPublishRule`
+  checks them only at publish, and a trial runs on drafts. Each of them goes into the reply prompt
+  (the opening line also into `{last.line}` and the first `ASSISTANT` message), so an empty one
+  stops the turn with `SceneIncomplete`, for the same reason as a level without a block. The
+  translation of the opening line goes into no prompt, so it does not stop the turn.
+- A provider without a key stops the turn with `ProviderNotConnected` before the first call, so the
+  outcome names the reason. `ModelProviders` still returns `Failed` for it, as a guard.
 
 | Option for a level without a saved block | Choice |
 | --- | --- |

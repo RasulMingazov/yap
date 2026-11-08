@@ -187,12 +187,10 @@ the reply.
 
 ### Requirement: A turn that cannot run
 
-The server SHALL NOT call a model and SHALL keep the conversation as it was when the answer is
-empty, when the conversation is finished, when the topic does not exist, when the topic has no
-interlocutor, when the topic no longer has the current step, when the current step has no task or
-no Pass when, when the Step check or the
-Character reply prompt has no saved text, or when the level has no saved block. The outcome SHALL
-name the reason.
+The server SHALL NOT call a model, SHALL keep the conversation as it was, and SHALL name the reason
+when the answer is empty, when the conversation is finished, when the Step check or the Character
+reply prompt has no saved text, when the level has no saved block, or when the provider of the
+Step check or the Character reply model has no key on the server.
 
 #### Scenario: An empty answer
 
@@ -204,12 +202,12 @@ name the reason.
 - **WHEN** the learner answers after the last step is accepted
 - **THEN** the turn does not run and names a finished conversation
 
-#### Scenario: A step without Pass when
+#### Scenario: The Step check prompt without a saved text
 
-- **WHEN** the current step of a draft has no Pass when
-- **THEN** the turn does not run and names the incomplete step
+- **WHEN** the owner never saved the Step check prompt
+- **THEN** the turn does not run and names the Step check prompt
 
-#### Scenario: A prompt without a saved text
+#### Scenario: The Character reply prompt without a saved text
 
 - **WHEN** the owner never saved the Character reply prompt
 - **THEN** the turn does not run and names the Character reply prompt
@@ -218,3 +216,47 @@ name the reason.
 
 - **WHEN** the owner did not save the levels yet
 - **THEN** the turn does not run and names the level
+
+#### Scenario: A provider without a key
+
+- **WHEN** the server has no DeepSeek key and Step check has DeepSeek
+- **THEN** the turn does not run and names DeepSeek
+
+### Requirement: A topic that is not ready for a turn
+
+The server SHALL NOT call a model, SHALL keep the conversation as it was, and SHALL name the reason
+when the topic does not exist, when it has no interlocutor, when its setting, its role, the English
+of its opening line or the description of its guest is empty, when it no longer has the current
+step, or when the current step has no task or no Pass when. A draft MAY be in such a state, and a
+turn reads the topic as it is now.
+
+#### Scenario: An unknown topic
+
+- **WHEN** the topic of the conversation does not exist
+- **THEN** the turn does not run and names an unknown topic
+
+#### Scenario: No interlocutor
+
+- **WHEN** the topic of a draft has no interlocutor
+- **THEN** the turn does not run and names the missing interlocutor
+
+#### Scenario: An incomplete scene
+
+- **WHEN** the topic of a draft has an empty setting, an empty role, an empty English opening line,
+  or a guest with an empty description
+- **THEN** the turn does not run and names the incomplete scene
+
+#### Scenario: A removed step
+
+- **WHEN** the owner removes step 3 of a draft while step 3 is current
+- **THEN** the turn does not run and names the missing step
+
+#### Scenario: A step without a task
+
+- **WHEN** the current step of a draft has no task
+- **THEN** the turn does not run and names the incomplete step
+
+#### Scenario: A step without Pass when
+
+- **WHEN** the current step of a draft has no Pass when
+- **THEN** the turn does not run and names the incomplete step
