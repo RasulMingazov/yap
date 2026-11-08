@@ -60,6 +60,11 @@ choice.
 - **WHEN** the owner saves Review with DeepSeek `deepseek-v4-pro`
 - **THEN** the server returns Review with DeepSeek `deepseek-v4-pro` and the other tasks as saved
 
+#### Scenario: A stored choice that left the catalog
+
+- **WHEN** Review has a stored model that the provider catalog no longer has
+- **THEN** the server returns Review with DeepSeek `deepseek-flash`, and Review calls use it
+
 ### Requirement: The owner saves every task at once
 
 Save SHALL replace the choices of all five tasks. The server SHALL reject the save when a task is
@@ -148,8 +153,9 @@ The sidebar SHALL show Models in the group Settings.
 
 ### Requirement: The Models screen
 
-Models SHALL show the subtitle that it sets which model does which task. The section Tasks SHALL
-have a table with a row for each task: Task with a line on when the task runs, Provider and Model.
+Models SHALL show the subtitle that it sets which model does which task. The section Who does what
+SHALL have a table with a row for each task: Task with a line on when the task runs, Provider and
+Model.
 A note below the table SHALL say that a level can set its own model for Character reply and Hints
 in Levels.
 

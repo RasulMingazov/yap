@@ -34,6 +34,12 @@ The issue and the canvas name `deepseek-chat`. DeepSeek scheduled `deepseek-chat
 page now lists only `deepseek-flash` (DeepSeek-V4.1-Flash) and `deepseek-v4-pro`. The core-llm
 tests already use `deepseek-flash`.
 
+The exact API ids, checked on 2026-11-08: the `model` row of the PARAM/VALUE table on the pricing
+page lists `deepseek-flash` and `deepseek-v4-pro`. The two names do not share one pattern; the
+catalog copies them as DeepSeek writes them. The footnote of that row says that the legacy names
+`deepseek-v4-flash` and `deepseek-v4-flash-vision-exp` are still accepted but their models are
+retired. The catalog does not list legacy names.
+
 | Option | Price per 1M tokens, cache miss in / out (peak) | Choice |
 | --- | --- | --- |
 | `deepseek-chat` | discontinued | no |
@@ -83,13 +89,17 @@ SaveTaskModelsOutcome = Invalid | Saved(ModelsOverview)
 
 - One rule in `model/`, `TaskModelTableValidity`, checks a full save: each task once, and each
   choice in the catalog.
-- `GetModelsUseCase` reads the rows, fills a missing or unknown row with `ModelCatalog.DEFAULT`, and
-  adds the providers with `ProviderConnections`.
+- A second rule in `model/`, `TaskModelChoice`, gives the choice of a task from its stored row: the
+  row when it is in the catalog, else `ModelCatalog.DEFAULT`. Two use cases need it, so it lives in
+  `model/`, as `docs/server/001-structure.md` says. `TaskModelChoiceTest` covers no row, a row in
+  the catalog and a row outside it.
+- `GetModelsUseCase` reads the rows, gives each task its choice with `TaskModelChoice`, and adds the
+  providers with `ProviderConnections`.
 - `SaveModelsUseCase` checks the rule, saves, and returns the overview.
 - `GetTaskModelUseCase(task, level: LevelCode): ModelChoice` is the rule of a call. For a task that
   depends on the level, it reads the level through `GetLevelsUseCase` of `feature-levels` and uses
-  its model when it has one. Else it uses the task row, or the default. It reads at each call and
-  caches nothing, so the next call sees a save.
+  its model when it has one. Else it uses `TaskModelChoice` on the task row. It reads at each call
+  and caches nothing, so the next call sees a save.
 - `feature-models` depends on `feature-levels` through its use case. `feature-levels` does not
   depend on `feature-models`.
 
@@ -117,8 +127,17 @@ alter table levels add column model text;
 - No seed rows: a missing row is the default.
 - A save upserts the five rows by `task` in one transaction. It never deletes a row.
 - The level upsert now also sets `model`, so Default clears it.
-- Each feature owns its table, so the change has two migrations. The orchestrator reserved `V6`;
-  `V7` needs its reservation (see Risks).
+- The level read gives no model when the stored model is not in the catalog. So Levels shows
+  Default, and the next save sends no model and passes the save rule. `GetTaskModelUseCase` then
+  needs no own check of a level model.
+- Each feature owns its table, so the change has two migrations: `V6` and `V7`, both reserved for
+  #11.
+- `V7` is a new version, not a column added to `V3__levels.sql`. An edit of the applied `V3`
+  changes its checksum, and with the reset flag the deploy clears the database and the levels that
+  the owner saved. A new version keeps them. The run also forbids edits of `V2` to `V5`.
+- Migration order: the part with `V6` merges only after the `V5` part of #8 is in `develop`, and
+  the part with `V7` after the part with `V6`. With the reset flag, a version that lands below an
+  applied one fails the validation and clears the database.
 
 ### The wire contract
 
@@ -147,18 +166,17 @@ alter table levels add column model text;
 - `deepseek-flash` instead of `deepseek-chat` (see above).
 - No price line under Model, no Connect a provider button, and no comparison sentence in the note.
   The issue puts them out of scope.
-- The note under the tasks table names Character reply and Hints. The canvas says the level model
+- The note under the Who does what table names Character reply and Hints. The canvas says the level model
   works wherever it is set.
 - The Levels Model choices show the model name, as the canvas does; Default for no model.
 
 ## Risks / Trade-offs
 
-- [`V7` is not reserved] → The plan asks the orchestrator. Fallback: the part with the level column
-  waits until `V7` is free, or both statements go into `V6` of `feature-models` with a note.
 - [`GetTaskModelUseCase` has no caller until #12] → Same as `GetLevelRulesUseCase` of #9. Its tests
   cover the issue's «a changed model is used by the next call»; #12 owns the end-to-end check.
 - [A task can point to a provider without a key] → Save accepts it so a local run without a key
   works. Only DeepSeek exists. #12 decides what a call does without a key.
-- [A model leaves the catalog] → A stored task choice reads as the default, and the call rule skips
-  a level model that is not in the catalog, so a call never gets an unknown name.
+- [A model leaves the catalog] → A stored task choice reads as the default, and a stored level
+  model reads as no model, so a call never gets an unknown name and a Levels save never fails on
+  it.
 - [Cost] → Pro costs about 3 to 4 times more. The owner chooses it per task or per level.

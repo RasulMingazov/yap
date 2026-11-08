@@ -25,6 +25,11 @@ models of the tasks.
 - **WHEN** the owner saves B1 with a model and then saves it without one
 - **THEN** the server returns B1 with no model
 
+#### Scenario: A stored model that left the catalog
+
+- **WHEN** B1 has a stored model that the provider catalog no longer has
+- **THEN** the server returns B1 with no model, and calls for B1 use the models of the tasks
+
 ### Requirement: The owner saves every level at once
 
 Save SHALL replace the values of all seven levels. The server SHALL remove the spaces at the start

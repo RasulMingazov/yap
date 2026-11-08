@@ -22,8 +22,8 @@ own model for the replies and the hints.
   optional setting. The admin API never returns a key.
 - The admin API reads the tasks with their models and the providers, and saves the tasks, behind
   the admin key.
-- The admin app gets the Models screen in the sidebar group Settings: the Tasks table with Task,
-  Provider and Model, and the Providers list with the Connected state.
+- The admin app gets the Models screen in the sidebar group Settings: the section Who does what
+  with Task, Provider and Model, and the section Providers with the Connected state.
 - The Levels screen gets the Model column: Default or a model of the catalog.
 
 Out of scope:
@@ -52,7 +52,7 @@ Out of scope:
 ## Impact
 
 - A new module `server/feature-models` with `V6__task_models.sql`. `server/feature-levels` gets
-  `V7__level_model.sql` (the orchestrator must reserve `V7`).
+  `V7__level_model.sql`. Both versions are reserved for #11, and they merge after the `V5` of #8.
 - `server/core-llm` gets the provider catalog and the optional DeepSeek key setting. `server/app`
   reads `DEEPSEEK_API_KEY`.
 - `contract-admin` gets the model DTOs, and `LevelSettingsDto` gets an optional `model`.
