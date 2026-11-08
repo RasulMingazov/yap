@@ -43,7 +43,7 @@ internal class CharacterViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(expected = StubCharacter.stubProfile(), actual = env.content().form)
+        assertEquals(expected = STUB_TEXTS, actual = env.texts())
     }
 
     @Test
@@ -66,13 +66,27 @@ internal class CharacterViewModelTest {
         env.viewModel.onEvent(Event.RetryClicked)
         advanceUntilIdle()
 
-        assertEquals(expected = StubCharacter.stubProfile(), actual = env.content().form)
+        assertEquals(expected = STUB_TEXTS, actual = env.texts())
+    }
+
+    @Test
+    fun `GIVEN typed fields WHEN Save is clicked THEN each text is saved in its field`() = runTest(dispatcher) {
+        val env = Environment(characterId = null)
+        env.viewModel.onEvent(Event.HistoryChanged(StubCharacter.HISTORY))
+        env.viewModel.onEvent(Event.MannerChanged(StubCharacter.MANNER))
+        env.viewModel.onEvent(Event.NameChanged(StubCharacter.NAME))
+        env.viewModel.onEvent(Event.PersonalityChanged(StubCharacter.PERSONALITY))
+
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.saveCharacterUseCase.invokeCall.calledWith(null, StubCharacter.stubProfile())
     }
 
     @Test
     fun `GIVEN a new character WHEN the save succeeds THEN its name becomes the title`() = runTest(dispatcher) {
         val env = Environment(characterId = null)
-        env.viewModel.onEvent(Event.FormChanged(StubCharacter.stubProfile()))
+        env.viewModel.onEvent(Event.NameChanged(StubCharacter.NAME))
 
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
@@ -129,5 +143,25 @@ internal class CharacterViewModelTest {
         )
 
         fun content(): UiState.Content = viewModel.uiState.value as UiState.Content
+
+        fun texts(): List<String> {
+            val content = content()
+            return listOf(
+                content.history,
+                content.manner,
+                content.name,
+                content.personality,
+            )
+        }
+    }
+
+    private companion object {
+
+        val STUB_TEXTS = listOf(
+            StubCharacter.HISTORY,
+            StubCharacter.MANNER,
+            StubCharacter.NAME,
+            StubCharacter.PERSONALITY,
+        )
     }
 }

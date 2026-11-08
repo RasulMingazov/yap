@@ -14,9 +14,12 @@ internal object CharacterUiStateMapper : (DataState) -> UiState {
     }
 
     private fun DataState.toContent(): UiState.Content = UiState.Content(
-        form = form,
         hint = hint(),
+        history = form.history,
         isSaveEnabled = !isSaving,
+        manner = form.manner,
+        name = form.name,
+        personality = form.personality,
         saveStatus = saveResult?.status(),
         subtitle = subtitle(),
         title = title(),
