@@ -13,6 +13,7 @@ import app.yap.admin.feature.topics.domain.usecase.SaveTopicUseCase
 import app.yap.admin.feature.topics.presentation.TopicViewModel
 import app.yap.admin.feature.topics.presentation.TopicsViewModel
 import de.jensklingenberg.ktorfit.Ktorfit
+import java.time.LocalDate
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
@@ -27,10 +28,11 @@ internal fun featureTopicsModule(): Module = module {
     factoryOf(::DefaultGetTopicUseCase) { bind<GetTopicUseCase>() }
     factoryOf(::DefaultSaveTopicUseCase) { bind<SaveTopicUseCase>() }
 
-    factory { (topicId: TopicId?) ->
+    factory { (releaseDate: LocalDate?, topicId: TopicId?) ->
         TopicViewModel(
             getCharactersUseCase = get(),
             getTopicUseCase = get(),
+            releaseDate = releaseDate,
             saveTopicUseCase = get(),
             topicId = topicId,
         )

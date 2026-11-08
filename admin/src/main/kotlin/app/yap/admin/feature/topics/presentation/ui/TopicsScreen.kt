@@ -46,10 +46,11 @@ import app.yap.admin.feature.topics.domain.TopicId
 import app.yap.admin.feature.topics.presentation.TopicsViewModel
 import app.yap.admin.feature.topics.presentation.TopicsViewModel.Event
 import app.yap.admin.feature.topics.presentation.TopicsViewModel.UiState
+import java.time.LocalDate
 
 @Composable
 internal fun TopicsScreen(
-    onNewTopicClick: () -> Unit,
+    onNewTopicClick: (LocalDate?) -> Unit,
     onTopicClick: (TopicId) -> Unit,
     viewModel: TopicsViewModel,
 ) {
@@ -68,7 +69,7 @@ internal fun TopicsScreen(
 @Composable
 internal fun TopicsContent(
     onEvent: (Event) -> Unit,
-    onNewTopicClick: () -> Unit,
+    onNewTopicClick: (LocalDate?) -> Unit,
     onTopicClick: (TopicId) -> Unit,
     uiState: UiState,
 ) {
@@ -77,7 +78,7 @@ internal fun TopicsContent(
             actions = {
                 PrimaryButton(
                     enabled = true,
-                    onClick = onNewTopicClick,
+                    onClick = { onNewTopicClick(null) },
                     text = "Новая тема",
                 )
             },
@@ -155,7 +156,7 @@ private fun ReloadBanner(
 
 @Composable
 private fun TodoSection(
-    onCreateClick: () -> Unit,
+    onCreateClick: (LocalDate) -> Unit,
     onTopicClick: (TopicId) -> Unit,
     todo: UiState.TodoList,
 ) {
@@ -180,7 +181,7 @@ private fun TodoSection(
                             date = entry.date,
                             dateColor = AdminTheme.Colors.bad,
                             note = entry.note,
-                            onClick = onCreateClick,
+                            onClick = { onCreateClick(entry.releaseDate) },
                             title = entry.title,
                         )
                     }
@@ -241,7 +242,7 @@ private fun TodoRow(
 
 @Composable
 private fun AllTopicsSection(
-    onCreateClick: () -> Unit,
+    onCreateClick: (LocalDate) -> Unit,
     onTopicClick: (TopicId) -> Unit,
     rows: List<UiState.Row>,
 ) {
@@ -296,7 +297,7 @@ private fun TopicTableHeader() {
 
 @Composable
 private fun EmptyDayRow(
-    onCreateClick: () -> Unit,
+    onCreateClick: (LocalDate) -> Unit,
     row: UiState.Row.EmptyDay,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -313,7 +314,7 @@ private fun EmptyDayRow(
         Spacer(modifier = Modifier.width(AdminTheme.Sizes.ledByColumnWidth + AdminTheme.Sizes.stepsColumnWidth))
         TableCell(modifier = Modifier.width(AdminTheme.Sizes.statusColumnWidth)) {
             LinkButton(
-                onClick = onCreateClick,
+                onClick = { onCreateClick(row.releaseDate) },
                 text = "Создать",
             )
         }

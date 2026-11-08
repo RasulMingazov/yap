@@ -27,13 +27,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class TopicViewModel(
+    releaseDate: LocalDate?,
     private val topicId: TopicId?,
     private val getCharactersUseCase: GetCharactersUseCase,
     private val getTopicUseCase: GetTopicUseCase,
     private val saveTopicUseCase: SaveTopicUseCase,
 ) : ViewModel() {
 
-    private val dataState = MutableStateFlow(DataState())
+    private val dataState = MutableStateFlow(DataState(form = EMPTY_CONTENT.copy(releaseDate = releaseDate)))
     val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicUiStateMapper)
 
     private val newsChannel = Channel<News>(Channel.BUFFERED)

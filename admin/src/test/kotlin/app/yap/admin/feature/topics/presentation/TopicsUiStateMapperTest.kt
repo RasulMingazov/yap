@@ -57,7 +57,10 @@ internal class TopicsUiStateMapperTest {
                         title = "At the cafe",
                         topicId = TopicId(StubTopic.TOPIC_ID),
                     ),
-                    UiState.Row.EmptyDay(date = "Сб, 25 окт"),
+                    UiState.Row.EmptyDay(
+                        date = "Сб, 25 окт",
+                        releaseDate = saturday,
+                    ),
                 ),
                 todo = UiState.TodoList.Entries(
                     entries = listOf(
@@ -70,6 +73,7 @@ internal class TopicsUiStateMapperTest {
                         UiState.TodoEntry.EmptyDay(
                             date = "Сб, 25 окт",
                             note = "В этот день пользователи увидят пустой день.",
+                            releaseDate = saturday,
                             title = "Темы нет.",
                         ),
                     ),
@@ -216,7 +220,12 @@ internal class TopicsUiStateMapperTest {
                     isRetrying = false,
                     message = "Не удалось обновить темы. Показан прежний список.",
                 ),
-                rows = listOf(UiState.Row.EmptyDay(date = "Пт, 24 окт")),
+                rows = listOf(
+                    UiState.Row.EmptyDay(
+                        date = "Пт, 24 окт",
+                        releaseDate = StubTopic.RELEASE_DATE,
+                    ),
+                ),
                 todo = UiState.TodoList.Empty(message = "Всё сделано"),
             ),
             actual = uiState,

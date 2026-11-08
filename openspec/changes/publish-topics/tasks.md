@@ -113,7 +113,7 @@ Create opens a new topic without a date until [17/26].
 
 ## 17. [17/26] Create on an empty day · ~150 · `A/Main.kt`, `A/navigation/` (`Screen.Topic` with the date), `T/FeatureTopicsModule.kt`, `T/presentation/TopicViewModel.kt`, `T/presentation/ui/TopicsScreen.kt`
 
-- [ ] 17.1 Pass the date of Create to a new topic; verify with the navigation test for Create, and the view model test for a new topic with a date (Release date shows the long date)
+- [x] 17.1 Pass the date of Create to a new topic; verify with the navigation test for Create, and the view model test for a new topic with a date (Release date shows the long date)
 
 ## 18. [18/26] The captures of Topics · ~130 · `A/core/design/` (`AdminTheme.Type`: Inter Medium and a medium body style; the status text size of a table cell), `admin/src/main/resources/font/` (Inter Medium), `A/ScreenCaptureTest.kt`, `T/presentation/ui/TopicsScreen.kt`
 

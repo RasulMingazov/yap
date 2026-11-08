@@ -6,6 +6,7 @@ import app.yap.admin.feature.server.domain.usecase.StubGetServerSettingsUseCase
 import app.yap.admin.navigation.NavigationViewModel.Event
 import app.yap.admin.navigation.NavigationViewModel.Screen
 import app.yap.admin.navigation.NavigationViewModel.UiState
+import java.time.LocalDate
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -91,6 +92,21 @@ internal class NavigationViewModelTest {
         advanceUntilIdle()
 
         assertEquals(expected = Screen.Models, actual = env.screen())
+    }
+
+    @Test
+    fun `GIVEN Topics is open WHEN Create is clicked THEN a new topic of that day opens`() = runTest(dispatcher) {
+        val env = Environment(settings = StubServerSettings.stubServerSettings())
+        advanceUntilIdle()
+        val screen = Screen.Topic(
+            releaseDate = LocalDate.of(2025, 10, 26),
+            topicId = null,
+        )
+
+        env.viewModel.onEvent(Event.ScreenClicked(screen))
+        advanceUntilIdle()
+
+        assertEquals(expected = screen, actual = env.screen())
     }
 
     private class Environment(

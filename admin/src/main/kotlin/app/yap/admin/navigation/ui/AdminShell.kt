@@ -26,6 +26,7 @@ import app.yap.admin.navigation.NavigationViewModel
 import app.yap.admin.navigation.NavigationViewModel.Event
 import app.yap.admin.navigation.NavigationViewModel.Screen
 import app.yap.admin.navigation.NavigationViewModel.UiState
+import java.time.LocalDate
 
 @Composable
 internal fun AdminShell(
@@ -35,7 +36,7 @@ internal fun AdminShell(
     modelsViewModel: ModelsViewModel,
     promptsViewModel: PromptsViewModel,
     serverViewModel: ServerViewModel,
-    topicViewModel: (TopicId?) -> TopicViewModel,
+    topicViewModel: (LocalDate?, TopicId?) -> TopicViewModel,
     topicsViewModel: TopicsViewModel,
     viewModel: NavigationViewModel,
 ) {
@@ -75,7 +76,7 @@ private fun ScreenContent(
     promptsViewModel: PromptsViewModel,
     screen: Screen,
     serverViewModel: ServerViewModel,
-    topicViewModel: (TopicId?) -> TopicViewModel,
+    topicViewModel: (LocalDate?, TopicId?) -> TopicViewModel,
     topicsViewModel: TopicsViewModel,
 ) {
     when (screen) {
@@ -94,11 +95,25 @@ private fun ScreenContent(
         is Screen.Server -> ServerScreen(viewModel = serverViewModel)
         is Screen.Topic -> TopicScreen(
             onBackClick = { onScreenClick(Screen.Topics) },
-            viewModel = remember(screen) { topicViewModel(screen.topicId) },
+            viewModel = remember(screen) { topicViewModel(screen.releaseDate, screen.topicId) },
         )
         is Screen.Topics -> TopicsScreen(
-            onNewTopicClick = { onScreenClick(Screen.Topic(topicId = null)) },
-            onTopicClick = { topicId -> onScreenClick(Screen.Topic(topicId)) },
+            onNewTopicClick = { releaseDate ->
+                onScreenClick(
+                    Screen.Topic(
+                        releaseDate = releaseDate,
+                        topicId = null,
+                    ),
+                )
+            },
+            onTopicClick = { topicId ->
+                onScreenClick(
+                    Screen.Topic(
+                        releaseDate = null,
+                        topicId = topicId,
+                    ),
+                )
+            },
             viewModel = topicsViewModel,
         )
     }
