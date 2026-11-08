@@ -25,8 +25,8 @@ before the screen. The captures come in their own part.
 
 ## 4. [4/26] Publish in the database · ~240 · `S/persistence/` (`TopicRepository`, `DatabaseTopicRepository`, `StubTopicRepository`) and the PostgreSQL test
 
-- [ ] 4.1 Add `publish` with the same write rules as the update of [3/26]: `maxAttempts = 1`, the `topics` row as the first write, no catch inside the block, and `23505` mapped to `DateTaken` outside it; verify with the PostgreSQL tests for a publish and a restart, a second published topic on a date (stores nothing), a save of a published topic onto a taken date, and two publishes at once with a latch (one published, the other unchanged)
-- [ ] 4.2 Add `hasPublishedOn(date, exceptTopicId)`; verify with the PostgreSQL tests for a date with another published topic, with only the topic itself, and with drafts only
+- [x] 4.1 Add `publish` with the same write rules as the update of [3/26]: `maxAttempts = 1`, the `topics` row as the first write, no catch inside the block, and `23505` mapped to `DateTaken` outside it; verify with the PostgreSQL tests for a publish and a restart, a second published topic on a date (stores nothing), a save of a published topic onto a taken date, and two publishes at once with a latch (one published, the other unchanged)
+- [x] 4.2 Add `hasPublishedOn(date, exceptTopicId)`; verify with the PostgreSQL tests for a date with another published topic, with only the topic itself, and with drafts only
 
 ## 5. [5/26] The topic counts on the server · ~310 · `K/CharacterSummaryDto.kt`, `docs/server/001-structure.md` (the port rule), `C/model/CharacterSummary.kt`, `C/usecase/` (`CharacterTopicCounts` port, `GetCharacterSummariesUseCase`), `C/api/` (mapper, routes), `C/testFixtures` (stub port), `C/FeatureCharactersModule.kt`, `S/persistence/DatabaseCharacterTopicCounts.kt`, `S/FeatureTopicsModule.kt`, `H/data/` (decode `CharacterSummaryDto`, keep the domain)
 

@@ -14,7 +14,13 @@ import app.yap.server.feature.topics.model.TopicStatus
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.update
@@ -178,6 +184,160 @@ internal class DatabaseTopicRepositoryTest {
                     expected = TopicWrite.DateTaken to other.copy(status = TopicStatus.PUBLISHED),
                     actual = outcome to repository.find(other.topicId),
                 )
+            }
+        }
+
+    @Test
+    fun `GIVEN a draft WHEN publishing it and restarting THEN the topic is published with the new content`() =
+        withRestartableDatabase { open ->
+            runTest {
+                val draft = open()
+                    .use { database ->
+                        val repository = DatabaseTopicRepository(database)
+                        repository.create(stubContent(steps = stubSteps("a", "b")))
+                    }
+                val content = draft.content.copy(steps = stubSteps("z"), title = "Changed")
+                val published = draft.copy(content = content, status = TopicStatus.PUBLISHED)
+
+                val outcome = open()
+                    .use { database ->
+                        val repository = DatabaseTopicRepository(database)
+                        repository.publish(content, draft.topicId)
+                    }
+
+                val found = open()
+                    .use { database ->
+                        val repository = DatabaseTopicRepository(database)
+                        repository.find(draft.topicId)
+                    }
+                assertEquals(expected = TopicPublish.Published(published) to published, actual = outcome to found)
+            }
+        }
+
+    @Test
+    fun `GIVEN an unknown topic WHEN publishing it THEN nothing is stored`() = withTestDatabase { database ->
+        runTest {
+            val repository = DatabaseTopicRepository(database)
+
+            val outcome = repository.publish(stubContent(), StubTopic.TOPIC_ID)
+
+            assertEquals(expected = TopicPublish.NotFound to emptyList(), actual = outcome to repository.list())
+        }
+    }
+
+    @Test
+    fun `GIVEN a date with a published topic WHEN publishing a draft of that date THEN the draft stays as stored`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseTopicRepository(database)
+                val taken = repository.create(stubContent(title = "Taken"))
+                val draft = repository.create(stubContent(steps = stubSteps("a", "b")))
+                repository.publish(taken.content, taken.topicId)
+
+                val outcome = repository.publish(draft.content.copy(steps = stubSteps("z")), draft.topicId)
+
+                assertEquals(
+                    expected = TopicPublish.DateTaken to draft,
+                    actual = outcome to repository.find(draft.topicId),
+                )
+            }
+        }
+
+    @Test
+    fun `GIVEN published topics of two dates WHEN publishing one with the date of the other THEN nothing is written`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseTopicRepository(database)
+                val taken = repository.create(stubContent(title = "Taken"))
+                val later = repository.create(stubContent(releaseDate = StubTopic.RELEASE_DATE.plusDays(1)))
+                repository.publish(taken.content, taken.topicId)
+                repository.publish(later.content, later.topicId)
+
+                val moved = later.content.copy(releaseDate = StubTopic.RELEASE_DATE)
+
+                val outcome = repository.publish(moved, later.topicId)
+
+                assertEquals(
+                    expected = TopicPublish.DateTaken to later.copy(status = TopicStatus.PUBLISHED),
+                    actual = outcome to repository.find(later.topicId),
+                )
+            }
+        }
+
+    @Test
+    fun `GIVEN two drafts of one date WHEN publishing both at once THEN one is published and the other is unchanged`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseTopicRepository(database)
+                val first = repository.create(stubContent(title = "A"))
+                val second = repository.create(stubContent(title = "B"))
+                val drafts = listOf(first, second)
+                val start = CompletableDeferred<Unit>()
+                val outcomes = drafts.map { draft ->
+                    async(Dispatchers.Default) {
+                        start.await()
+                        repository.publish(draft.content.copy(steps = stubSteps("z")), draft.topicId)
+                    }
+                }
+
+                start.complete(Unit)
+                val written = outcomes
+                    .awaitAll()
+                    .filterIsInstance<TopicPublish.Published>()
+                    .single()
+                    .topic
+
+                val stored = repository.list().associateBy { topic -> topic.topicId }
+                val other = drafts.single { draft -> draft.topicId != written.topicId }
+                assertEquals(
+                    expected = listOf(written, other),
+                    actual = listOf(stored.getValue(written.topicId), stored.getValue(other.topicId)),
+                )
+            }
+        }
+
+    @Test
+    fun `GIVEN another topic published on a date WHEN asking about the date THEN a published topic is there`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseTopicRepository(database)
+                val published = repository.create(stubContent())
+                val asking = repository.create(stubContent())
+                repository.publish(published.content, published.topicId)
+
+                val taken = repository.hasPublishedOn(StubTopic.RELEASE_DATE, asking.topicId)
+
+                assertTrue(taken)
+            }
+        }
+
+    @Test
+    fun `GIVEN only the topic itself published on a date WHEN asking about the date THEN no other is there`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseTopicRepository(database)
+                val published = repository.create(stubContent())
+                repository.publish(published.content, published.topicId)
+
+                val taken = repository.hasPublishedOn(StubTopic.RELEASE_DATE, published.topicId)
+
+                assertFalse(taken)
+            }
+        }
+
+    @Test
+    fun `GIVEN only drafts on a date WHEN asking about the date THEN no published topic of that date is there`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseTopicRepository(database)
+                repository.create(stubContent())
+                val asking = repository.create(stubContent())
+                val other = repository.create(stubContent(releaseDate = StubTopic.RELEASE_DATE.plusDays(1)))
+                repository.publish(other.content, other.topicId)
+
+                val taken = repository.hasPublishedOn(StubTopic.RELEASE_DATE, asking.topicId)
+
+                assertFalse(taken)
             }
         }
 
