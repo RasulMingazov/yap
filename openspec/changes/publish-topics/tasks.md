@@ -36,11 +36,11 @@ names the shapes.
 - [x] 4.1 Add `publish` with the same write rules as the update of [3/26]: `maxAttempts = 1`, the `topics` row as the first write, no catch inside the block, and `23505` mapped to `DateTaken` outside it; verify with the PostgreSQL tests for a publish and a restart, a second published topic on a date (stores nothing), a save of a published topic onto a taken date, and two publishes at once with a latch (one published, the other unchanged)
 - [x] 4.2 Add `hasPublishedOn(date, exceptTopicId)`; verify with the PostgreSQL tests for a date with another published topic, with only the topic itself, and with drafts only
 
-## 5. [5/26] The topic counts on the server · ~310 · `K/CharacterSummaryDto.kt`, `docs/server/001-structure.md` (the port rule), `C/model/CharacterSummary.kt`, `C/usecase/` (`CharacterTopicCounts` port, `GetCharacterSummariesUseCase`), `C/api/` (mapper, routes), `C/testFixtures` (stub port), `C/FeatureCharactersModule.kt`, `S/persistence/DatabaseCharacterTopicCounts.kt`, `S/FeatureTopicsModule.kt`, `H/data/` (decode `CharacterSummaryDto`, keep the domain)
+## 5. [5/26] The topic counts on the server · ~310 · `K/CharacterSummaryDto.kt`, `docs/server/001-structure.md` (the port rule), `C/model/CharacterSummary.kt`, `C/usecase/` (`CharacterTopicCounts` port, `GetCharacterSummariesUseCase`), `C/api/` (mapper, routes), `C/testFixtures` (stub port), `C/FeatureCharactersModule.kt`, `S/persistence/DatabaseCharacterTopicCounts.kt` and its PostgreSQL test, `S/FeatureTopicsModule.kt`, `server/app/src/main/kotlin/app/yap/server/Application.kt`, `server/app/src/test/kotlin/app/yap/server/StubAppModules.kt`, `H/data/` (decode `CharacterSummaryDto`, keep the domain)
 
-- [ ] 5.1 Add the port, its query in `feature-topics`, `GetCharacterSummariesUseCase` and the counts in `GET /admin/characters`; `GetCharactersUseCase` stays without counts; verify with the PostgreSQL test for drafts and published topics and a character without topics, the route test for the list with counts, and `AppModulesTest`
-- [ ] 5.2 Add the port rule to `docs/server/001-structure.md`; verify that the guide names where the interface lives and who binds it
-- [ ] 5.3 Decode the summary in `RemoteCharacterRepository` in the same PR, so the admin list keeps working; verify with the mock engine test for the list
+- [x] 5.1 Add the port, its query in `feature-topics`, `GetCharacterSummariesUseCase` and the counts in `GET /admin/characters`; `GetCharactersUseCase` stays without counts; verify with the PostgreSQL test for drafts and published topics and a character without topics, the route test for the list with counts, and `AppModulesTest`
+- [x] 5.2 Add the port rule to `docs/server/001-structure.md`; verify that the guide names where the interface lives and who binds it
+- [x] 5.3 Decode the summary in `RemoteCharacterRepository` in the same PR, so the admin list keeps working; verify with the mock engine test for the list
 
 ## 6. [6/26] The calendar on the server · ~340 · `S/model/` (`TopicCalendar`, its rows, `LedBy`, `Todo`), `S/usecase/GetTopicCalendarUseCase.kt`, `S/FeatureTopicsModule.kt` (the `Clock`)
 
