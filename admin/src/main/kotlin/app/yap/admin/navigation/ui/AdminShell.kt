@@ -11,7 +11,10 @@ import app.yap.admin.feature.characters.presentation.ui.CharacterScreen
 import app.yap.admin.feature.characters.presentation.ui.CharactersScreen
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ui.ServerScreen
+import app.yap.admin.feature.topics.domain.TopicId
+import app.yap.admin.feature.topics.presentation.TopicViewModel
 import app.yap.admin.feature.topics.presentation.TopicsViewModel
+import app.yap.admin.feature.topics.presentation.ui.TopicScreen
 import app.yap.admin.feature.topics.presentation.ui.TopicsScreen
 import app.yap.admin.navigation.NavigationViewModel
 import app.yap.admin.navigation.NavigationViewModel.Event
@@ -23,6 +26,7 @@ internal fun AdminShell(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: CharactersViewModel,
     serverViewModel: ServerViewModel,
+    topicViewModel: (TopicId?) -> TopicViewModel,
     topicsViewModel: TopicsViewModel,
     viewModel: NavigationViewModel,
 ) {
@@ -41,6 +45,7 @@ internal fun AdminShell(
                 onScreenClick = onScreenClick,
                 screen = state.screen,
                 serverViewModel = serverViewModel,
+                topicViewModel = topicViewModel,
                 topicsViewModel = topicsViewModel,
             )
         }
@@ -55,6 +60,7 @@ private fun ScreenContent(
     onScreenClick: (Screen) -> Unit,
     screen: Screen,
     serverViewModel: ServerViewModel,
+    topicViewModel: (TopicId?) -> TopicViewModel,
     topicsViewModel: TopicsViewModel,
 ) {
     when (screen) {
@@ -68,6 +74,14 @@ private fun ScreenContent(
             viewModel = charactersViewModel,
         )
         is Screen.Server -> ServerScreen(viewModel = serverViewModel)
-        is Screen.Topics -> TopicsScreen(viewModel = topicsViewModel)
+        is Screen.Topic -> TopicScreen(
+            onBackClick = { onScreenClick(Screen.Topics) },
+            viewModel = remember(screen) { topicViewModel(screen.topicId) },
+        )
+        is Screen.Topics -> TopicsScreen(
+            onNewTopicClick = { onScreenClick(Screen.Topic(topicId = null)) },
+            onTopicClick = { topicId -> onScreenClick(Screen.Topic(topicId)) },
+            viewModel = topicsViewModel,
+        )
     }
 }

@@ -2,6 +2,8 @@ package app.yap.admin
 
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.presentation.CharacterViewModel
+import app.yap.admin.feature.topics.domain.TopicId
+import app.yap.admin.feature.topics.presentation.TopicViewModel
 import io.ktor.client.engine.HttpClientEngine
 import kotlin.test.Test
 import org.koin.dsl.module
@@ -17,7 +19,10 @@ internal class AppModulesTest {
 
         module { includes(modules) }.verify(
             extraTypes = listOf(HttpClientEngine::class),
-            injections = injectedParameters(definition<CharacterViewModel>(CharacterId::class)),
+            injections = injectedParameters(
+                definition<CharacterViewModel>(CharacterId::class),
+                definition<TopicViewModel>(TopicId::class),
+            ),
         )
     }
 }

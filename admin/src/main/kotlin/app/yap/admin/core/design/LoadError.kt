@@ -17,6 +17,7 @@ internal fun LoadError(
             style = AdminTheme.Type.body,
         )
         SecondaryButton(
+            enabled = true,
             onClick = onRetryClick,
             text = "Повторить",
         )

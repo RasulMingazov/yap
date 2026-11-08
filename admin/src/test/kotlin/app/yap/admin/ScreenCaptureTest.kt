@@ -47,6 +47,8 @@ internal class ScreenCaptureTest {
             capture(name = "topics-$state", current = Screen.Topics) {
                 TopicsContent(
                     onEvent = {},
+                    onNewTopicClick = {},
+                    onTopicClick = {},
                     uiState = TopicsUiStateMapper.map(dataState),
                 )
             }

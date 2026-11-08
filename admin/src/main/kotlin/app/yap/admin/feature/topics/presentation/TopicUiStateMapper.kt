@@ -22,9 +22,10 @@ internal object TopicUiStateMapper {
         choices = choices(),
         form = form,
         guestDescription = guestDescription(),
+        hint = hint(),
         isSaveEnabled = !isSaving,
         releaseDateText = form.releaseDate.longText(),
-        saveStatus = saveStatus?.status(),
+        saveStatus = saveStatus(),
         subtitle = subtitle(),
         title = title(),
     )
@@ -56,7 +57,13 @@ internal object TopicUiStateMapper {
 
     private fun DataState.guestDescription(): String? = (form.interlocutor as? Interlocutor.Guest)?.description
 
+    private fun DataState.hint(): String? =
+        if (saved == null) "Для черновика нужны название и дата выхода. Остальное можно заполнить позже." else null
+
     private fun LocalDate?.longText(): String = this?.let(ReleaseDateFormat::long).orEmpty()
+
+    private fun DataState.saveStatus(): Status? =
+        if (isSaving) Status(text = "Сохранение…", tone = Status.Tone.MUTED) else saveStatus?.status()
 
     private fun SaveStatus.status(): Status = when (this) {
         SaveStatus.REJECTED -> Status(

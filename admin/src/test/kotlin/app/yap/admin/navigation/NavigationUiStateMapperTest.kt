@@ -23,4 +23,19 @@ internal class NavigationUiStateMapperTest {
             actual = uiState,
         )
     }
+
+    @Test
+    fun `GIVEN a new topic is open WHEN mapping THEN the sidebar shows Topics as the current section`() {
+        val screen = Screen.Topic(topicId = null)
+
+        val uiState = NavigationUiStateMapper.map(DataState(screen = screen))
+
+        assertEquals(
+            expected = UiState.Content(
+                screen = screen,
+                section = Screen.Topics,
+            ),
+            actual = uiState,
+        )
+    }
 }

@@ -1,14 +1,11 @@
 package app.yap.admin.feature.characters.presentation.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -21,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTextField
 import app.yap.admin.core.design.AdminTheme
+import app.yap.admin.core.design.Hint
 import app.yap.admin.core.design.LoadError
 import app.yap.admin.core.design.Loader
 import app.yap.admin.core.design.PrimaryButton
@@ -108,23 +106,7 @@ private fun CharacterForm(
         title = content.title,
     )
     ScreenBody(spacing = AdminTheme.Sizes.sectionGap) {
-        content.hint?.let { hint ->
-            Text(
-                text = hint,
-                color = AdminTheme.Colors.ink,
-                style = AdminTheme.Type.body,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = AdminTheme.Colors.fill,
-                        shape = RoundedCornerShape(AdminTheme.Sizes.cornerRadius),
-                    )
-                    .padding(
-                        horizontal = AdminTheme.Sizes.hintHorizontalPadding,
-                        vertical = AdminTheme.Sizes.hintVerticalPadding,
-                    ),
-            )
-        }
+        content.hint?.let { hint -> Hint(text = hint) }
         Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap)) {
             SectionHeader(title = "Кто это")
             AdminTextField(

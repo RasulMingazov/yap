@@ -87,6 +87,19 @@ internal class TopicViewModelTest {
     }
 
     @Test
+    fun `GIVEN the server rejected the draft WHEN a field changes THEN the error stays`() = runTest(dispatcher) {
+        val env = Environment(topicId = null, saveResult = SaveTopicResult.Invalid)
+        advanceUntilIdle()
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.FormChanged(StubTopic.stubContent(title = "At the bank")))
+        advanceUntilIdle()
+
+        assertEquals(expected = Status.Tone.ERROR, actual = env.content().saveStatus?.tone)
+    }
+
+    @Test
     fun `GIVEN a new topic WHEN a day is picked THEN the popup shows it`() = runTest(dispatcher) {
         val env = Environment(topicId = null)
         advanceUntilIdle()
