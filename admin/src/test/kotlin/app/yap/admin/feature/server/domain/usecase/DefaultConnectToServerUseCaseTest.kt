@@ -10,13 +10,14 @@ import kotlinx.coroutines.test.runTest
 internal class DefaultConnectToServerUseCaseTest {
 
     @Test
-    fun `GIVEN the server accepts the key WHEN connecting THEN the settings are saved`() = runTest {
-        val settings = StubServerSettings.stubServerSettings()
+    fun `GIVEN the server accepts the key WHEN connecting THEN the trimmed settings are saved`() = runTest {
         val env = Environment(connection = ServerConnection.Connected(environment = "staging"))
 
-        env.useCase(settings)
+        env.useCase(StubServerSettings.stubServerSettings(address = " http://staging.yap ", key = " staging-key "))
 
-        env.serverSettingsRepository.saveCall.calledWith(settings)
+        env.serverSettingsRepository.saveCall.calledWith(
+            StubServerSettings.stubServerSettings(address = "http://staging.yap", key = "staging-key"),
+        )
     }
 
     @Test
@@ -26,6 +27,17 @@ internal class DefaultConnectToServerUseCaseTest {
         env.useCase(StubServerSettings.stubServerSettings())
 
         env.serverSettingsRepository.saveCall.notCalled()
+    }
+
+    @Test
+    fun `GIVEN settings with spaces around WHEN connecting THEN it connects with the trimmed settings`() = runTest {
+        val env = Environment(connection = ServerConnection.Unreachable)
+
+        env.useCase(StubServerSettings.stubServerSettings(address = " http://staging.yap ", key = " staging-key "))
+
+        env.serverRepository.connectCall.calledWith(
+            StubServerSettings.stubServerSettings(address = "http://staging.yap", key = "staging-key"),
+        )
     }
 
     private class Environment(

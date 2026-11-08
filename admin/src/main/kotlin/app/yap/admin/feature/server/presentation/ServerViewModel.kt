@@ -26,29 +26,63 @@ internal class ServerViewModel(
     }
 
     fun onEvent(event: Event) = when (event) {
-        is Event.AddressChanged -> dataState.update { state -> state.copy(address = event.address) }
-        is Event.ConnectClicked -> connect()
-        is Event.KeyChanged -> dataState.update { state -> state.copy(key = event.key) }
+        is Event.AddressChanged -> onAddressChanged(event.address)
+        is Event.ConnectClicked -> onConnectClicked()
+        is Event.KeyChanged -> onKeyChanged(event.key)
     }
 
     private fun loadSettings() {
         viewModelScope.launch {
             val settings = getServerSettingsUseCase() ?: return@launch
-            val isEdited = dataState.value != DataState()
-            if (isEdited) return@launch
-            dataState.update { state -> state.copy(address = settings.address, key = settings.key) }
-            connect()
+            if (dataState.value.isEdited) return@launch
+            dataState.update { state ->
+                state.copy(
+                    address = settings.address,
+                    key = settings.key,
+                )
+            }
+            connect(settings)
         }
     }
 
-    private fun connect() {
+    private fun onAddressChanged(address: String) {
+        dataState.update { state ->
+            state.copy(
+                address = address,
+                isEdited = true,
+            )
+        }
+    }
+
+    private fun onConnectClicked() {
         val state = dataState.value
-        if (state.isConnecting) return
+        val settings = ServerSettings(
+            address = state.address,
+            key = state.key,
+        )
+        connect(settings)
+    }
+
+    private fun connect(settings: ServerSettings) {
+        if (dataState.value.isConnecting) return
         dataState.update { current -> current.copy(isConnecting = true) }
         viewModelScope.launch {
-            val settings = ServerSettings(address = state.address.trim(), key = state.key.trim())
             val connection = connectToServerUseCase(settings)
-            dataState.update { current -> current.copy(connection = connection, isConnecting = false) }
+            dataState.update { current ->
+                current.copy(
+                    connection = connection,
+                    isConnecting = false,
+                )
+            }
+        }
+    }
+
+    private fun onKeyChanged(key: String) {
+        dataState.update { state ->
+            state.copy(
+                isEdited = true,
+                key = key,
+            )
         }
     }
 
@@ -56,6 +90,7 @@ internal class ServerViewModel(
         val address: String = DEFAULT_ADDRESS,
         val connection: ServerConnection? = null,
         val isConnecting: Boolean = false,
+        val isEdited: Boolean = false,
         val key: String = "",
     )
 
