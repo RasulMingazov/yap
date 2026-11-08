@@ -49,7 +49,7 @@ Slice 1 of this part holds the use cases, the state types nested in `LevelsViewM
 the stub use cases, the view-model tests and `featureLevelsModule()` in `AppModules.kt`.
 
 Files: `admin/` `feature/levels/domain/usecase/`, `feature/levels/presentation/`
-(`LevelsViewModel`, `LevelsUiStateMapper`), `feature/levels/di/`, and their tests.
+(`LevelsViewModel`, `LevelsUiStateMapper`), `feature/levels/FeatureLevelsModule.kt`, `AppModules.kt`, and their tests.
 
 - [x] 5.1 Add `GetLevelsUseCase`, `SaveLevelsUseCase` and `LevelsViewModel`; verify with the mapper and view-model tests for empty and saved levels, B1 on the first open, a click on a level, the Saved status, the rejected save, the unread number, the save failure and the load error
 
