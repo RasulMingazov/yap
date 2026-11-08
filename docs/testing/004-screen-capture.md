@@ -17,7 +17,8 @@ and this guide lists it.
 ## Admin
 
 `ScreenCaptureTest` renders each admin screen inside the sidebar frame, at 1280 × 800, and writes
-the images to `admin/build/screens/`:
+the images to `admin/build/screens/`. A form longer than the window, such as Topic, renders at the
+full height of the form, so the image shows every section:
 
 ```bash
 ./gradlew :admin:test --tests 'app.yap.admin.ScreenCaptureTest'

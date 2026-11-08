@@ -5,6 +5,8 @@ import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.design.AdminMaterialTheme
 import app.yap.admin.core.design.AdminTheme
@@ -28,6 +30,7 @@ import app.yap.admin.feature.server.domain.ServerConnection
 import app.yap.admin.feature.server.presentation.ServerUiStateMapper
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ui.ServerContent
+import app.yap.admin.feature.topics.domain.Interlocutor
 import app.yap.admin.feature.topics.domain.LoadTopicsResult
 import app.yap.admin.feature.topics.domain.StubTopic
 import app.yap.admin.feature.topics.presentation.TopicUiStateMapper
@@ -73,12 +76,14 @@ internal class ScreenCaptureTest {
     @Test
     fun `GIVEN every state of the Topic form WHEN capturing THEN each state has an image`() {
         val new = TopicViewModel.DataState(load = TopicViewModel.Load.LOADED)
-        val opened = TopicViewModel.DataState().saved(SAVED_TOPIC)
+        val opened = TopicViewModel.DataState(cast = CAST).saved(SAVED_TOPIC)
         val states = mapOf(
             "loading" to TopicViewModel.DataState(),
             "error" to TopicViewModel.DataState(load = TopicViewModel.Load.FAILED),
             "new" to new,
+            "new-cast" to new.copy(cast = CAST),
             "opened" to opened,
+            "guest" to TopicViewModel.DataState(cast = CAST).saved(GUEST_TOPIC),
             "rejected" to new.copy(
                 form = StubTopic.stubContent(
                     durationMinutes = 0,
@@ -91,7 +96,7 @@ internal class ScreenCaptureTest {
         )
 
         val images = states.map { (state, dataState) ->
-            capture(name = "topic-$state", current = Screen.Topics) {
+            capture(name = "topic-$state", current = Screen.Topics, height = TOPIC_FORM_HEIGHT) {
                 TopicContent(
                     back = TOPICS_BACK,
                     onEvent = {},
@@ -254,13 +259,13 @@ internal class ScreenCaptureTest {
         name: String,
         current: Screen,
         click: Offset? = null,
-        height: Int = AdminTheme.Sizes.windowHeight.value.toInt(),
+        height: Dp = AdminTheme.Sizes.windowHeight,
         serverLabel: String = CONNECTED_LABEL,
         content: @Composable () -> Unit,
     ): File {
         val scene = ImageComposeScene(
             width = AdminTheme.Sizes.windowWidth.value.toInt(),
-            height = height,
+            height = height.value.toInt(),
             density = Density(1f),
         ) {
             AdminMaterialTheme {
@@ -303,7 +308,6 @@ internal class ScreenCaptureTest {
 
     private companion object {
 
-        const val LEVELS_HEIGHT = 1000
         const val LONG_ADDRESS = "https://staging.yap-admin.example.com"
         const val LONG_BLOCK = "Speak in short, simple sentences of up to 16 words.\n" +
             "Use everyday B1 words. Explain a rare word in a few simple words.\n" +
@@ -333,6 +337,15 @@ internal class ScreenCaptureTest {
         val CONNECTED_LABEL = ServerUiStateMapper
             .map(ServerViewModel.DataState(connection = ServerConnection.Connected(environment = "staging")))
             .serverLabel
+        val GUEST_TOPIC = StubTopic.stubTopic(
+            content = StubTopic.stubContent(
+                interlocutor = Interlocutor.Guest(
+                    description = "An older taxi driver. He speaks slowly, with a light accent. Polite, but he " +
+                        "does not chat.",
+                ),
+                role = "Taxi driver",
+            ),
+        )
         val IDIOMS_SELECT = Offset(731f, 328f)
         val LEVELS = listOf(
             savedLevel(
@@ -385,6 +398,7 @@ internal class ScreenCaptureTest {
                 to = null,
             ),
         )
+        val LEVELS_HEIGHT = 1000.dp
         val SAVED_TOPIC = StubTopic.stubTopic(
             content = StubTopic.stubContent(
                 setting = "Evening at the airport. The learner gets into a taxi to the Hilton on Park Street. The " +
@@ -416,6 +430,7 @@ internal class ScreenCaptureTest {
             label = "Темы",
             onClick = {},
         )
+        val TOPIC_FORM_HEIGHT = 1800.dp
 
         fun savedLevel(
             code: LevelCode,
