@@ -62,7 +62,7 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 - [x] 14.0 Add `SectionHeader` and use it in the character screen; verify with `./gradlew build` and the unchanged character captures
 - [x] 14.1a Add the screen with Title, Description, Setting and Save draft, and open it from a title and from New topic; verify with the view model test for a field edit after a rejected draft, the mapper tests for the hint and Saving, the navigation test for the Topic section, and `./gradlew build`
-- [ ] 14.1b Add the date popup, the Duration event of `TopicViewModel` (from [13/16]) and the Opening line section; verify with the view model tests for a fourth digit, a letter and an empty Duration, and `./gradlew build`
+- [x] 14.1b Add the date popup, the Duration event of `TopicViewModel` (from [13/16]) and the Opening line section; verify with the view model tests for a fourth digit, a letter and an empty Duration, and `./gradlew build`
 - [ ] 14.2 Capture Topic new, saved, Saved, the 400 error and the load error; verify with the images
 
 ## 15. [15/16] Topic: Interlocutor and Steps · ~310 · `A/ScreenCaptureTest.kt`, `T/presentation/TopicViewModel.kt` and its test, `T/presentation/ui/` (`InterlocutorSection`, `CastRadioRow`, `StepsSection`)
