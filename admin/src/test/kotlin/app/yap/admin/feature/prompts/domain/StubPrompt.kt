@@ -21,6 +21,23 @@ internal object StubPrompt {
         versions = versions,
     )
 
+    fun stubPromptSummaries(): List<PromptSummary> = listOf(
+        stubPromptSummary(promptKey = PromptKey.TOPIC_REPLY),
+        stubPromptSummary(promptKey = PromptKey.TOPIC_CHECK),
+        stubPromptSummary(promptKey = PromptKey.TOPIC_HINTS),
+        stubPromptSummary(promptKey = PromptKey.TOPIC_REVIEW),
+        stubPromptSummary(group = PromptGroup.CALIBRATION, promptKey = PromptKey.CALIBRATION_CHECK),
+        stubPromptSummary(group = PromptGroup.CALIBRATION, promptKey = PromptKey.CALIBRATION_REPLY),
+    )
+
+    fun stubPromptSummary(
+        group: PromptGroup = PromptGroup.TOPIC,
+        promptKey: PromptKey = PromptKey.TOPIC_REPLY,
+    ): PromptSummary = PromptSummary(
+        group = group,
+        promptKey = promptKey,
+    )
+
     fun stubPromptVersion(
         isCurrent: Boolean = true,
         number: Int = NUMBER,
