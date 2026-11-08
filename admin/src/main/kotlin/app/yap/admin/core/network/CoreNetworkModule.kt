@@ -15,4 +15,5 @@ internal fun coreNetworkModule(): Module = module {
     single(createdAtStart = true) { adminHttpClient(serverSettingsRepository = get()) } onClose { httpClient ->
         httpClient?.close()
     }
+    single { adminKtorfit(httpClient = get()) }
 }

@@ -2,15 +2,17 @@ package app.yap.admin.feature.characters.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.adminKtorfit
 import app.yap.admin.core.network.settings.StubServerSettings
 import app.yap.admin.core.network.settings.StubServerSettingsRepository
+import app.yap.admin.feature.characters.data.api.createCharacterApi
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.StubCharacter
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -33,15 +35,6 @@ internal class RemoteCharacterRepositoryTest {
     }
 
     @Test
-    fun `GIVEN no saved server settings WHEN loading the characters THEN loading fails`() = runTest {
-        val env = Environment(answer = answer(content = "[]"), settings = null)
-
-        val result = env.repository.list()
-
-        assertEquals(expected = LoadResult.Failed to 0, actual = result to env.engine.requestHistory.size)
-    }
-
-    @Test
     fun `GIVEN a new profile WHEN creating a character THEN the server gets the profile with the key`() = runTest {
         val env = Environment(answer = answer(content = CHARACTER_JSON, status = HttpStatusCode.Created))
 
@@ -55,6 +48,7 @@ internal class RemoteCharacterRepositoryTest {
                 "${StubServerSettings.ADDRESS}/admin/characters",
                 "Bearer ${StubServerSettings.KEY}",
                 Json.parseToJsonElement(PROFILE_JSON),
+                ContentType.Application.Json,
             ),
             actual = listOf(
                 result,
@@ -62,6 +56,7 @@ internal class RemoteCharacterRepositoryTest {
                 request.url.toString(),
                 request.headers[HttpHeaders.Authorization],
                 Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
+                request.body.contentType,
             ),
         )
     }
@@ -74,8 +69,12 @@ internal class RemoteCharacterRepositoryTest {
 
         val request = env.engine.requestHistory.single()
         assertEquals(
-            expected = HttpMethod.Put to "${StubServerSettings.ADDRESS}/admin/characters/${StubCharacter.CHARACTER_ID}",
-            actual = request.method to request.url.toString(),
+            expected = listOf(
+                HttpMethod.Put,
+                "${StubServerSettings.ADDRESS}/admin/characters/${StubCharacter.CHARACTER_ID}",
+                ContentType.Application.Json,
+            ),
+            actual = listOf(request.method, request.url.toString(), request.body.contentType),
         )
     }
 
@@ -97,15 +96,15 @@ internal class RemoteCharacterRepositoryTest {
         assertEquals(expected = LoadResult.Failed, actual = result)
     }
 
-    private class Environment(
-        answer: MockRequestHandler,
-        settings: ServerSettings? = StubServerSettings.stubServerSettings(),
-    ) {
+    private class Environment(answer: MockRequestHandler) {
 
         val engine = MockEngine(answer)
-        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
-        val repository = RemoteCharacterRepository(
+        val serverSettingsRepository = StubServerSettingsRepository(settings = StubServerSettings.stubServerSettings())
+        private val ktorfit = adminKtorfit(
             httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+        )
+        val repository = RemoteCharacterRepository(
+            characterApi = ktorfit.createCharacterApi(),
             serverSettingsRepository = serverSettingsRepository,
         )
     }

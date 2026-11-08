@@ -18,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTextField
 import app.yap.admin.core.design.AdminTheme
@@ -27,6 +26,7 @@ import app.yap.admin.core.design.Loader
 import app.yap.admin.core.design.PrimaryButton
 import app.yap.admin.core.design.ScreenBody
 import app.yap.admin.core.design.ScreenToolbar
+import app.yap.admin.core.design.SectionHeader
 import app.yap.admin.core.design.StatusText
 import app.yap.admin.core.design.ToolbarBack
 import app.yap.admin.feature.characters.presentation.CharacterViewModel
@@ -126,12 +126,7 @@ private fun CharacterForm(
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap)) {
-            Text(
-                text = "Кто это",
-                color = AdminTheme.Colors.ink,
-                style = AdminTheme.Type.sub,
-                fontWeight = FontWeight.SemiBold,
-            )
+            SectionHeader(title = "Кто это")
             AdminTextField(
                 label = "Имя — как его называют пользователи",
                 onValueChange = { name -> onEvent(Event.FormChanged(content.form.copy(name = name))) },
