@@ -125,13 +125,25 @@ The sidebar SHALL show the group Rules between Content and Settings, with Levels
 Levels SHALL show the subtitle that the levels set how the interlocutor speaks to each rating
 level. The table SHALL have a row for each level with Level, Rating, Vocabulary, Words in a
 sentence, max, and Idioms. Rating SHALL show the range from the server and a field for the rating
-from. Below the table SHALL be the prompt block of the chosen level, and a note that the server puts
-the block into the reply and hints prompts as `{level.rules}`.
+from. The Rating of No rating SHALL show that the level is also for the calibration, with no field.
+A level without saved values SHALL show no idioms choice. Below the table SHALL be the prompt block
+of the chosen level, and a note that the server puts the block into the reply and hints prompts as
+`{level.rules}`.
 
 #### Scenario: The first open
 
 - **WHEN** the owner opens Levels
 - **THEN** B1 is the chosen level and its prompt block shows below the table
+
+#### Scenario: No rating
+
+- **WHEN** the owner opens Levels
+- **THEN** the row of No rating shows the calibration in Rating and has no field for the rating from
+
+#### Scenario: A level before a save
+
+- **WHEN** the owner opens Levels before the levels are saved
+- **THEN** the Idioms of each level show no choice
 
 #### Scenario: A click on a level
 
@@ -141,6 +153,11 @@ the block into the reply and hints prompts as `{level.rules}`.
 #### Scenario: The levels do not load
 
 - **WHEN** the admin app cannot load the levels
+- **THEN** Levels shows an error that the levels did not load, and Retry
+
+#### Scenario: A level is missing in the answer
+
+- **WHEN** the server returns the levels without one of the seven
 - **THEN** Levels shows an error that the levels did not load, and Retry
 
 ### Requirement: Saving the levels
@@ -163,7 +180,14 @@ and a Saved status.
 #### Scenario: A number that is not a number
 
 - **WHEN** the owner types a rating from or a word count that the admin app cannot read
-- **THEN** the admin app shows an error beside Save that names the level, and sends nothing
+- **THEN** the admin app shows an error beside Save that names the field and the level, and sends
+  nothing
+
+#### Scenario: An empty value
+
+- **WHEN** the owner leaves a value of a level empty and clicks Save
+- **THEN** the admin app shows the error beside Save that asks to fill every level with growing
+  ratings, and sends nothing
 
 #### Scenario: The server does not answer
 

@@ -58,17 +58,34 @@ internal class LevelsViewModelTest {
     }
 
     @Test
-    fun `GIVEN levels before a save WHEN saving THEN a blank rating from is sent as none`() = runTest(dispatcher) {
+    fun `GIVEN No rating without a rating from WHEN saving THEN every level is sent`() = runTest(dispatcher) {
         val env = Environment()
         advanceUntilIdle()
         val rated = LevelCode.entries.dropLast(1).map { code -> StubLevel.stubEntry(code = code) }
         val noRating = StubLevel.stubEntry(LevelCode.NO_RATING, StubLevel.stubSettings(ratingFrom = null))
 
-        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.NO_RATING, form = LevelForm.of(noRating.settings)))
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
         env.saveLevelsUseCase.invokeCall.calledWith(rated + noRating)
+    }
+
+    @Test
+    fun `GIVEN A1 without a rating from WHEN saving THEN it asks to fill every level and sends nothing`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            advanceUntilIdle()
+            val form = LevelForm.of(StubLevel.stubSettings())
+
+            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.A1, form = form.copy(ratingFrom = "")))
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.saveLevelsUseCase.invokeCall.notCalled()
+            assertEquals(
+                expected = "Заполните все уровни, рейтинг должен расти от A1 к C2",
+                actual = env.content().saveStatus?.text,
+            )
     }
 
     @Test

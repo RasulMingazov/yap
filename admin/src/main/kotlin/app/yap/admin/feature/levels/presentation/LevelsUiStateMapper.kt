@@ -4,7 +4,6 @@ import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelCode
-import app.yap.admin.feature.levels.domain.RatingRange
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.DataState
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.Load
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.NumberField
@@ -21,29 +20,29 @@ internal object LevelsUiStateMapper {
 
     private fun DataState.toContent(): UiState.Content = UiState.Content(
         block = block(),
-        idioms = Idioms.entries.map(::idiomsOption),
+        idioms = Idioms.entries.map { idioms -> idioms.option() },
         isSaveEnabled = !isSaving,
         rows = levels.map { level -> row(level) },
         saveStatus = saveStatus?.status(),
     )
 
     private fun DataState.block(): UiState.Block {
-        val range = levels
-            .first { level -> level.code == chosen }
-            .range
+        val level = levels.first { level -> level.code == chosen }
         return UiState.Block(
-            rating = range?.let { chosenRange -> "рейтинг ${chosenRange.text()}" },
+            rating = level.rating(),
             text = forms.getValue(chosen).block,
             title = "Блок промпта · ${chosen.label()}",
         )
     }
+
+    private fun Level.rating(): String? = rangeText()?.let { text -> "рейтинг $text" }
 
     private fun DataState.row(level: Level): UiState.Row {
         val form = forms.getValue(level.code)
         return UiState.Row(
             code = level.code,
             form = form,
-            idioms = form.idioms?.let(::idiomsOption),
+            idioms = form.idioms?.option(),
             isChosen = level.code == chosen,
             isRatingFromShown = level.code.hasRatingFrom,
             label = level.code.label(),
@@ -51,9 +50,9 @@ internal object LevelsUiStateMapper {
         )
     }
 
-    private fun idiomsOption(idioms: Idioms): UiState.IdiomsOption = UiState.IdiomsOption(
-        idioms = idioms,
-        label = idioms.label(),
+    private fun Idioms.option(): UiState.IdiomsOption = UiState.IdiomsOption(
+        idioms = this,
+        label = label(),
     )
 
     private fun Idioms.label(): String = when (this) {
@@ -65,10 +64,10 @@ internal object LevelsUiStateMapper {
 
     private fun Level.rangeText(): String? = when {
         !code.hasRatingFrom -> "и калибровка"
-        else -> range?.text()
+        range == null -> null
+        range.to == null -> "${range.from}+"
+        else -> "${range.from}–${range.to}"
     }
-
-    private fun RatingRange.text(): String = if (to == null) "$from+" else "$from–$to"
 
     private fun SaveStatus.status(): Status = when (this) {
         is SaveStatus.Invalid -> Status(

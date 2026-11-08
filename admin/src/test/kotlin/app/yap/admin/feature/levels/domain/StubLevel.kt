@@ -25,7 +25,7 @@ internal object StubLevel {
         stubLevel(
             code = code,
             range = range,
-            settings = settings,
+            settings = if (code == LevelCode.NO_RATING) settings?.copy(ratingFrom = null) else settings,
         )
     }
 

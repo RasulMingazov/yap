@@ -65,8 +65,8 @@ style, unless #10 added it first), `feature/levels/presentation/ui/LevelsScreen.
 tests. #7 and #10 change the same navigation and design files.
 
 Slice 1 of this part holds the decisions of the Levels UX review that change the state:
-`feature/levels/domain/LevelCode.kt`, `LevelsViewModel`, `LevelsUiStateMapper`, `StubLevel` and
-their tests (about 190 lines). Slice 2 holds `AdminSelect`, the mono style, `LevelsScreen` and the
+`feature/levels/domain/LevelCode.kt`, `LevelsViewModel`, `LevelsUiStateMapper`, `StubLevel`, their
+tests, and the scenarios of these decisions in `specs/rating-levels/spec.md` (about 250 lines). Slice 2 holds `AdminSelect`, the mono style, `LevelsScreen` and the
 navigation files. Slice 3 holds `ScreenCaptureTest.kt` and the images.
 
 - [ ] 6.1 Add `AdminSelect`, the mono style and the Levels screen with Save in the toolbar; verify with `./gradlew build` and the images of the screen capture for each state

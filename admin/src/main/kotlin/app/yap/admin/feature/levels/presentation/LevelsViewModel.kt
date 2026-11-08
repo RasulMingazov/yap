@@ -76,12 +76,15 @@ internal class LevelsViewModel(
     private fun onSaveClicked() {
         val state = dataState.value
         if (state.isSaving) return
-        val problem = state.forms.firstNotNullOfOrNull { (code, form) -> form.problem(code) }
+        val checks = state.forms.map { (code, form) -> form.check(code) }
+        val problem = checks
+            .filterIsInstance<FormCheck.Problem>()
+            .firstOrNull()
         if (problem != null) {
-            dataState.update { current -> current.copy(saveStatus = problem) }
+            dataState.update { current -> current.copy(saveStatus = problem.status) }
             return
         }
-        save(state.forms.map { (code, form) -> form.toEntry(code) })
+        save(checks.filterIsInstance<FormCheck.Ready>().map { ready -> ready.entry })
     }
 
     private fun save(entries: List<LevelEntry>) {
@@ -142,29 +145,32 @@ internal class LevelsViewModel(
         val vocabulary: String,
     ) {
 
-        fun problem(code: LevelCode): SaveStatus? = when {
-            ratingFrom.isUnread() -> SaveStatus.UnreadNumber(code = code, field = NumberField.RATING_FROM)
-            maxWords.isUnread() -> SaveStatus.UnreadNumber(code = code, field = NumberField.MAX_WORDS)
-            isEmpty(code) -> SaveStatus.Invalid
-            else -> null
+        fun check(code: LevelCode): FormCheck {
+            val readMaxWords = maxWords.toIntOrNull()
+            return when {
+                ratingFrom.isUnread() -> FormCheck.Problem(SaveStatus.UnreadNumber(code, NumberField.RATING_FROM))
+                maxWords.isUnread() -> FormCheck.Problem(SaveStatus.UnreadNumber(code, NumberField.MAX_WORDS))
+                readMaxWords == null || idioms == null || isEmpty(code) -> FormCheck.Problem(SaveStatus.Invalid)
+                else -> FormCheck.Ready(
+                    LevelEntry(
+                        code = code,
+                        settings = LevelSettings(
+                            block = block,
+                            idioms = idioms,
+                            maxWords = readMaxWords,
+                            ratingFrom = ratingFrom.toIntOrNull(),
+                            vocabulary = vocabulary,
+                        ),
+                    ),
+                )
+            }
         }
-
-        fun toEntry(code: LevelCode): LevelEntry = LevelEntry(
-            code = code,
-            settings = LevelSettings(
-                block = block,
-                idioms = checkNotNull(idioms),
-                maxWords = maxWords.toInt(),
-                ratingFrom = ratingFrom.toIntOrNull(),
-                vocabulary = vocabulary,
-            ),
-        )
 
         private fun String.isUnread(): Boolean = isNotBlank() && toIntOrNull() == null
 
         private fun isEmpty(code: LevelCode): Boolean {
             val isRatingFromMissing = code.hasRatingFrom && ratingFrom.isBlank()
-            return idioms == null || isRatingFromMissing || listOf(block, maxWords, vocabulary).any(String::isBlank)
+            return isRatingFromMissing || listOf(block, vocabulary).any(String::isBlank)
         }
 
         companion object {
@@ -185,6 +191,13 @@ internal class LevelsViewModel(
                 vocabulary = settings.vocabulary,
             )
         }
+    }
+
+    sealed interface FormCheck {
+
+        data class Problem(val status: SaveStatus) : FormCheck
+
+        data class Ready(val entry: LevelEntry) : FormCheck
     }
 
     enum class Load {
