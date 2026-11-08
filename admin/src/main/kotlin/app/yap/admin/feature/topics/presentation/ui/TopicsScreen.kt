@@ -17,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTheme
-import app.yap.admin.core.design.EmptyMessage
 import app.yap.admin.core.design.LoadError
 import app.yap.admin.core.design.Loader
 import app.yap.admin.core.design.PrimaryButton
@@ -71,9 +70,8 @@ internal fun TopicsContent(
             when (uiState) {
                 is UiState.Content -> TopicTable(
                     onTopicClick = onTopicClick,
-                    rows = uiState.rows,
+                    rows = uiState.rows.filterIsInstance<UiState.Row.Topic>(),
                 )
-                is UiState.Empty -> EmptyMessage(text = uiState.message)
                 is UiState.Error -> LoadError(
                     message = uiState.message,
                     onRetryClick = { onEvent(Event.RetryClicked) },
@@ -87,7 +85,7 @@ internal fun TopicsContent(
 @Composable
 private fun TopicTable(
     onTopicClick: (TopicId) -> Unit,
-    rows: List<UiState.Content.Row>,
+    rows: List<UiState.Row.Topic>,
 ) {
     Column {
         Row {
