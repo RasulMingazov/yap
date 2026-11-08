@@ -32,8 +32,9 @@ transaction. The `topics` row is the first write of each; the steps are deleted 
 it. Nothing inside the transaction block catches the exception, so a failed transaction stops at
 that first statement and rolls back. The repository catches the `ExposedSQLException` with
 SQLState `23505` [2] outside the transaction block and returns a typed `DateTaken`. The update
-result has `DateTaken` from [3/18], the part that adds the index. A PostgreSQL test publishes two drafts of one date at once, with a latch, and checks
-that exactly one is published and the other keeps its stored fields.
+result has `DateTaken` from [3/26], the part that adds the index. A PostgreSQL test publishes two
+drafts of one date at once, with a latch, and checks that exactly one is published and the other
+keeps its stored fields.
 
 ### `V5__topic_status.sql`
 
@@ -64,12 +65,19 @@ TopicStatus = DRAFT | PUBLISHED                  stored
 ReleaseState = DRAFT | PUBLISHED | TODAY | OUT   derived from the status, the date and today
 TopicField = TITLE | RELEASE_DATE | DURATION | DESCRIPTION | SETTING | INTERLOCUTOR | ROLE
            | OPENING_LINE | TRANSLATION | STEPS
+TopicGap = Missing(field) | IncompleteSteps(numbers) | PastDate | DateTaken
 Topic(content, status, topicId)
 ```
 
-- `TopicDraftRule.gaps(content)` returns the draft fields that fail. `TopicPublishRule.gaps(content)`
-  adds the publish fields. A use case accepts content when the set is empty. The names follow the
-  rule guide in `docs/server/001-structure.md`.
+- `TopicDraftRule.gaps(content)` returns the draft gaps. `TopicPublishRule.gaps(content, stored,
+  today)` adds the publish gaps. `Missing(STEPS)` means no step; `IncompleteSteps` holds the
+  1-based numbers of the steps that miss a field. `PastDate` comes for a draft with a date before
+  today, and for a published topic whose new date is before today; a stored past date of a
+  published topic stays valid. A use case accepts content when the set is empty. The names follow
+  the rule guide in `docs/server/001-structure.md`.
+- `DateTaken` is not a rule gap: `TopicDetails` adds it for a draft when the repository finds
+  another published topic of the same date (`hasPublishedOn(date, exceptTopicId)`). The note shows
+  it before the click. A write that still meets the index answers 409.
 - Create makes a draft. Update reads the topic, applies the rule of its status, and writes
   `where topic_id = ? and status = <the status it read>`. No row written for a topic that exists
   means a publish came between the read and the write. The status only moves from draft to
@@ -102,16 +110,17 @@ Characters list and the interlocutor choice, read the list.
 - `GetCharacterSummariesUseCase` serves the route and calls the port. `GetCharactersUseCase` stays
   without counts, so the calendar reads the names with no count query.
 - `docs/server/001-structure.md` allows a feature to use another feature only through its use
-  cases and model types. Part [5/18] adds the port rule there: the feature that needs the data owns
+  cases and model types. Part [5/26] adds the port rule there: the feature that needs the data owns
   the interface in its `usecase/`; the feature that holds the data implements it and binds it in
   its Koin module; the dependency between the Gradle modules keeps its direction.
 
 ### The DTOs
 
 ```text
-TopicDto(content, gaps: List<TopicFieldDto>, status: TopicStatusDto, topicId)
+TopicDto(content, gaps: List<TopicGapDto>, status: TopicStatusDto, topicId)
 TopicStatusDto = DRAFT | PUBLISHED | TODAY | OUT
-TopicRejectionDto(gaps: List<TopicFieldDto>)                  the body of every 400 of a topic write
+TopicGapDto = missing(field: TopicFieldDto) | incompleteSteps(numbers) | pastDate | dateTaken
+TopicRejectionDto(gaps: List<TopicGapDto>)                    the body of every 400 of a topic write
 TopicCalendarDto(rows: List<CalendarRowDto>, todos: List<TodoDto>)
 CalendarRowDto(date, topic: CalendarTopicDto?)
 CalendarTopicDto(completeSteps, ledBy: LedByDto?, status, steps, title, topicId)
@@ -137,11 +146,24 @@ The admin app maps each field and status to its Russian copy and tone. It derive
   `TopicsUiStateMapper` builds the To do entries and the rows; its only public function is `invoke`.
 - Create passes its date: `Screen.Topic(topicId, releaseDate)` in the navigation, and the
   `TopicViewModel` factory takes the date. `Main.kt` resolves the view models as now.
-- `TopicViewModel` gets `PublishClicked`. One status slot shows, in this order: Saving… or
-  Publishing…, the result of the last action (Saved, a rejection, a taken date), then the note from
-  the last server answer.
-- Publish is the primary button. Save draft keeps the secondary look. The `button` slot of
-  `ToolbarSaveAction` holds both buttons, so the status stays on the left of both.
+- `TopicViewModel` gets `PublishClicked`, `PublishConfirmed`, `SaveConfirmed` and
+  `QuestionDismissed`. One status slot shows, in this order: Saving… or Publishing…, the result of
+  the last action (Saved, a rejection, a taken date), then the note from the last server answer.
+- The questions (Publish, and the move of the date of a Published or Today topic) are a panel
+  inside the screen below the toolbar, not a window: `PublishQuestion` in `T/presentation/ui/`.
+  The view model holds which question is open; the mapper builds its text. Comparing the form
+  date with the stored date is a render choice on the status that the server sent, not a rule.
+- After a field edit, the note and a rejection error stay with a lead that they are about the
+  version that the server saw. Options were to hide them until the next answer, but the error of a
+  rejected draft already stays until the next click (#7), so both keep the same behaviour.
+- A rejection error has three parts: what happened, that the changes are not saved, the next step.
+  Save draft builds its 400 text from the gaps too.
+- A failed reload of the calendar shows a banner with Retry above the kept calendar.
+- The copy agrees with the feminine «тема»: «Опубликована», «Вышла», «· опубликована». A Today
+  note says that users see edits at once.
+- Publish is the primary button and hides for a published topic. Save draft keeps the secondary
+  look. The `button` slot of `ToolbarSaveAction` holds both buttons, so the status stays on the
+  left of both.
 - `AdminTheme.Colors` gets `warn = #9A5200` from the canvas, and `Status.Tone` gets `WARNING`.
 - `TopicCountText` in `feature/characters/presentation` picks the Russian form: 1 тема, 2 темы,
   5 тем. `feature/topics` already depends on `feature/characters`.
@@ -165,9 +187,11 @@ The admin app maps each field and status to its Russian copy and tone. It derive
 
 - The sidebar shows no To do badge next to Topics.
 - The note of a ready draft says publish only, not try and publish: Try comes with #15.
-- The note of a draft names the missing fields, not the numbers of the steps.
 - To do mixes empty days and drafts in date order.
-- A published topic shows Save, not Save draft.
+- A published topic shows Save, not Save draft, and hides Publish instead of a disabled Published.
+- The copy uses the feminine forms: «Опубликована», «Вышла»; the canvas has «Опубликован», «Вышел».
+- Publish and a move of the date of a published topic ask first, in a panel inside the screen.
+- The one word for the interlocutor («Ведёт», «Собеседник», «Персонаж») waits for the owner (m5).
 
 ## Risks / Trade-offs
 

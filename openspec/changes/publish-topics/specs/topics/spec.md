@@ -21,8 +21,7 @@ the status in its database.
 The server SHALL publish a topic only when it meets the draft rule and has a duration, a
 description, a setting, an interlocutor, a role, the opening line, its translation and at least one
 step. A guest SHALL have a description. Each step SHALL have its task, Pass when and outcome. The
-server SHALL name each field that the topic misses: Title, Release date, Duration, Description,
-Setting, Interlocutor, Role, Opening line, Translation and Steps.
+server SHALL name each missing field, and the numbers of the steps that are not complete.
 
 #### Scenario: A topic with every field
 
@@ -31,13 +30,60 @@ Setting, Interlocutor, Role, Opening line, Translation and Steps.
 
 #### Scenario: Missing fields
 
-- **WHEN** the owner publishes a topic without a setting and with a step that has no outcome
-- **THEN** the server publishes nothing and names Setting and Steps
+- **WHEN** the owner publishes a topic without a setting, whose steps 3 and 5 have no outcome
+- **THEN** the server publishes nothing and names Setting and the steps 3 and 5
+
+#### Scenario: No steps
+
+- **WHEN** the owner publishes a topic without steps
+- **THEN** the server publishes nothing and names Steps
 
 #### Scenario: A guest without a description
 
 - **WHEN** the owner publishes a topic with a guest whose description is empty
 - **THEN** the server publishes nothing and names Interlocutor
+
+### Requirement: A release date in the past
+
+The server SHALL NOT publish a draft with a release date before today, and SHALL NOT save a
+published topic with a new release date before today. It SHALL name the past date as what the
+topic still needs. A published topic that keeps its stored past date SHALL stay valid.
+
+#### Scenario: A draft with a past date
+
+- **WHEN** today is 23 October, and the owner publishes a draft with the date 22 October
+- **THEN** the server publishes nothing and names the past date
+
+#### Scenario: A topic that is out
+
+- **WHEN** a published topic with the date 22 October is out, and the owner saves it with a new
+  title and the same date
+- **THEN** the server stores the title
+
+#### Scenario: A move into the past
+
+- **WHEN** today is 23 October, and the owner saves a published topic of 25 October with the date
+  22 October
+- **THEN** the server rejects the save, names the past date, and the topic keeps 25 October
+
+### Requirement: What publishing still needs
+
+Each topic that the server returns SHALL carry what publishing still needs, as the publish rule
+names it: the missing fields of Title, Release date, Duration, Description, Setting, Interlocutor,
+Role, Opening line, Translation and Steps, the numbers of the incomplete steps, and a past date. For
+a draft, it SHALL also name a taken date when another topic of the same date is
+published.
+
+#### Scenario: A taken date
+
+- **WHEN** a published topic has the date 24 October, and the admin app reads a draft of
+  24 October with every field
+- **THEN** the draft names the taken date and nothing else
+
+#### Scenario: A ready draft
+
+- **WHEN** the admin app reads a draft with every field and a free date of today or later
+- **THEN** the draft names nothing
 
 ### Requirement: One published topic per date
 
@@ -143,7 +189,7 @@ be complete when its task, Pass when and outcome are filled.
 
 The calendar SHALL have To do: each day from today to the 13th day after today without a topic,
 and each draft with today's date or a later date whose date has no published topic, in date order.
-A draft in To do SHALL name the fields that publishing still needs.
+A draft in To do SHALL name what publishing still needs.
 
 #### Scenario: To do
 
@@ -177,44 +223,39 @@ the draft. Without entries, To do SHALL say that there is nothing to do.
 
 ### Requirement: The note of a draft in To do
 
-The note of a draft in To do SHALL say that it is a draft to publish when publishing needs no more
-fields, and SHALL name the missing fields otherwise.
+The note of a draft in To do SHALL say that it is a draft to publish when publishing needs nothing
+more, and SHALL name what publishing still needs otherwise, with the numbers of the incomplete
+steps.
 
 #### Scenario: A draft that misses fields
 
-- **WHEN** To do has a draft that misses Description and Steps
-- **THEN** its note names description and steps, and Open opens the Topic screen of the draft
+- **WHEN** To do has a draft that misses Description, and whose steps 3, 4 and 5 are not complete
+- **THEN** its note names the description and the steps 3–5, and Open opens the Topic screen of the
+  draft
 
 #### Scenario: A ready draft
 
-- **WHEN** To do has a draft that publishing needs no more fields for
+- **WHEN** To do has a draft that publishing needs nothing more for
 - **THEN** its note says that it is a draft to publish
 
 ### Requirement: Publish on the Topic screen
 
-Publish SHALL be beside Save draft. For a saved draft, Publish SHALL send the form to the server,
-with an empty release date and an empty duration as no value. When the server accepts it, the admin
-app SHALL show the topic that the server returns. For a new topic, Publish SHALL be disabled. For a
-published topic, Publish SHALL show Published and SHALL be disabled, and Save draft SHALL show
-Save.
+Publish SHALL be beside Save draft. For a saved draft, Publish SHALL first ask inside the screen,
+with Publish and Cancel: the topic goes out on its date for all users, it cannot be unpublished,
+and it can be edited. Publish in the question SHALL send the form, with an empty date and an empty
+duration as no value. Cancel SHALL send nothing. The admin app SHALL show the topic that the server
+returns. For a new topic, Publish SHALL be disabled.
 
-#### Scenario: The publish succeeds
+#### Scenario: The question
 
-- **WHEN** the owner clicks Publish on a draft with every field
-- **THEN** the subtitle shows the release date and that the topic is published, Publish shows
-  Published and is disabled, and Save draft shows Save
+- **WHEN** the owner clicks Publish on a saved draft of 24 October
+- **THEN** a question inside the screen says that the topic goes out on 24 October for all users,
+  that it cannot be unpublished and that it can be edited, with Publish and Cancel
 
-#### Scenario: The server names missing fields
+#### Scenario: Cancel
 
-- **WHEN** the server answers 400 on Publish and names Setting and Steps
-- **THEN** the admin app keeps the form and shows one error beside the buttons that names setting
-  and steps
-
-#### Scenario: The date has a published topic
-
-- **WHEN** the server answers 409 on Publish or on Save
-- **THEN** the admin app keeps the form and shows one error beside the buttons that the date already
-  has a published topic
+- **WHEN** the question shows, and the owner clicks Cancel
+- **THEN** the question closes, and the admin app sends nothing and keeps the form
 
 #### Scenario: The server does not answer
 
@@ -226,6 +267,64 @@ Save.
 - **WHEN** the owner clicks New topic
 - **THEN** Publish is disabled
 
+### Requirement: The toolbar of a published topic
+
+For a published topic, Publish SHALL be hidden, Save draft SHALL show Save, and the subtitle and the
+status SHALL show its state.
+
+#### Scenario: The publish succeeds
+
+- **WHEN** the owner confirms the publish of a draft with every field
+- **THEN** the subtitle shows the release date and that the topic is published, Publish is hidden,
+  and Save draft shows Save
+
+### Requirement: A rejected write on the Topic screen
+
+A 400 or a 409 on Publish, on Save draft or on Save SHALL keep the form and show one error beside
+the buttons in three parts: what happened, that the changes are not saved, and the next step. The
+error of a 400 SHALL name what the server names. The error of a 409 SHALL say that the date already
+has a published topic, and that the owner chooses another date.
+
+#### Scenario: A rejected publish
+
+- **WHEN** the server answers 400 on Publish and names Setting and the steps 3 and 5
+- **THEN** the error says that the topic is not published, names the setting and the steps 3 and 5,
+  says that the changes are not saved, and says to fill them and publish again
+
+#### Scenario: The date has a published topic
+
+- **WHEN** the server answers 409 on Publish or on Save
+- **THEN** the error says that the date already has a published topic, that the changes are not
+  saved, and to choose another date
+
+#### Scenario: A rejected draft
+
+- **WHEN** the server answers 400 on Save draft and names Title
+- **THEN** the error says that the draft is not saved, names the title, and says to fill it and
+  save again
+
+### Requirement: Moving the date of a published topic
+
+When the owner saves a published topic whose status is Published or Today with a release date
+other than the stored one, the admin app SHALL first ask inside the screen: the stored date will be
+left without a topic. The question SHALL have Save and Cancel. Cancel SHALL send nothing.
+
+#### Scenario: A move
+
+- **WHEN** a published topic of 24 October is upcoming, and the owner picks 26 October and clicks
+  Save
+- **THEN** a question says that 24 October will be left without a topic, with Save and Cancel
+
+#### Scenario: The same date
+
+- **WHEN** the owner saves a published topic with its stored date
+- **THEN** the admin app sends the save with no question
+
+#### Scenario: Cancel the move
+
+- **WHEN** the question shows, and the owner clicks Cancel
+- **THEN** the admin app sends nothing and keeps the form
+
 ### Requirement: The status of a publish
 
 While the publish runs, the admin app SHALL show Publishing… beside the buttons, and SHALL disable
@@ -234,36 +333,69 @@ rejected publish SHALL stay until the next click on Save draft or Publish.
 
 #### Scenario: The publish runs
 
-- **WHEN** the owner clicks Publish and the server has not answered yet
+- **WHEN** the owner confirms Publish and the server has not answered yet
 - **THEN** Publishing… shows beside the buttons, and Save draft, Publish, the fields, the date
   popup, Add step and the back arrow are disabled
 
 #### Scenario: An edit after a rejected publish
 
 - **WHEN** the server rejected the publish, and the owner edits a field
-- **THEN** the error stays beside the buttons until the next click on Save draft or Publish
+- **THEN** the error stays beside the buttons, says that it is about the version that the server
+  saw, and stays until the next click on Save draft or Publish
 
 ### Requirement: The publish note
 
 With no save or publish status, the status beside the buttons SHALL come from the last answer of
-the server. For a draft, it SHALL say that all fields are filled, or name the fields that
-publishing still needs. For a published topic, it SHALL show the date it goes out, that it goes out
-today, or the date it went out.
+the server. For a new topic, it SHALL say to save a draft to publish it. For a draft, it SHALL say
+that all fields are filled, or name what publishing still needs: the missing fields, the numbers of
+the incomplete steps, a past date to change, or a taken date to change.
+
+#### Scenario: A new topic
+
+- **WHEN** the owner clicks New topic
+- **THEN** the status says to save a draft to publish it
 
 #### Scenario: A ready draft
 
-- **WHEN** the owner opens a saved draft that publishing needs no more fields for
+- **WHEN** the owner opens a saved draft that publishing needs nothing more for
 - **THEN** the status says that all fields are filled
 
 #### Scenario: A draft that misses fields
 
 - **WHEN** the owner opens a saved draft that misses Duration
-- **THEN** the status names the duration as the field that publishing still needs
+- **THEN** the status names the duration as what publishing still needs
 
-#### Scenario: A published topic
+#### Scenario: A past date
 
-- **WHEN** the owner opens a published topic with the date 24 October, and today is 23 October
+- **WHEN** the owner opens a saved draft whose date is before today
+- **THEN** the status says that the date has passed and to choose a new release date
+
+#### Scenario: A taken date
+
+- **WHEN** the owner opens a saved draft of 24 October, and 24 October has a published topic
+- **THEN** the status says that 24 October already has a published topic and to choose another date
+
+### Requirement: The note of a published topic
+
+For a published topic, the note SHALL show the date it goes out; for a topic of today, that it
+goes out today and that users see edits at once; for a topic that is out, the date it went out.
+The words SHALL agree with the feminine gender of the Russian word for topic. After a field edit,
+the note SHALL stay and SHALL say that it is about the version that the server saw.
+
+#### Scenario: An upcoming topic
+
+- **WHEN** the owner opens a published topic of 24 October, and today is 23 October
 - **THEN** the status says that the topic goes out on 24 October
+
+#### Scenario: A topic of today
+
+- **WHEN** the owner opens a published topic of today
+- **THEN** the status says that the topic goes out today and that users see edits at once
+
+#### Scenario: An edit after an answer
+
+- **WHEN** the status shows a note from the server, and the owner edits a field
+- **THEN** the note stays and says that it is about the version that the server saw
 
 ## MODIFIED Requirements
 
@@ -298,8 +430,8 @@ one topic at `GET /admin/topics/{topicId}`, create a draft and return it with it
 `POST /admin/topics`, replace the fields of a topic and return it at `PUT /admin/topics/{topicId}`,
 and replace the fields of a topic, publish it and return it at
 `POST /admin/topics/{topicId}/publish`. Each topic that the server returns SHALL carry its status
-and the fields that publishing still needs. A 400 for a topic that a rule rejects SHALL name the
-fields that the rule misses. The server SHALL answer 409 when a write puts a second published topic
+and what publishing still needs. A 400 for a topic that a rule rejects SHALL name what the rule
+misses. The server SHALL answer 409 when a write puts a second published topic
 on a date.
 
 #### Scenario: No admin key
@@ -368,7 +500,8 @@ SHALL have New topic.
 #### Scenario: The calendar does not update
 
 - **WHEN** the admin app shows a calendar and cannot load it again
-- **THEN** it keeps the calendar
+- **THEN** it keeps the calendar, and shows above it an error that the topics did not update, with
+  Retry
 
 #### Scenario: No topics yet
 
@@ -421,9 +554,8 @@ toolbar SHALL have a back arrow to Topics, the status, Save draft and Publish.
 
 While the save runs, the admin app SHALL show Saving… beside Save draft, and SHALL disable Save
 draft, Publish, the fields, the date popup, Add step and the back arrow. A field edit SHALL remove
-the Saved status. The error of a rejected draft SHALL stay until the next click on Save draft or
-Publish. A save of a published topic that the server rejects with 400 SHALL show one error that
-names the missing fields.
+the Saved status. The error of a rejected save SHALL stay until the next click on Save draft or
+Publish, and after a field edit SHALL say that it is about the version that the server saw.
 
 #### Scenario: The save runs
 
@@ -434,7 +566,8 @@ names the missing fields.
 #### Scenario: An edit after a rejected draft
 
 - **WHEN** the server rejected the draft, and the owner edits a field
-- **THEN** the error stays beside Save draft until the next click on Save draft or Publish
+- **THEN** the error stays beside Save draft, says that it is about the version that the server saw,
+  and stays until the next click on Save draft or Publish
 
 #### Scenario: An edit after a save
 
@@ -444,7 +577,8 @@ names the missing fields.
 #### Scenario: A rejected save of a published topic
 
 - **WHEN** the server answers 400 on Save of a published topic and names Setting
-- **THEN** the admin app keeps the form and shows one error that names the setting
+- **THEN** the admin app keeps the form, and the error names the setting and says that the changes
+  are not saved
 
 ### Requirement: The Interlocutor and Steps sections
 
@@ -475,3 +609,26 @@ every rating level.
 - **WHEN** Sam leads 12 topics and Mia leads 1 topic
 - **THEN** the row of Sam shows 12 topics and the row of Mia shows 1 topic, each in the Russian form
   for its number
+
+### Requirement: Saving a draft
+
+Save draft SHALL send the topic to the server, with an empty release date and an empty duration as
+no value. When the server accepts it, the admin app SHALL show the topic that the server returns,
+and a Saved status beside Save draft. A new topic SHALL then become a saved topic.
+
+#### Scenario: The save succeeds
+
+- **WHEN** the owner fills the title and the release date of a new topic and clicks Save draft
+- **THEN** the title becomes the title of the topic, the subtitle shows the release date, and the
+  Saved status shows beside Save draft
+
+#### Scenario: The server rejects the draft
+
+- **WHEN** the server answers 400 on Save draft and names the duration
+- **THEN** the admin app keeps the form and shows one error beside Save draft that names the
+  duration, says that the changes are not saved, and says to fix it and save again
+
+#### Scenario: The server does not answer
+
+- **WHEN** the admin app cannot reach the server on Save draft
+- **THEN** it keeps the form as it is and shows a snackbar that the save failed

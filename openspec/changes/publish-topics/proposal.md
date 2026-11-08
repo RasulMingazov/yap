@@ -7,8 +7,9 @@ drafts early, before a learner gets an empty day (#8).
 
 ## What Changes
 
-- A topic is a draft or published. Publish needs every field of the topic. The server checks it
-  and names the fields that are missing.
+- A topic is a draft or published. Publish needs every field of the topic and a date of today or
+  later. The server checks it and names what is missing: the fields, the numbers of the incomplete
+  steps, a past date, and a date that another published topic holds.
 - A date has at most one published topic. Drafts can share a date.
 - On its release date, a published topic is the topic of the day. The server derives the status:
   Draft, Published, Today or Out. The day starts at midnight Moscow time.
@@ -19,7 +20,9 @@ drafts early, before a learner gets an empty day (#8).
 - The characters list of the admin API gets the topic count of each character.
 - Topics gets To do, the section All topics, the columns Led by, Steps and Status, the empty days
   with Create, and the note about publishing.
-- The Topic screen gets Publish, the publish status, and Save for a published topic.
+- The Topic screen gets Publish with a question first, the publish note, errors that say the
+  changes are not saved and what to do next, Save for a published topic, and a question before a
+  save moves the date of a published topic.
 - Characters and the interlocutor choice show the topic count of each character.
 - **BREAKING** (admin API only): `GET /admin/topics` goes away. The calendar replaces it.
 
