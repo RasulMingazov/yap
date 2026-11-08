@@ -2,9 +2,7 @@ package app.yap.server.feature.topics.usecase
 
 import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import app.yap.server.feature.characters.usecase.GetCharacterUseCase
-import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.StubTopic
-import app.yap.server.feature.topics.model.TopicDetails
 import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicGap
@@ -35,14 +33,9 @@ internal class GetTopicsUseCaseTest {
 
             val details = useCase()
 
+            topicRepository.hasPublishedOnCall.calledWith(StubTopic.RELEASE_DATE, StubTopic.TOPIC_ID)
             assertEquals(
-                expected = listOf(
-                    TopicDetails(
-                        gaps = setOf(TopicGap.DateTaken),
-                        state = ReleaseState.DRAFT,
-                        topic = StubTopic.stubTopic(),
-                    ),
-                ),
+                expected = listOf(StubTopic.stubDetails(gaps = setOf(TopicGap.DateTaken))),
                 actual = details,
             )
         }

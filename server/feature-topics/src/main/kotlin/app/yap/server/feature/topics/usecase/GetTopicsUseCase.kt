@@ -14,12 +14,14 @@ class GetTopicsUseCase(
 
     suspend operator fun invoke(): List<TopicDetails> {
         val today = moscowToday(clock)
-        return topicRepository.list().map { topic ->
-            topicDetailsRule.details(
-                isDateTaken = topicRepository.hasPublishedOn(topic.date, topic.topicId),
-                today = today,
-                topic = topic,
-            )
-        }
+        return topicRepository
+            .list()
+            .map { topic ->
+                topicDetailsRule.details(
+                    isDateTaken = topicRepository.hasPublishedOn(topic.date, topic.topicId),
+                    today = today,
+                    topic = topic,
+                )
+            }
     }
 }
