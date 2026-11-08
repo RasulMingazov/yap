@@ -6,11 +6,9 @@ import app.yap.admin.feature.topics.domain.TopicId
 import app.yap.admin.feature.topics.domain.repository.TopicRepository
 import app.yap.admin.feature.topics.domain.usecase.DefaultGetTopicCalendarUseCase
 import app.yap.admin.feature.topics.domain.usecase.DefaultGetTopicUseCase
-import app.yap.admin.feature.topics.domain.usecase.DefaultGetTopicsUseCase
 import app.yap.admin.feature.topics.domain.usecase.DefaultSaveTopicUseCase
 import app.yap.admin.feature.topics.domain.usecase.GetTopicCalendarUseCase
 import app.yap.admin.feature.topics.domain.usecase.GetTopicUseCase
-import app.yap.admin.feature.topics.domain.usecase.GetTopicsUseCase
 import app.yap.admin.feature.topics.domain.usecase.SaveTopicUseCase
 import app.yap.admin.feature.topics.presentation.TopicViewModel
 import app.yap.admin.feature.topics.presentation.TopicsViewModel
@@ -27,7 +25,6 @@ internal fun featureTopicsModule(): Module = module {
 
     factoryOf(::DefaultGetTopicCalendarUseCase) { bind<GetTopicCalendarUseCase>() }
     factoryOf(::DefaultGetTopicUseCase) { bind<GetTopicUseCase>() }
-    factoryOf(::DefaultGetTopicsUseCase) { bind<GetTopicsUseCase>() }
     factoryOf(::DefaultSaveTopicUseCase) { bind<SaveTopicUseCase>() }
 
     factory { (topicId: TopicId?) ->

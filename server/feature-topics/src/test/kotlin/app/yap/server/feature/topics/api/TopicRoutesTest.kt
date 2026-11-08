@@ -18,7 +18,6 @@ import app.yap.server.feature.topics.persistence.TopicWrite
 import app.yap.server.feature.topics.usecase.CreateTopicUseCase
 import app.yap.server.feature.topics.usecase.GetTopicCalendarUseCase
 import app.yap.server.feature.topics.usecase.GetTopicUseCase
-import app.yap.server.feature.topics.usecase.GetTopicsUseCase
 import app.yap.server.feature.topics.usecase.PublishTopicUseCase
 import app.yap.server.feature.topics.usecase.UpdateTopicUseCase
 import io.ktor.client.request.get
@@ -46,18 +45,6 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
 internal class TopicRoutesTest {
-
-    @Test
-    fun `GIVEN a topic WHEN listing the topics THEN the server answers with its JSON`() = testApplication {
-        application { Environment().install(this) }
-
-        val response = client.get("/admin/topics")
-
-        assertEquals(
-            expected = HttpStatusCode.OK to Json.parseToJsonElement("[${topicJson()}]"),
-            actual = response.status to Json.parseToJsonElement(response.bodyAsText()),
-        )
-    }
 
     @Test
     fun `GIVEN a filled draft WHEN creating a topic THEN the server answers 201 with it`() = testApplication {
@@ -440,11 +427,6 @@ internal class TopicRoutesTest {
                         topicRepository = topicRepository,
                     ),
                     getTopicUseCase = GetTopicUseCase(
-                        clock = StubTopic.CLOCK,
-                        topicDetailsRule = topicDetailsRule,
-                        topicRepository = topicRepository,
-                    ),
-                    getTopicsUseCase = GetTopicsUseCase(
                         clock = StubTopic.CLOCK,
                         topicDetailsRule = topicDetailsRule,
                         topicRepository = topicRepository,
