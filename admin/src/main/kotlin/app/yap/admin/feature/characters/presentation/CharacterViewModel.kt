@@ -35,12 +35,10 @@ internal class CharacterViewModel(
     }
 
     fun onEvent(event: Event) = when (event) {
-        is Event.FormChanged -> dataState.update { state ->
-            state.copy(
-                form = event.form,
-                saveResult = null,
-            )
-        }
+        is Event.HistoryChanged -> edit { form -> form.copy(history = event.history) }
+        is Event.MannerChanged -> edit { form -> form.copy(manner = event.manner) }
+        is Event.NameChanged -> edit { form -> form.copy(name = event.name) }
+        is Event.PersonalityChanged -> edit { form -> form.copy(personality = event.personality) }
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
     }
@@ -48,6 +46,15 @@ internal class CharacterViewModel(
     override fun onCleared() {
         super.onCleared()
         newsChannel.close()
+    }
+
+    private fun edit(change: (CharacterProfile) -> CharacterProfile) {
+        dataState.update { state ->
+            state.copy(
+                form = change(state.form),
+                saveResult = null,
+            )
+        }
     }
 
     private fun onRetryClicked() {
@@ -126,9 +133,12 @@ internal class CharacterViewModel(
     sealed interface UiState {
 
         data class Content(
-            val form: CharacterProfile,
             val hint: String?,
+            val history: String,
             val isSaveEnabled: Boolean,
+            val manner: String,
+            val name: String,
+            val personality: String,
             val saveStatus: Status?,
             val subtitle: String,
             val title: String,
@@ -146,7 +156,13 @@ internal class CharacterViewModel(
 
     sealed interface Event {
 
-        data class FormChanged(val form: CharacterProfile) : Event
+        data class HistoryChanged(val history: String) : Event
+
+        data class MannerChanged(val manner: String) : Event
+
+        data class NameChanged(val name: String) : Event
+
+        data class PersonalityChanged(val personality: String) : Event
 
         data object RetryClicked : Event
 
