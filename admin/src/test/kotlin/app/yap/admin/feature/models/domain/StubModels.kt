@@ -5,17 +5,26 @@ internal object StubModels {
     const val MODEL = "deepseek-flash"
     const val PROVIDER = "DEEPSEEK"
 
-    fun stubModels(): Models = Models(
-        providers = listOf(stubProvider()),
-        tasks = stubTasks(),
+    fun stubModels(
+        providers: List<Provider> = listOf(stubProvider()),
+        tasks: List<TaskModel> = stubTasks(),
+    ): Models = Models(
+        providers = providers,
+        tasks = tasks,
     )
 
-    fun stubProvider(): Provider = Provider(
-        code = PROVIDER,
-        connected = true,
-        keySetting = "DEEPSEEK_API_KEY",
-        models = listOf(MODEL, "deepseek-v4-pro"),
-        name = "DeepSeek",
+    fun stubProvider(
+        code: String = PROVIDER,
+        connected: Boolean = true,
+        keySetting: String = "DEEPSEEK_API_KEY",
+        models: List<String> = listOf(MODEL, "deepseek-v4-pro"),
+        name: String = "DeepSeek",
+    ): Provider = Provider(
+        code = code,
+        connected = connected,
+        keySetting = keySetting,
+        models = models,
+        name = name,
     )
 
     fun stubTasks(): List<TaskModel> = ModelTask.entries.map { task ->

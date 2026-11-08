@@ -118,7 +118,7 @@ internal class RemoteModelRepositoryTest {
 
     private class Environment(
         answer: MockRequestHandler,
-        settings: ServerSettings? =StubServerSettings.stubServerSettings(),
+        settings: ServerSettings? = StubServerSettings.stubServerSettings(),
     ) {
 
         val engine = MockEngine(answer)
@@ -146,13 +146,7 @@ internal class RemoteModelRepositoryTest {
         const val MODELS_JSON = """
             {
               "providers": [
-                {
-                  "code": "DEEPSEEK",
-                  "connected": true,
-                  "keySetting": "DEEPSEEK_API_KEY",
-                  "models": ["deepseek-flash", "deepseek-v4-pro"],
-                  "name": "DeepSeek"
-                }
+                {"code": "DEEPSEEK", "connected": true, "keySetting": "DEEPSEEK_API_KEY", "models": ["deepseek-flash", "deepseek-v4-pro"], "name": "DeepSeek"}
               ],
               "tasks": $TASKS_JSON
             }
