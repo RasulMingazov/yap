@@ -109,7 +109,7 @@ private fun TopicForm(
                 )
             }
         },
-        back = back,
+        back = back.copy(enabled = content.isSaveEnabled),
         subtitle = content.subtitle,
         title = content.title,
     )
@@ -140,18 +140,21 @@ private fun SceneSection(
             label = "Название",
             onValueChange = { title -> onEvent(Event.FormChanged(form.copy(title = title))) },
             value = form.title,
+            enabled = content.isSaveEnabled,
             modifier = Modifier.fillMaxWidth(),
         )
         AdminTextField(
             label = "Описание — одна строка на карточке дня",
             onValueChange = { description -> onEvent(Event.FormChanged(form.copy(description = description))) },
             value = form.description,
+            enabled = content.isSaveEnabled,
             modifier = Modifier.fillMaxWidth(),
         )
         AdminTextField(
             label = "Обстановка — где, когда и что вокруг. Пользователь её не видит, по ней играет модель",
             onValueChange = { setting -> onEvent(Event.FormChanged(form.copy(setting = setting))) },
             value = form.setting,
+            enabled = content.isSaveEnabled,
             minLines = SETTING_LINES,
             modifier = Modifier.fillMaxWidth(),
         )
