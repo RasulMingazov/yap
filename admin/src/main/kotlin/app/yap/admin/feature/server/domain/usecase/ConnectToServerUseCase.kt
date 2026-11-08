@@ -1,9 +1,9 @@
 package app.yap.admin.feature.server.domain.usecase
 
+import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.settings.ServerSettingsRepository
 import app.yap.admin.feature.server.domain.ServerConnection
-import app.yap.admin.feature.server.domain.ServerSettings
 import app.yap.admin.feature.server.domain.repository.ServerRepository
-import app.yap.admin.feature.server.domain.repository.ServerSettingsRepository
 
 internal interface ConnectToServerUseCase {
 

@@ -1,4 +1,4 @@
-package app.yap.admin.feature.server.domain
+package app.yap.admin.core.network.settings
 
 internal data class ServerSettings(
     val address: String,

@@ -2,12 +2,12 @@ package app.yap.admin.feature.levels.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
+import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.settings.StubServerSettings
+import app.yap.admin.core.network.settings.StubServerSettingsRepository
 import app.yap.admin.feature.levels.domain.LevelCode
 import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.StubLevel
-import app.yap.admin.feature.server.domain.ServerSettings
-import app.yap.admin.feature.server.domain.StubServerSettings
-import app.yap.admin.feature.server.domain.repository.StubServerSettingsRepository
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
@@ -114,9 +114,10 @@ internal class RemoteLevelRepositoryTest {
     ) {
 
         val engine = MockEngine(answer)
+        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
         val repository = RemoteLevelRepository(
-            httpClient = adminHttpClient(engine),
-            serverSettingsRepository = StubServerSettingsRepository(settings = settings),
+            httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+            serverSettingsRepository = serverSettingsRepository,
         )
     }
 

@@ -1,6 +1,5 @@
-package app.yap.admin.feature.server.data.repository
+package app.yap.admin.core.network.settings
 
-import app.yap.admin.feature.server.domain.StubServerSettings
 import java.util.UUID
 import java.util.prefs.Preferences
 import kotlin.test.AfterTest

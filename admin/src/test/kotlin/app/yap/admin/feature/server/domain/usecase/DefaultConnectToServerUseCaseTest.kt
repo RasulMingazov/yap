@@ -1,9 +1,9 @@
 package app.yap.admin.feature.server.domain.usecase
 
+import app.yap.admin.core.network.settings.StubServerSettings
+import app.yap.admin.core.network.settings.StubServerSettingsRepository
 import app.yap.admin.feature.server.domain.ServerConnection
-import app.yap.admin.feature.server.domain.StubServerSettings
 import app.yap.admin.feature.server.domain.repository.StubServerRepository
-import app.yap.admin.feature.server.domain.repository.StubServerSettingsRepository
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 

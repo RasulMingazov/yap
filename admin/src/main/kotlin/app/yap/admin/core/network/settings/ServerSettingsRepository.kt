@@ -1,6 +1,4 @@
-package app.yap.admin.feature.server.domain.repository
-
-import app.yap.admin.feature.server.domain.ServerSettings
+package app.yap.admin.core.network.settings
 
 internal interface ServerSettingsRepository {
 

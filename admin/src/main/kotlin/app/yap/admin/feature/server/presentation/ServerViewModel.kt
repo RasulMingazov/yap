@@ -2,10 +2,10 @@ package app.yap.admin.feature.server.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.yap.admin.core.network.settings.ServerSettings
 import app.yap.admin.core.presentation.Status
 import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.server.domain.ServerConnection
-import app.yap.admin.feature.server.domain.ServerSettings
 import app.yap.admin.feature.server.domain.usecase.ConnectToServerUseCase
 import app.yap.admin.feature.server.domain.usecase.GetServerSettingsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow

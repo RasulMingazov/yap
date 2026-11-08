@@ -1,8 +1,9 @@
 package app.yap.admin.feature.server.data.repository
 
 import app.yap.admin.core.network.adminHttpClient
+import app.yap.admin.core.network.settings.StubServerSettings
+import app.yap.admin.core.network.settings.StubServerSettingsRepository
 import app.yap.admin.feature.server.domain.ServerConnection
-import app.yap.admin.feature.server.domain.StubServerSettings
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpHeaders
@@ -26,7 +27,7 @@ internal class RemoteServerRepositoryTest {
             )
         }
 
-        val connection = RemoteServerRepository(adminHttpClient(engine)).connect(StubServerSettings.stubServerSettings())
+        val connection = repository(engine).connect(StubServerSettings.stubServerSettings())
 
         assertEquals(
             expected = ServerConnection.Connected(environment = "staging") to "Bearer ${StubServerSettings.KEY}",
@@ -38,7 +39,7 @@ internal class RemoteServerRepositoryTest {
     fun `GIVEN the server rejects the key WHEN connecting THEN it is unauthorized`() = runTest {
         val engine = MockEngine { respond(content = "", status = HttpStatusCode.Unauthorized) }
 
-        val connection = RemoteServerRepository(adminHttpClient(engine)).connect(StubServerSettings.stubServerSettings())
+        val connection = repository(engine).connect(StubServerSettings.stubServerSettings())
 
         assertEquals(expected = ServerConnection.Unauthorized, actual = connection)
     }
@@ -47,8 +48,11 @@ internal class RemoteServerRepositoryTest {
     fun `GIVEN the server cannot be reached WHEN connecting THEN it is unreachable`() = runTest {
         val engine = MockEngine { throw IOException("Connection refused") }
 
-        val connection = RemoteServerRepository(adminHttpClient(engine)).connect(StubServerSettings.stubServerSettings())
+        val connection = repository(engine).connect(StubServerSettings.stubServerSettings())
 
         assertEquals(expected = ServerConnection.Unreachable, actual = connection)
     }
+
+    private fun repository(engine: MockEngine): RemoteServerRepository =
+        RemoteServerRepository(adminHttpClient(serverSettingsRepository = StubServerSettingsRepository(), engine = engine))
 }
