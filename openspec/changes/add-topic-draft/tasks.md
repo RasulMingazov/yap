@@ -58,8 +58,9 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 - [x] 13.1 Add the view model; verify with the tests for the load, the field edits, a picked date, Guest, Saved, the 400 error, the save failure and the load error. The Duration event and its tests moved to [14/16], the step events (Add step, a step edit) and their tests to [15/16]
 
-## 14. [14/16] Topic: Scene and Opening line · ~340 · `A/Main.kt`, `A/navigation/`, `A/ScreenCaptureTest.kt`, `T/presentation/TopicViewModel.kt` and its test, `T/presentation/ui/` (`TopicScreen`, `ReleaseDateField`, `TopicsScreen`)
+## 14. [14/16] Topic: Scene and Opening line · ~340 · `A/Main.kt`, `A/navigation/`, `A/ScreenCaptureTest.kt`, `T/presentation/TopicViewModel.kt` and its test, `T/presentation/ui/` (`TopicScreen`, `ReleaseDateField`, `TopicsScreen`), `T/FeatureTopicsModule.kt` · slice 1 (~40): `A/core/design/` (`Buttons`, `SectionHeader`), `A/feature/characters/presentation/ui/CharacterScreen.kt`
 
+- [x] 14.0 Give `SecondaryButton` an `enabled` parameter with a disabled look, and add `SectionHeader` with an optional number and note; use it in the character screen; verify with `./gradlew build` and the unchanged character captures
 - [ ] 14.1 Add the screen, the two sections, the date popup and the Duration event of `TopicViewModel` (from [13/16]), and open it from a title and from New topic; verify with the view model tests for a fourth digit, a letter and an empty Duration, and `./gradlew build`
 - [ ] 14.2 Capture Topic new, saved, Saved, the 400 error and the load error; verify with the images
 
