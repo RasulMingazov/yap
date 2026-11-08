@@ -30,6 +30,10 @@ Out of scope:
 
 - Try on the Topic screen: #15. The To do note of a ready draft does not mention Try until #15.
 - The items under Proposals: no issue owns them yet.
+- The `trim()` in the character, level and prompt DTO mappers: the tech PR «server: map DTOs 1:1 in the character, level and prompt mappers», with no
+  issue.
+- One event per field on the Character screen: the tech PR «admin: one event per field on the Character screen», with
+  no issue.
 
 ## Proposals
 
@@ -58,6 +62,8 @@ None.
   publish use case and routes. It implements the topic count port of `feature-characters`.
 - `server/feature-characters`: the port for the topic counts, the summaries use case for the list,
   and the port rule in `docs/server/001-structure.md`.
+- `docs/server/001-structure.md`: the DTO mapper maps 1:1; a rule in `model/` normalizes the text
+  input (the readability audit of 2026-11-08).
 - `contract-admin`: the calendar, the status, the field and the rejection DTOs, the character
   summary DTO, and two new fields in `TopicDto`.
 - `admin`: the calendar screen, Publish on the Topic screen, the counts, a `warn` color token, and

@@ -3,8 +3,9 @@ package app.yap.server.feature.characters.api
 import app.yap.server.feature.characters.model.StubCharacter
 import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import app.yap.server.feature.characters.usecase.CreateCharacterUseCase
+import app.yap.server.feature.characters.usecase.GetCharacterSummariesUseCase
 import app.yap.server.feature.characters.usecase.GetCharacterUseCase
-import app.yap.server.feature.characters.usecase.GetCharactersUseCase
+import app.yap.server.feature.characters.usecase.StubCharacterTopicCounts
 import app.yap.server.feature.characters.usecase.UpdateCharacterUseCase
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -27,17 +28,19 @@ import kotlinx.serialization.json.Json
 internal class CharacterRoutesTest {
 
     @Test
-    fun `GIVEN a character WHEN listing the characters THEN the server answers with its JSON`() = testApplication {
-        val env = Environment()
-        application { env.install(this) }
+    fun `GIVEN a character with two topics WHEN listing the characters THEN the row has the topic count`() =
+        testApplication {
+            val env = Environment()
+            env.characterTopicCounts.byCharacterCall.returns(mapOf(StubCharacter.CHARACTER_ID to 2))
+            application { env.install(this) }
 
-        val response = client.get("/admin/characters")
+            val response = client.get("/admin/characters")
 
-        assertEquals(
-            expected = HttpStatusCode.OK to Json.parseToJsonElement("[$CHARACTER_JSON]"),
-            actual = response.status to Json.parseToJsonElement(response.bodyAsText()),
-        )
-    }
+            assertEquals(
+                expected = HttpStatusCode.OK to Json.parseToJsonElement("[$SUMMARY_JSON]"),
+                actual = response.status to Json.parseToJsonElement(response.bodyAsText()),
+            )
+        }
 
     @Test
     fun `GIVEN a filled profile WHEN creating a character THEN the server answers 201 with it`() = testApplication {
@@ -138,6 +141,7 @@ internal class CharacterRoutesTest {
     private class Environment {
 
         val characterRepository = StubCharacterRepository()
+        val characterTopicCounts = StubCharacterTopicCounts()
 
         fun install(application: Application) {
             application.install(ContentNegotiation) {
@@ -147,7 +151,10 @@ internal class CharacterRoutesTest {
                 characterRoutes(
                     createCharacterUseCase = CreateCharacterUseCase(characterRepository = characterRepository),
                     getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
-                    getCharactersUseCase = GetCharactersUseCase(characterRepository = characterRepository),
+                    getCharacterSummariesUseCase = GetCharacterSummariesUseCase(
+                        characterRepository = characterRepository,
+                        characterTopicCounts = characterTopicCounts,
+                    ),
                     updateCharacterUseCase = UpdateCharacterUseCase(characterRepository = characterRepository),
                 )
             }
@@ -173,5 +180,8 @@ internal class CharacterRoutesTest {
             }
         """
         val CHARACTER_JSON = """{"characterId": "${StubCharacter.CHARACTER_ID.value}", "profile": $PROFILE_JSON}"""
+        val SUMMARY_JSON = """
+            {"characterId": "${StubCharacter.CHARACTER_ID.value}", "profile": $PROFILE_JSON, "topicCount": 2}
+        """
     }
 }

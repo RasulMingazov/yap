@@ -5,8 +5,14 @@ import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.CharacterProfile
 import app.yap.contract.admin.CharacterDto
 import app.yap.contract.admin.CharacterProfileDto
+import app.yap.contract.admin.CharacterSummaryDto
 
 internal fun CharacterDto.toDomain(): Character = Character(
+    characterId = CharacterId(characterId),
+    profile = profile.toDomain(),
+)
+
+internal fun CharacterSummaryDto.toDomain(): Character = Character(
     characterId = CharacterId(characterId),
     profile = profile.toDomain(),
 )
