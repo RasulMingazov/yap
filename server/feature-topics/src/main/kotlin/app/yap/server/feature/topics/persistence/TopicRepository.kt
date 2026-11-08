@@ -12,5 +12,5 @@ interface TopicRepository {
 
     suspend fun list(): List<Topic>
 
-    suspend fun update(topic: Topic): Boolean
+    suspend fun update(topic: Topic): TopicWrite
 }

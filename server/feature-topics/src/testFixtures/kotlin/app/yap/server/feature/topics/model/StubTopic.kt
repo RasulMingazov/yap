@@ -21,9 +21,11 @@ object StubTopic {
 
     fun stubTopic(
         content: TopicContent = stubContent(),
+        status: TopicStatus = TopicStatus.DRAFT,
         topicId: TopicId = TOPIC_ID,
     ): Topic = Topic(
         content = content,
+        status = status,
         topicId = topicId,
     )
 
