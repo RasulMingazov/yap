@@ -42,9 +42,9 @@ import app.yap.admin.core.design.SectionHeader
 import app.yap.admin.core.design.TableCell
 import app.yap.admin.core.design.TableHeaderCell
 import app.yap.admin.core.design.ToolbarSaveAction
+import app.yap.admin.feature.levels.domain.LevelInput
 import app.yap.admin.feature.levels.presentation.LevelsViewModel
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.Event
-import app.yap.admin.feature.levels.presentation.LevelsViewModel.LevelForm
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.News
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
 
@@ -197,7 +197,7 @@ private fun LevelRow(
 ) {
     val enabled = content.isSaveEnabled
     val form = row.form
-    val onFormChange: (LevelForm) -> Unit = { changed -> onEvent(Event.FormChanged(row.code, changed)) }
+    val onFormChange: (LevelInput) -> Unit = { changed -> onEvent(Event.FormChanged(row.code, changed)) }
     Row(
         modifier = Modifier
             .background(if (row.isChosen) AdminTheme.Colors.fill else AdminTheme.Colors.transparent)

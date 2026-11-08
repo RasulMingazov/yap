@@ -5,3 +5,5 @@ internal data class Level(
     val range: RatingRange?,
     val settings: LevelSettings?,
 )
+
+internal fun List<Level>.hasEveryLevel(): Boolean = map { level -> level.code } == LevelCode.entries
