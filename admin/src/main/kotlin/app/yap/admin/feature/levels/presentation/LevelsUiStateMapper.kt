@@ -4,9 +4,9 @@ import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelCode
-import app.yap.admin.feature.levels.domain.RatingRange
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.DataState
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.Load
+import app.yap.admin.feature.levels.presentation.LevelsViewModel.NumberField
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.SaveStatus
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
 
@@ -20,31 +20,40 @@ internal object LevelsUiStateMapper {
 
     private fun DataState.toContent(): UiState.Content = UiState.Content(
         block = block(),
-        idioms = idiomsOptions(),
+        idioms = Idioms.entries.map { idioms -> idioms.option() },
         isSaveEnabled = !isSaving,
-        rows = rows(),
+        rows = levels.map { level -> row(level) },
         saveStatus = saveStatus?.status(),
     )
 
     private fun DataState.block(): UiState.Block {
-        val range = levels
-            .first { level -> level.code == chosen }
-            .range
+        val level = levels.first { level -> level.code == chosen }
         return UiState.Block(
-            rating = range.rating(),
+            rating = level.rating(),
             text = forms.getValue(chosen).block,
             title = "Блок промпта · ${chosen.label()}",
         )
     }
 
-    private fun RatingRange?.rating(): String? = if (this == null) null else "рейтинг ${text()}"
+    private fun Level.rating(): String? = rangeText()?.let { text -> "рейтинг $text" }
 
-    private fun idiomsOptions(): List<UiState.IdiomsOption> = Idioms.entries.map { idioms ->
-        UiState.IdiomsOption(
-            idioms = idioms,
-            label = idioms.label(),
+    private fun DataState.row(level: Level): UiState.Row {
+        val form = forms.getValue(level.code)
+        return UiState.Row(
+            code = level.code,
+            form = form,
+            idioms = form.idioms?.option(),
+            isChosen = level.code == chosen,
+            isRatingFromShown = level.code.hasRatingFrom,
+            label = level.code.label(),
+            range = level.rangeText(),
         )
     }
+
+    private fun Idioms.option(): UiState.IdiomsOption = UiState.IdiomsOption(
+        idioms = this,
+        label = label(),
+    )
 
     private fun Idioms.label(): String = when (this) {
         Idioms.FREELY -> "да"
@@ -53,17 +62,12 @@ internal object LevelsUiStateMapper {
         Idioms.SOMETIMES -> "иногда"
     }
 
-    private fun DataState.rows(): List<UiState.Row> = levels.map { level -> row(level) }
-
-    private fun DataState.row(level: Level): UiState.Row = UiState.Row(
-        code = level.code,
-        form = forms.getValue(level.code),
-        isChosen = level.code == chosen,
-        label = level.code.label(),
-        range = level.range?.text(),
-    )
-
-    private fun RatingRange.text(): String = if (to == null) "$from+" else "$from–$to"
+    private fun Level.rangeText(): String? = when {
+        !code.hasRatingFrom -> "и калибровка"
+        range == null -> null
+        range.to == null -> "${range.from}+"
+        else -> "${range.from}–${range.to}"
+    }
 
     private fun SaveStatus.status(): Status = when (this) {
         is SaveStatus.Invalid -> Status(
@@ -71,7 +75,15 @@ internal object LevelsUiStateMapper {
             tone = Status.Tone.ERROR,
         )
         is SaveStatus.Saved -> Status(text = "Сохранено", tone = Status.Tone.SUCCESS)
-        is SaveStatus.UnreadNumber -> Status(text = "Проверьте числа: ${code.label()}", tone = Status.Tone.ERROR)
+        is SaveStatus.UnreadNumber -> Status(
+            text = "Проверьте число в «${field.label()}»: ${code.label()}",
+            tone = Status.Tone.ERROR,
+        )
+    }
+
+    private fun NumberField.label(): String = when (this) {
+        NumberField.MAX_WORDS -> "Слов в фразе"
+        NumberField.RATING_FROM -> "Рейтинг"
     }
 
     private fun LevelCode.label(): String = if (this == LevelCode.NO_RATING) "Без рейтинга" else name

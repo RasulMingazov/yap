@@ -1,5 +1,6 @@
 package app.yap.admin.feature.levels.presentation
 
+import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.LevelCode
 import app.yap.admin.feature.levels.domain.StubLevel
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.DataState
@@ -12,8 +13,8 @@ import kotlin.test.assertEquals
 internal class LevelsUiStateMapperTest {
 
     @Test
-    fun `GIVEN levels before a save WHEN mapping THEN a row has no range and an empty form`() {
-        val state = DataState().loaded(listOf(StubLevel.stubLevel(range = null, settings = null)))
+    fun `GIVEN levels before a save WHEN mapping THEN a row has no range, an empty form and no idioms`() {
+        val state = DataState().loaded(StubLevel.stubLevels(range = null, settings = null))
 
         val uiState = LevelsUiStateMapper.map(state) as UiState.Content
 
@@ -21,29 +22,46 @@ internal class LevelsUiStateMapperTest {
             expected = UiState.Row(
                 code = LevelCode.B1,
                 form = LevelForm.EMPTY,
+                idioms = null,
                 isChosen = true,
+                isRatingFromShown = true,
                 label = "B1",
                 range = null,
             ),
-            actual = uiState.rows.single(),
+            actual = uiState.rows[LevelCode.B1.ordinal],
         )
     }
 
     @Test
-    fun `GIVEN saved levels WHEN mapping THEN C2 has an open end and No rating has no range`() {
-        val state = DataState().loaded(
-            listOf(
-                StubLevel.stubLevel(code = LevelCode.B1),
-                StubLevel.stubLevel(code = LevelCode.C2, range = StubLevel.stubRange(from = 1500, to = null)),
-                StubLevel.stubLevel(code = LevelCode.NO_RATING, range = null),
-            ),
-        )
+    fun `GIVEN saved levels WHEN mapping THEN C2 has an open end`() {
+        val state = DataState().loaded(StubLevel.stubLevels(range = StubLevel.stubRange(from = 1500, to = null)))
+
+        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+
+        assertEquals(expected = "1500+", actual = uiState.rows[LevelCode.C2.ordinal].range)
+    }
+
+    @Test
+    fun `GIVEN No rating WHEN mapping THEN its row has no rating from and shows the calibration`() {
+        val state = DataState().loaded(StubLevel.stubLevels(range = null))
 
         val uiState = LevelsUiStateMapper.map(state) as UiState.Content
 
         assertEquals(
-            expected = listOf("B1" to "1050–1199", "C2" to "1500+", "Без рейтинга" to null),
-            actual = uiState.rows.map { row -> row.label to row.range },
+            expected = Triple("Без рейтинга", "и калибровка", false),
+            actual = uiState.rows.last().let { row -> Triple(row.label, row.range, row.isRatingFromShown) },
+        )
+    }
+
+    @Test
+    fun `GIVEN a saved level WHEN mapping THEN its idioms show as chosen`() {
+        val state = DataState().loaded(StubLevel.stubLevels())
+
+        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+
+        assertEquals(
+            expected = UiState.IdiomsOption(idioms = Idioms.RARELY, label = "редко"),
+            actual = uiState.rows.first().idioms,
         )
     }
 

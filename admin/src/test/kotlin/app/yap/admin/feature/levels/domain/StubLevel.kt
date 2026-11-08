@@ -18,7 +18,16 @@ internal object StubLevel {
         settings = settings,
     )
 
-    fun stubLevels(): List<Level> = LevelCode.entries.map { code -> stubLevel(code = code) }
+    fun stubLevels(
+        range: RatingRange? = stubRange(),
+        settings: LevelSettings? = stubSettings(),
+    ): List<Level> = LevelCode.entries.map { code ->
+        stubLevel(
+            code = code,
+            range = range,
+            settings = if (code == LevelCode.NO_RATING) settings?.copy(ratingFrom = null) else settings,
+        )
+    }
 
     fun stubEntry(
         code: LevelCode = LevelCode.B1,
