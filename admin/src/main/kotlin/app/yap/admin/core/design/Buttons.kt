@@ -45,19 +45,18 @@ internal fun PrimaryButton(
 
 @Composable
 internal fun SecondaryButton(
-    enabled: Boolean,
     onClick: () -> Unit,
     text: String,
 ) {
     ButtonBox(
-        background = if (enabled) AdminTheme.Colors.background else AdminTheme.Colors.fill,
+        background = AdminTheme.Colors.background,
         border = AdminTheme.Colors.lineStrong,
-        enabled = enabled,
+        enabled = true,
         horizontalPadding = AdminTheme.Sizes.secondaryButtonPadding,
         onClick = onClick,
     ) {
         ButtonText(
-            color = if (enabled) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
+            color = AdminTheme.Colors.ink,
             text = text,
         )
     }

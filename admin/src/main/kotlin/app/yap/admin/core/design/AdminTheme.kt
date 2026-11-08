@@ -51,8 +51,6 @@ internal object AdminTheme {
         val rowPadding = 12.dp
         val secondaryButtonPadding = 12.dp
         val sectionGap = 32.dp
-        val sectionHeaderGap = 10.dp
-        val sectionNumberWidth = 16.dp
         val sideBottomPadding = 16.dp
         val sideGroupGap = 20.dp
         val sideGroupTitlePadding = 6.dp
