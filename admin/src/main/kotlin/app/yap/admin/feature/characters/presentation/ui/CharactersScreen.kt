@@ -1,7 +1,9 @@
 package app.yap.admin.feature.characters.presentation.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -12,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -90,25 +93,34 @@ private fun CharacterRows(
         HorizontalDivider(color = AdminTheme.Colors.line)
         rows.forEach { row ->
             key(row.characterId) {
-                Column(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onCharacterClick(row.characterId) }
                         .heightIn(min = AdminTheme.Sizes.rowMinHeight)
                         .padding(vertical = AdminTheme.Sizes.rowPadding),
+                    horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.rowGap),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = row.name,
+                            color = AdminTheme.Colors.ink,
+                            style = AdminTheme.Type.body,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = row.personality,
+                            color = AdminTheme.Colors.muted,
+                            style = AdminTheme.Type.sub,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                     Text(
-                        text = row.name,
-                        color = AdminTheme.Colors.ink,
-                        style = AdminTheme.Type.body,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        text = row.personality,
+                        text = row.topicCountText,
                         color = AdminTheme.Colors.muted,
                         style = AdminTheme.Type.sub,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 HorizontalDivider(color = AdminTheme.Colors.line)

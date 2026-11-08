@@ -10,6 +10,7 @@ import app.yap.admin.feature.characters.data.mapper.toDto
 import app.yap.admin.feature.characters.domain.Character
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.CharacterProfile
+import app.yap.admin.feature.characters.domain.CharacterSummary
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.repository.CharacterRepository
 import app.yap.contract.admin.CharacterDto
@@ -35,7 +36,7 @@ internal class RemoteCharacterRepository(
         send = { characterApi.find(characterId.value) },
     )
 
-    override suspend fun list(): LoadResult<List<Character>> = serverSettingsRepository.callServer(
+    override suspend fun list(): LoadResult<List<CharacterSummary>> = serverSettingsRepository.callServer(
         failed = LoadResult.Failed,
         read = { response ->
             response.toLoadResult {

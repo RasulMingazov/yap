@@ -3,6 +3,7 @@ package app.yap.admin.feature.topics.presentation
 import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.StubCharacter
+import app.yap.admin.feature.characters.domain.StubCharacterSummary
 import app.yap.admin.feature.topics.domain.Interlocutor
 import app.yap.admin.feature.topics.domain.StubTopic
 import app.yap.admin.feature.topics.presentation.TopicViewModel.DataState
@@ -17,7 +18,7 @@ internal class TopicUiStateMapperTest {
 
     @Test
     fun `GIVEN a new topic WHEN mapping THEN the fields are empty, with one empty step and the cast to choose from`() {
-        val state = DataState(cast = listOf(StubCharacter.stubCharacter()), load = Load.LOADED)
+        val state = DataState(cast = listOf(StubCharacterSummary.stubCharacterSummary()), load = Load.LOADED)
 
         val content = contentOf(state)
 
@@ -45,10 +46,29 @@ internal class TopicUiStateMapperTest {
     }
 
     @Test
+    fun `GIVEN characters with topics WHEN mapping THEN each cast row shows its topic count`() {
+        val cast = listOf(
+            StubCharacterSummary.stubCharacterSummary(topicCount = 12),
+            StubCharacterSummary.stubCharacterSummary(
+                characterId = MIA_ID,
+                profile = StubCharacter.stubProfile(name = "Mia"),
+                topicCount = 1,
+            ),
+        )
+
+        val content = contentOf(DataState(cast = cast, load = Load.LOADED))
+
+        assertEquals(
+            expected = listOf("12 тем", "1 тема", "Только для этой темы"),
+            actual = content.choices.map { choice -> choice.meta },
+        )
+    }
+
+    @Test
     fun `GIVEN a saved topic WHEN mapping THEN the title, the long date and the draft subtitle come from the topic`() {
         val topic = StubTopic.stubTopic()
         val state = DataState(
-            cast = listOf(StubCharacter.stubCharacter()),
+            cast = listOf(StubCharacterSummary.stubCharacterSummary()),
             form = topic.content,
             load = Load.LOADED,
             saved = topic,
@@ -123,4 +143,9 @@ internal class TopicUiStateMapperTest {
     }
 
     private fun contentOf(state: DataState): UiState.Content = assertIs<UiState.Content>(TopicUiStateMapper(state))
+
+    private companion object {
+
+        const val MIA_ID = "7d1e0c2a-4b3f-4e6a-9c8d-2f1a0b3c4d5e"
+    }
 }

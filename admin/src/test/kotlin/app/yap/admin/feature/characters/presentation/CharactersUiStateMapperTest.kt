@@ -2,6 +2,7 @@ package app.yap.admin.feature.characters.presentation
 
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.StubCharacter
+import app.yap.admin.feature.characters.domain.StubCharacterSummary
 import app.yap.admin.feature.characters.presentation.CharactersViewModel.DataState
 import app.yap.admin.feature.characters.presentation.CharactersViewModel.UiState
 import kotlin.test.Test
@@ -11,8 +12,8 @@ import kotlin.test.assertIs
 internal class CharactersUiStateMapperTest {
 
     @Test
-    fun `GIVEN loaded characters WHEN mapping THEN each character is a row with its name and personality`() {
-        val state = DataState(characters = listOf(StubCharacter.stubCharacter()))
+    fun `GIVEN loaded characters WHEN mapping THEN each row has the name, the personality and the topic count`() {
+        val state = DataState(characters = listOf(StubCharacterSummary.stubCharacterSummary(topicCount = 12)))
 
         val uiState = CharactersUiStateMapper(state)
 
@@ -23,6 +24,7 @@ internal class CharactersUiStateMapperTest {
                         characterId = CharacterId(StubCharacter.CHARACTER_ID),
                         name = "Sam",
                         personality = "Friendly and curious.",
+                        topicCountText = "12 тем",
                     ),
                 ),
             ),
@@ -50,7 +52,7 @@ internal class CharactersUiStateMapperTest {
 
     @Test
     fun `GIVEN a shown list and a failed reload WHEN mapping THEN the list stays`() {
-        val state = DataState(characters = listOf(StubCharacter.stubCharacter()), isLoadFailed = true)
+        val state = DataState(characters = listOf(StubCharacterSummary.stubCharacterSummary()), isLoadFailed = true)
 
         val uiState = CharactersUiStateMapper(state)
 

@@ -1,7 +1,8 @@
 package app.yap.admin.feature.topics.presentation
 
 import app.yap.admin.core.presentation.Status
-import app.yap.admin.feature.characters.domain.Character
+import app.yap.admin.feature.characters.domain.CharacterSummary
+import app.yap.admin.feature.characters.presentation.TopicCountText
 import app.yap.admin.feature.topics.domain.Interlocutor
 import app.yap.admin.feature.topics.presentation.TopicViewModel.DataState
 import app.yap.admin.feature.topics.presentation.TopicViewModel.Load
@@ -38,12 +39,12 @@ internal object TopicUiStateMapper : (DataState) -> UiState {
         return castChoices + guestChoice()
     }
 
-    private fun Character.toChoice(selected: Interlocutor?): Choice {
+    private fun CharacterSummary.toChoice(selected: Interlocutor?): Choice {
         val interlocutor = Interlocutor.Cast(characterId = characterId)
         return Choice(
             interlocutor = interlocutor,
             isSelected = interlocutor == selected,
-            meta = null,
+            meta = TopicCountText(topicCount),
             name = profile.name,
         )
     }

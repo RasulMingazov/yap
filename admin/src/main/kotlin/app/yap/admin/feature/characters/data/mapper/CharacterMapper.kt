@@ -3,6 +3,7 @@ package app.yap.admin.feature.characters.data.mapper
 import app.yap.admin.feature.characters.domain.Character
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.CharacterProfile
+import app.yap.admin.feature.characters.domain.CharacterSummary
 import app.yap.contract.admin.CharacterDto
 import app.yap.contract.admin.CharacterProfileDto
 import app.yap.contract.admin.CharacterSummaryDto
@@ -12,9 +13,10 @@ internal fun CharacterDto.toDomain(): Character = Character(
     profile = profile.toDomain(),
 )
 
-internal fun CharacterSummaryDto.toDomain(): Character = Character(
+internal fun CharacterSummaryDto.toDomain(): CharacterSummary = CharacterSummary(
     characterId = CharacterId(characterId),
     profile = profile.toDomain(),
+    topicCount = topicCount,
 )
 
 private fun CharacterProfileDto.toDomain(): CharacterProfile = CharacterProfile(

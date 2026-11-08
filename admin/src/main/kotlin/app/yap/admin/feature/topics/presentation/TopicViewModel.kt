@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.presentation.Status
 import app.yap.admin.core.presentation.mapState
-import app.yap.admin.feature.characters.domain.Character
+import app.yap.admin.feature.characters.domain.CharacterSummary
 import app.yap.admin.feature.characters.domain.usecase.GetCharactersUseCase
 import app.yap.admin.feature.topics.domain.Interlocutor
 import app.yap.admin.feature.topics.domain.LoadTopicResult
@@ -98,7 +98,7 @@ internal class TopicViewModel(
         }
     }
 
-    private suspend fun onCastLoaded(cast: List<Character>) {
+    private suspend fun onCastLoaded(cast: List<CharacterSummary>) {
         if (topicId == null) {
             dataState.update { state ->
                 state.copy(
@@ -155,7 +155,7 @@ internal class TopicViewModel(
     }
 
     data class DataState(
-        val cast: List<Character> = emptyList(),
+        val cast: List<CharacterSummary> = emptyList(),
         val form: TopicContent = EMPTY_CONTENT,
         val guestDescription: String = "",
         val isSaving: Boolean = false,
