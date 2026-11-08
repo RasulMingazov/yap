@@ -23,7 +23,7 @@ internal object LevelsUiStateMapper {
         idioms = Idioms.entries.map { idioms -> idioms.option() },
         isSaveEnabled = !isSaving,
         rows = levels.map { level -> row(level) },
-        saveStatus = saveStatus?.status(),
+        saveStatus = if (isSaving) Status(text = "Сохранение…", tone = Status.Tone.MUTED) else saveStatus?.status(),
     )
 
     private fun DataState.block(): UiState.Block {

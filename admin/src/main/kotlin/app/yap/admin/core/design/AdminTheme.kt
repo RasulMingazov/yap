@@ -53,6 +53,7 @@ internal object AdminTheme {
         val rowPadding = 12.dp
         val secondaryButtonPadding = 12.dp
         val sectionGap = 32.dp
+        val sectionInnerGap = 8.dp
         val sectionHeaderGap = 10.dp
         val sectionNumberWidth = 16.dp
         val sideBottomPadding = 16.dp
@@ -88,6 +89,7 @@ internal object AdminTheme {
 
         val body = TextStyle(fontFamily = inter, fontSize = 14.sp, lineHeight = 20.sp)
         val brand = TextStyle(fontFamily = inter, fontSize = 15.sp, lineHeight = 20.sp)
+        val mono = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 19.sp)
         val small = TextStyle(fontFamily = inter, fontSize = 12.sp, lineHeight = 16.sp)
         val sub = TextStyle(fontFamily = inter, fontSize = 13.sp, lineHeight = 18.sp)
         val tableCell = body.copy(lineHeightStyle = fullLineHeight)

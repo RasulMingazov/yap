@@ -174,6 +174,11 @@ and a Saved status.
 - **WHEN** the owner fills every level and clicks Save
 - **THEN** the table shows the ranges from the server and the Saved status shows beside Save
 
+#### Scenario: The save is in progress
+
+- **WHEN** the owner clicks Save and the server has not answered yet
+- **THEN** a saving status shows beside Save, and Save and the fields of the levels are disabled
+
 #### Scenario: The server rejects the save
 
 - **WHEN** the server rejects the levels
