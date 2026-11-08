@@ -36,13 +36,13 @@ before the screen. The captures come in their own part.
 
 ## 6. [6/26] The calendar on the server · ~340 · `S/model/` (`TopicCalendar`, its rows, `LedBy`, `Todo`), `S/usecase/GetTopicCalendarUseCase.kt`, `S/FeatureTopicsModule.kt` (the `Clock`)
 
-- [ ] 6.1 Add `TopicCalendar` with the 14 days from today, the rows, the complete steps and To do with the gaps of each draft; verify with the model tests for the scenarios The rows, No topics yet, To do, A draft on a date with a published topic, The steps of a row, and a draft with the steps 3–5 incomplete, the title order on one date, and both interlocutors
-- [ ] 6.2 Add the use case with the clock and `GetCharactersUseCase` for the names; verify with a stub test with a fixed clock and the character names
+- [x] 6.1 Add `TopicCalendar` with the 14 days from today, the rows, the complete steps and To do with the gaps of each draft; verify with the model tests for the scenarios The rows, No topics yet, To do, A draft on a date with a published topic, The steps of a row, and a draft with the steps 3–5 incomplete, the title order on one date, and both interlocutors
+- [x] 6.2 Add the use case with the clock and `GetCharactersUseCase` for the names; verify with a stub test with a fixed clock and the character names
 
 ## 7. [7/26] Publish and save · ~340 · `S/usecase/` (`PublishTopicUseCase`, `UpdateTopicUseCase`, `CreateTopicUseCase`, `GetTopicUseCase`), `S/model/` (the outcomes, `TopicDetails`), `S/FeatureTopicsModule.kt`, `S/api/` (`TopicRoutes`, `TopicDtoMapper`: compile only)
 
 - [ ] 7.1 Add `PublishTopicUseCase` and the rule of the status in `UpdateTopicUseCase`, with the stored topic and today for `PastDate`; the outcomes carry the gaps and `DateTaken`; a stale status runs the update once more with the publish rule; verify with the stub tests for a publish, the gaps, a past date, an unknown topic, a taken date, a publish of a published topic, a save of a published topic with an empty setting (stores nothing), a save of a draft that stays a draft, and a stale status
-- [ ] 7.2 Return `TopicDetails` (the topic, the release state, the publish gaps, and `DateTaken` for a draft whose date has another published topic) from get, create, update and publish; verify with the stub tests with a fixed clock for a ready draft, a taken date and a published topic
+- [ ] 7.2 Return `TopicDetails` (the topic, the release state, the publish gaps, and `DateTaken` for a draft whose date has another published topic) from get, create, update and publish; verify with the stub tests with a fixed clock for a ready draft, a taken date and a published topic; move the `date` extension of `TopicCalendarRule` into `Topic` as an `internal` member, with its `requireNotNull`, because `TopicDetails` reads the date too
 
 ## 8. [8/26] The topic DTOs · ~370 · `K/` (`TopicDto`, `TopicStatusDto`, `TopicFieldDto`, `TopicGapDto`, `TopicRejectionDto`, `TopicCalendarDto`, `CalendarRowDto`, `CalendarTopicDto`, `LedByDto`, `TodoDto`), `S/api/` (`TopicDtoMapper`, `TopicCalendarDtoMapper`), `T/` tests that build `TopicDto`
 
