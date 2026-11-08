@@ -5,6 +5,7 @@ import app.yap.server.feature.characters.usecase.GetCharacterUseCase
 import app.yap.server.feature.topics.model.Interlocutor
 import app.yap.server.feature.topics.model.StubTopic
 import app.yap.server.feature.topics.model.TopicDraftRule
+import app.yap.server.feature.topics.model.TopicPublishRule
 import app.yap.server.feature.topics.persistence.StubTopicRepository
 import app.yap.server.feature.topics.persistence.TopicWrite
 import app.yap.server.feature.topics.usecase.CreateTopicUseCase
@@ -208,17 +209,6 @@ internal class TopicRoutesTest {
         assertEquals(expected = HttpStatusCode.Conflict, actual = response.status)
     }
 
-    @Test
-    fun `GIVEN a topic published after it was read WHEN updating it THEN the server answers 409`() = testApplication {
-        val env = Environment()
-        env.topicRepository.updateCall.returns(TopicWrite.StaleStatus)
-        application { env.install(this) }
-
-        val response = putTopic(contentJson())
-
-        assertEquals(expected = HttpStatusCode.Conflict, actual = response.status)
-    }
-
     private class Environment {
 
         val characterRepository = StubCharacterRepository()
@@ -240,7 +230,9 @@ internal class TopicRoutesTest {
                     getTopicUseCase = GetTopicUseCase(topicRepository = topicRepository),
                     getTopicsUseCase = GetTopicsUseCase(topicRepository = topicRepository),
                     updateTopicUseCase = UpdateTopicUseCase(
+                        clock = StubTopic.CLOCK,
                         topicDraftRule = topicDraftRule,
+                        topicPublishRule = TopicPublishRule(topicDraftRule = topicDraftRule),
                         topicRepository = topicRepository,
                     ),
                 )

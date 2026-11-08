@@ -70,7 +70,7 @@ private fun Route.updateTopicRoute(updateTopicUseCase: UpdateTopicUseCase) {
         when (outcome) {
             is UpdateTopicOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
             is UpdateTopicOutcome.NotFound -> call.respond(HttpStatusCode.NotFound)
-            is UpdateTopicOutcome.DateTaken, is UpdateTopicOutcome.StaleStatus -> call.respond(HttpStatusCode.Conflict)
+            is UpdateTopicOutcome.DateTaken -> call.respond(HttpStatusCode.Conflict)
             is UpdateTopicOutcome.Updated -> call.respond(outcome.topic.toDto())
         }
     }
