@@ -13,9 +13,24 @@ import app.yap.admin.feature.topics.presentation.TopicViewModel.UiState.Content.
 internal object TopicUiStateMapper : (DataState) -> UiState {
 
     override fun invoke(state: DataState): UiState = when (state.load) {
-        Load.FAILED -> UiState.Error(message = "Не удалось загрузить тему")
+        Load.FAILED -> UiState.Error(
+            message = "Не удалось загрузить тему",
+            toolbar = state.placeholderToolbar(),
+        )
         Load.LOADED -> state.toContent()
-        Load.LOADING -> UiState.Loading
+        Load.LOADING -> UiState.Loading(toolbar = state.placeholderToolbar())
+    }
+
+    private fun DataState.placeholderToolbar(): UiState.Toolbar = if (topicId == null) {
+        UiState.Toolbar(
+            subtitle = form.releaseDate?.let(ReleaseDateFormat::long),
+            title = "Новая тема",
+        )
+    } else {
+        UiState.Toolbar(
+            subtitle = null,
+            title = "Тема",
+        )
     }
 
     private fun DataState.toContent(): UiState.Content = UiState.Content(

@@ -28,13 +28,18 @@ import kotlinx.coroutines.launch
 
 internal class TopicViewModel(
     releaseDate: LocalDate?,
-    private val topicId: TopicId?,
+    topicId: TopicId?,
     private val getCharactersUseCase: GetCharactersUseCase,
     private val getTopicUseCase: GetTopicUseCase,
     private val saveTopicUseCase: SaveTopicUseCase,
 ) : ViewModel() {
 
-    private val dataState = MutableStateFlow(DataState(form = EMPTY_CONTENT.copy(releaseDate = releaseDate)))
+    private val dataState = MutableStateFlow(
+        DataState(
+            form = EMPTY_CONTENT.copy(releaseDate = releaseDate),
+            topicId = topicId,
+        ),
+    )
     val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicUiStateMapper)
 
     private val newsChannel = Channel<News>(Channel.BUFFERED)
@@ -100,6 +105,7 @@ internal class TopicViewModel(
     }
 
     private suspend fun onCastLoaded(cast: List<CharacterSummary>) {
+        val topicId = dataState.value.topicId
         if (topicId == null) {
             dataState.update { state ->
                 state.copy(
@@ -163,6 +169,7 @@ internal class TopicViewModel(
         val load: Load = Load.LOADING,
         val saved: Topic? = null,
         val saveStatus: SaveStatus? = null,
+        val topicId: TopicId? = null,
     ) {
 
         fun saved(topic: Topic): DataState = withForm(topic.content)
@@ -212,9 +219,17 @@ internal class TopicViewModel(
             )
         }
 
-        data class Error(val message: String) : UiState
+        data class Error(
+            val message: String,
+            val toolbar: Toolbar,
+        ) : UiState
 
-        data object Loading : UiState
+        data class Loading(val toolbar: Toolbar) : UiState
+
+        data class Toolbar(
+            val subtitle: String?,
+            val title: String,
+        )
     }
 
     sealed interface News {
