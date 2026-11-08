@@ -30,6 +30,15 @@ internal class LevelDtoMapperTest {
     }
 
     @Test
+    fun `GIVEN an input with a model WHEN mapping it THEN the entry keeps the model`() {
+        val dto = StubLevelDto.stubInputDto(settings = StubLevelDto.stubSettingsDto(model = StubLevel.MODEL))
+
+        val entry = dto.toModel()
+
+        assertEquals(expected = StubLevel.MODEL, actual = entry.settings.model)
+    }
+
+    @Test
     fun `GIVEN a code that is not a level WHEN mapping the input THEN it fails with a bad request`() {
         val dto = StubLevelDto.stubInputDto(code = "D1")
 
@@ -57,5 +66,14 @@ internal class LevelDtoMapperTest {
             ),
             actual = dto,
         )
+    }
+
+    @Test
+    fun `GIVEN a level with a model WHEN mapping it to the DTO THEN the DTO holds the model`() {
+        val level = StubLevel.stubLevel(settings = StubLevel.stubSettings(model = StubLevel.MODEL))
+
+        val dto = level.toDto()
+
+        assertEquals(expected = StubLevel.MODEL, actual = dto.settings?.model)
     }
 }

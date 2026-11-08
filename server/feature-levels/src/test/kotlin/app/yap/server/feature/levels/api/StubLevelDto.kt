@@ -14,10 +14,12 @@ internal object StubLevelDto {
         settings = settings,
     )
 
-    fun stubInputDtos(): List<LevelInputDto> = listOf(
+    fun stubInputDtos(
+        b1: LevelSettingsDto = stubSettingsDto(),
+    ): List<LevelInputDto> = listOf(
         stubInputDto(code = "A1", settings = stubSettingsDto(ratingFrom = 600)),
         stubInputDto(code = "A2", settings = stubSettingsDto(ratingFrom = 900)),
-        stubInputDto(code = "B1"),
+        stubInputDto(code = "B1", settings = b1),
         stubInputDto(code = "B2", settings = stubSettingsDto(ratingFrom = 1200)),
         stubInputDto(code = "C1", settings = stubSettingsDto(ratingFrom = 1350)),
         stubInputDto(code = "C2", settings = stubSettingsDto(ratingFrom = 1500)),
@@ -28,12 +30,14 @@ internal object StubLevelDto {
         block: String = StubLevel.BLOCK,
         idioms: String = "RARELY",
         maxWords: Int = StubLevel.MAX_WORDS,
+        model: String? = null,
         ratingFrom: Int? = StubLevel.RATING_FROM,
         vocabulary: String = StubLevel.VOCABULARY,
     ): LevelSettingsDto = LevelSettingsDto(
         block = block,
         idioms = idioms,
         maxWords = maxWords,
+        model = model,
         ratingFrom = ratingFrom,
         vocabulary = vocabulary,
     )
