@@ -16,9 +16,10 @@ object StubTaskModel {
     )
 
     fun stubTable(
+        reply: ModelChoice = ModelCatalog.DEFAULT,
         review: ModelChoice = ModelCatalog.DEFAULT,
     ): List<TaskModel> = listOf(
-        stubTaskModel(task = ModelTask.TOPIC_REPLY),
+        stubTaskModel(choice = reply, task = ModelTask.TOPIC_REPLY),
         stubTaskModel(task = ModelTask.TOPIC_CHECK),
         stubTaskModel(task = ModelTask.TOPIC_HINTS),
         stubTaskModel(choice = review, task = ModelTask.TOPIC_REVIEW),

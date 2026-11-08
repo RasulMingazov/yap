@@ -50,7 +50,7 @@ names the shapes.
 ## 7. [7/26] Publish and save · ~340 · `S/usecase/` (`PublishTopicUseCase`, `UpdateTopicUseCase`, `CreateTopicUseCase`, `GetTopicUseCase`), `S/model/` (the outcomes, `TopicDetails`), `S/FeatureTopicsModule.kt`, `S/api/` (`TopicRoutes`, `TopicDtoMapper`: compile only)
 
 - [x] 7.1 Add `PublishTopicUseCase` and the rule of the status in `UpdateTopicUseCase`, with the stored topic and today for `PastDate`; the outcomes carry the gaps and `DateTaken`; a stale status runs the update once more with the publish rule; move the `date` extension of `TopicCalendarRule` into `Topic` as an `internal` member, with its `requireNotNull`, because `publishedDate` reads the date; verify with the stub tests for a publish, the gaps, a past date, an unknown topic, a taken date, a publish of a published topic, a save of a published topic with an empty setting (stores nothing), a save of a draft that stays a draft, a save of a published topic that is out with its date, and a stale status
-- [ ] 7.2 Return `TopicDetails` (the topic, the release state, the publish gaps, and `DateTaken` for a draft whose date has another published topic) from get, create, update and publish; verify with the stub tests with a fixed clock for a ready draft, a taken date and a published topic
+- [x] 7.2 Return `TopicDetails` (the topic, the release state, the publish gaps, and `DateTaken` for a draft whose date has another published topic) from get, create, update and publish; verify with the stub tests with a fixed clock for a ready draft, a taken date and a published topic
 
 ## 8. [8/26] The topic DTOs · two slices
 

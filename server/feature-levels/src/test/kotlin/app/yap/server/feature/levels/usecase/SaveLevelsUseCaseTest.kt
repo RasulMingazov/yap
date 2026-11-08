@@ -37,6 +37,17 @@ internal class SaveLevelsUseCaseTest {
         assertEquals(expected = SaveLevelsOutcome.Invalid, actual = outcome)
     }
 
+    @Test
+    fun `GIVEN a level with a model outside the catalog WHEN saving THEN nothing is stored`() = runTest {
+        val env = Environment()
+        val table = StubLevel.stubTable(b1 = StubLevel.stubSettings(model = "deepseek-chat"))
+
+        val outcome = env.useCase(table)
+
+        env.levelRepository.saveCall.notCalled()
+        assertEquals(expected = SaveLevelsOutcome.ModelUnavailable, actual = outcome)
+    }
+
     private class Environment {
 
         val levelRepository = StubLevelRepository()

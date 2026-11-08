@@ -8,5 +8,5 @@ sealed interface UpdateTopicOutcome {
 
     data object NotFound : UpdateTopicOutcome
 
-    data class Updated(val topic: Topic) : UpdateTopicOutcome
+    data class Updated(val details: TopicDetails) : UpdateTopicOutcome
 }

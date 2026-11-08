@@ -82,9 +82,10 @@ Topic(content, status, topicId)
   today, and for a published topic whose new date is before today; a stored past date of a
   published topic stays valid. A use case accepts content when the set is empty. The names follow
   the rule guide in `docs/server/001-structure.md`.
-- `DateTaken` is not a rule gap: `TopicDetails` adds it for a draft when the repository finds
-  another published topic of the same date (`hasPublishedOn(date, exceptTopicId)`). The note shows
-  it before the click. A write that still meets the index answers 409.
+- `DateTaken` is not a rule gap: the use case asks the repository
+  (`hasPublishedOn(date, exceptTopicId)`), and `TopicDetailsRule` adds `DateTaken` to the
+  details of a draft when another published topic has the same date. The rule stays pure: it
+  takes `isDateTaken` and `today` from the use case. The note shows it before the click. A write that still meets the index answers 409.
 - Create makes a draft. Update reads the topic, applies the rule of its status, and writes
   `where topic_id = ? and status = <the status it read>`. No row written for a topic that exists
   means a publish came between the read and the write. The status only moves from draft to

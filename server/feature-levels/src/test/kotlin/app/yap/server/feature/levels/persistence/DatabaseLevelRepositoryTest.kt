@@ -53,4 +53,43 @@ internal class DatabaseLevelRepositoryTest {
             assertEquals(expected = changed.toSet(), actual = repository.list().toSet())
         }
     }
+
+    @Test
+    fun `GIVEN a level saved with a model WHEN reading the levels THEN it has the model`() = withTestDatabase { database ->
+        runTest {
+            val repository = DatabaseLevelRepository(database)
+            val table = StubLevel.stubTable(b1 = StubLevel.stubSettings(model = StubLevel.MODEL))
+            repository.save(table)
+
+            val entries = repository.list()
+
+            assertEquals(expected = table.toSet(), actual = entries.toSet())
+        }
+    }
+
+    @Test
+    fun `GIVEN a level with a model WHEN saving it without one THEN it has no model`() = withTestDatabase { database ->
+        runTest {
+            val repository = DatabaseLevelRepository(database)
+            repository.save(StubLevel.stubTable(b1 = StubLevel.stubSettings(model = StubLevel.MODEL)))
+            val withoutModel = StubLevel.stubTable()
+
+            repository.save(withoutModel)
+
+            assertEquals(expected = withoutModel.toSet(), actual = repository.list().toSet())
+        }
+    }
+
+    @Test
+    fun `GIVEN a stored model outside the catalog WHEN reading the levels THEN the level has no model`() =
+        withTestDatabase { database ->
+            runTest {
+                val repository = DatabaseLevelRepository(database)
+                repository.save(StubLevel.stubTable(b1 = StubLevel.stubSettings(model = "deepseek-chat")))
+
+                val entries = repository.list()
+
+                assertEquals(expected = StubLevel.stubTable().toSet(), actual = entries.toSet())
+            }
+        }
 }

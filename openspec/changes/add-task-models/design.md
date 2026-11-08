@@ -97,7 +97,7 @@ SaveTaskModelsOutcome = Invalid | CatalogChanged | Saved(ModelsOverview)
 - `GetModelsUseCase` reads the rows, gives each task its choice with `TaskModelChoice`, and adds the
   providers with `ProviderConnections`.
 - `SaveModelsUseCase` checks the rule, saves, and returns the overview.
-- `GetTaskModelUseCase(task, level: LevelCode): ModelChoice` is the rule of a call. For a task that
+- `GetTaskModelUseCase(code: LevelCode, task: ModelTask): ModelChoice` is the rule of a call. For a task that
   depends on the level, it reads the level through `GetLevelsUseCase` of `feature-levels` and uses
   its model when it has one. Else it uses `TaskModelChoice` on the task row. It reads at each call
   and caches nothing, so the next call sees a save.

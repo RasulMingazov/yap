@@ -20,4 +20,11 @@ internal class ModelTaskTest {
             actual = tasks,
         )
     }
+
+    @Test
+    fun `GIVEN the tasks WHEN asking which depend on the level THEN they are Character reply and Hints`() {
+        val tasks = ModelTask.entries.filter { task -> task.dependsOnLevel }
+
+        assertEquals(expected = listOf(ModelTask.TOPIC_REPLY, ModelTask.TOPIC_HINTS), actual = tasks)
+    }
 }

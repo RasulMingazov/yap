@@ -8,9 +8,7 @@ import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelCode
-import app.yap.admin.feature.levels.domain.LevelEntry
 import app.yap.admin.feature.levels.domain.LevelInput
-import app.yap.admin.feature.levels.domain.LevelSettings
 import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.hasEveryLevel
 import app.yap.admin.feature.levels.domain.usecase.GetLevelsUseCase
@@ -52,7 +50,7 @@ internal class LevelsViewModel(
         dataState.update { state ->
             state.copy(
                 forms = state.forms + (event.code to event.form),
-                saveStatus = null,
+                saveResult = null,
             )
         }
     }
@@ -81,71 +79,48 @@ internal class LevelsViewModel(
     private fun onSaveClicked() {
         val state = dataState.value
         if (state.isSaving) return
-        val checks = state.forms.map { (code, form) -> check(code, form) }
-        val problem = checks
-            .filterIsInstance<FormCheck.Problem>()
-            .firstOrNull()
-        if (problem != null) {
-            dataState.update { current -> current.copy(saveStatus = problem.status) }
-            return
-        }
-        save(checks.filterIsInstance<FormCheck.Ready>().map { ready -> ready.entry })
-    }
-
-    private fun check(code: LevelCode, form: LevelInput): FormCheck {
-        val idioms = form.idioms
-        val maxWords = form.maxWords.toIntOrNull()
-        return when {
-            form.ratingFrom.isNotBlank() && form.ratingFrom.toIntOrNull() == null ->
-                FormCheck.Problem(SaveStatus.UnreadNumber(code, NumberField.RATING_FROM))
-            maxWords == null -> FormCheck.Problem(SaveStatus.UnreadNumber(code, NumberField.MAX_WORDS))
-            idioms == null -> FormCheck.Problem(SaveStatus.NoIdioms(code))
-            else -> FormCheck.Ready(
-                LevelEntry(
-                    code = code,
-                    settings = LevelSettings(
-                        block = form.block,
-                        idioms = idioms,
-                        maxWords = maxWords,
-                        ratingFrom = form.ratingFrom.toIntOrNull(),
-                        vocabulary = form.vocabulary,
-                    ),
-                ),
-            )
-        }
-    }
-
-    private fun save(entries: List<LevelEntry>) {
-        dataState.update { state ->
-            state.copy(
+        dataState.update { current ->
+            current.copy(
                 isSaving = true,
-                saveStatus = null,
+                saveResult = null,
             )
         }
         viewModelScope.launch {
-            when (val result = saveLevelsUseCase(entries)) {
-                is SaveLevelsResult.Failed -> onSaveFailed()
-                is SaveLevelsResult.Invalid -> dataState.update { state ->
-                    state.copy(
-                        isSaving = false,
-                        saveStatus = SaveStatus.Invalid,
-                    )
-                }
-                is SaveLevelsResult.Saved -> onSaved(result.levels)
+            when (val result = saveLevelsUseCase(state.forms)) {
+                is SaveLevelsResult.Failed -> onSaveFailed(result)
+                is SaveLevelsResult.Invalid,
+                is SaveLevelsResult.NoIdioms,
+                is SaveLevelsResult.NoWordCount,
+                is SaveLevelsResult.UnreadNumber -> endSave(result)
+                is SaveLevelsResult.Saved -> onSaved(result)
             }
         }
     }
 
-    private fun onSaved(levels: List<Level>) {
-        if (!levels.hasEveryLevel()) {
-            dataState.update { state -> state.copy(saveStatus = SaveStatus.Saved) }
+    private suspend fun onSaveFailed(result: SaveLevelsResult.Failed) {
+        endSave(result)
+        newsChannel.send(News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."))
+    }
+
+    private fun onSaved(result: SaveLevelsResult.Saved) {
+        if (!result.levels.hasEveryLevel()) {
+            dataState.update { state -> state.copy(saveResult = result) }
             load()
             return
         }
         dataState.update { state ->
             state
-                .loaded(levels)
-                .copy(saveStatus = SaveStatus.Saved)
+                .loaded(result.levels)
+                .copy(saveResult = result)
+        }
+    }
+
+    private fun endSave(result: SaveLevelsResult) {
+        dataState.update { state ->
+            state.copy(
+                isSaving = false,
+                saveResult = result,
+            )
         }
     }
 
@@ -155,45 +130,14 @@ internal class LevelsViewModel(
         levels = levels,
     )
 
-    private suspend fun onSaveFailed() {
-        dataState.update { state -> state.copy(isSaving = false) }
-        newsChannel.send(News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."))
-    }
-
     data class DataState(
         val chosen: LevelCode = LevelCode.B1,
         val forms: Map<LevelCode, LevelInput> = emptyMap(),
         val isLoadFailed: Boolean = false,
         val isSaving: Boolean = false,
         val levels: List<Level>? = null,
-        val saveStatus: SaveStatus? = null,
+        val saveResult: SaveLevelsResult? = null,
     )
-
-    sealed interface FormCheck {
-
-        data class Problem(val status: SaveStatus) : FormCheck
-
-        data class Ready(val entry: LevelEntry) : FormCheck
-    }
-
-    enum class NumberField {
-        MAX_WORDS,
-        RATING_FROM,
-    }
-
-    sealed interface SaveStatus {
-
-        data object Invalid : SaveStatus
-
-        data class NoIdioms(val code: LevelCode) : SaveStatus
-
-        data object Saved : SaveStatus
-
-        data class UnreadNumber(
-            val code: LevelCode,
-            val field: NumberField,
-        ) : SaveStatus
-    }
 
     sealed interface UiState {
 
