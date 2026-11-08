@@ -30,6 +30,10 @@ Out of scope:
 
 - Try on the Topic screen: #15. The To do note of a ready draft does not mention Try until #15.
 - The items under Proposals: no issue owns them yet.
+- The `trim()` in the character, level and prompt DTO mappers: the tech PR «server: map DTOs 1:1 in the character, level and prompt mappers», with no
+  issue.
+- One event per field on the Character screen: the tech PR «admin: one event per field on the Character screen», with
+  no issue.
 
 ## Proposals
 

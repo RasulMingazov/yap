@@ -187,9 +187,13 @@ does not change.
 
   ```text
   TopicsViewModel.DataState(calendar: TopicCalendar?, isLoadFailed, isLoading)
-  TopicViewModel.DataState(cast: List<Character>?, form: TopicContent, guestDescription,
-      isLoadFailed, isSaving, saveResult: SaveTopicResult?, topic: Topic?, topicId: TopicId?)
+  TopicViewModel.DataState(cast: List<CharacterSummary>?, form: TopicContent, guestDescription,
+      isLoadFailed, isLoading, isSaving, saveResult: SaveTopicResult?, topic: Topic?)
   ```
+
+  `cast` has the list type that [10/26] leaves. `isLoading` is the busy flag of the load, so no
+  `null` means Loading. The view model takes the identifier of the topic to load from its
+  constructor, and the save reads `topic?.topicId`; `DataState` holds no copy of it.
 
   No `Load` enum, no `SaveStatus`, no stored `LoadTopicsResult`, no `loaded()`, `saved()` or
   `withForm()`. The view model sets the facts in named private functions. The private function
@@ -201,13 +205,15 @@ does not change.
   `StepTaskChanged`, `StepPassWhenChanged`, `StepOutcomeChanged`, beside `DurationChanged`,
   `ReleaseDatePicked`, `InterlocutorChosen`, `GuestDescriptionChanged` and `AddStepClicked`. The
   view model does the `copy`. `UiState.Content` carries `Fields` with the texts, not the domain
-  `TopicContent`. The Character screen is a separate refactor.
+  `TopicContent`. The Character screen follows in the tech PR
+  «admin: one event per field on the Character screen».
 - The admin loads return the shared `LoadResult<T>`: `LoadResult<TopicCalendar>` and
   `LoadResult<Topic>`. `LoadTopicResult` and `LoadTopicsResult` go away.
 - The server DTO mappers map the fields 1:1. Normalizing is a rule in `model/`
   (`TopicContent.normalized()`), and the use cases apply it before the other rules.
   `docs/server/001-structure.md` changes its mapper rule in [8/26] slice 1. The character, level
-  and prompt mappers still trim; they follow in a separate change.
+  and prompt mappers still trim; they follow in the tech PR
+  «server: map DTOs 1:1 in the character, level and prompt mappers».
 - «Today in Moscow» is its own function, `moscowToday(clock)`, not a member of the `ReleaseState`
   enum.
 - A zero duration stays `Missing(DURATION)`. A separate gap for it would change the spec and is
