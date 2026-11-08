@@ -153,6 +153,16 @@ the block into the reply and hints prompts as `{level.rules}`.
 - **WHEN** the server returns the levels without one of the seven
 - **THEN** Levels shows an error that the levels did not load, and Retry
 
+### Requirement: The table marks the chosen level
+
+The table SHALL mark the row of the chosen level. A note below the table SHALL say that a click on
+a level opens its prompt block.
+
+#### Scenario: The chosen row
+
+- **WHEN** the owner clicks B2 in the table
+- **THEN** the row of B2 is marked and the row of B1 is not
+
 ### Requirement: The rows without a rating from or without values
 
 The Rating of No rating SHALL show that the level is also for the calibration, with no field for the

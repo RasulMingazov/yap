@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
@@ -138,7 +137,7 @@ private fun LevelsForm(
                 content = content,
                 onEvent = onEvent,
             )
-            Note(text = AnnotatedString(TABLE_NOTE))
+            Note(text = TABLE_NOTE)
         }
         BlockSection(
             content = content,
