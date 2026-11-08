@@ -163,7 +163,7 @@ This part uses the state of parts 10 and 11 and does not change it. Part 14 hold
 
 Files: `al/presentation/ui/LevelsScreen.kt`.
 
-- [ ] 12.1 Add the Model column, the table note on Character reply, Hints and Default (M2), the No rating line (M3), the models error with Retry (M4), and the status with Refresh beside Save (M6); verify with `./gradlew build`
+- [x] 12.1 Add the Model column, the table note on Character reply, Hints and Default (M2), the No rating line (M3), the models error with Retry (M4), and the status with Refresh beside Save (M6); verify with `./gradlew build`
 - [ ] 12.2 Owner check: run the admin app against a server with a database; verify a level model after a save and after a server restart
 
 ## 13. [13/15] Models screen captures
