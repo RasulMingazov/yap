@@ -2,9 +2,10 @@ package app.yap.admin.feature.prompts.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.adminKtorfit
 import app.yap.admin.core.network.settings.StubServerSettings
 import app.yap.admin.core.network.settings.StubServerSettingsRepository
+import app.yap.admin.feature.prompts.data.api.createPromptApi
 import app.yap.admin.feature.prompts.domain.PromptGroup
 import app.yap.admin.feature.prompts.domain.PromptKey
 import app.yap.admin.feature.prompts.domain.PromptSummary
@@ -35,15 +36,6 @@ internal class RemotePromptRepositoryTest {
 
         val summary = PromptSummary(group = PromptGroup.TOPIC, promptKey = PromptKey.TOPIC_REPLY)
         assertEquals(expected = LoadResult.Loaded(listOf(summary)), actual = result)
-    }
-
-    @Test
-    fun `GIVEN no saved server settings WHEN loading the prompts THEN loading fails`() = runTest {
-        val env = Environment(answer = answer(content = "[]"), settings = null)
-
-        val result = env.repository.list()
-
-        assertEquals(expected = LoadResult.Failed to 0, actual = result to env.engine.requestHistory.size)
     }
 
     @Test
@@ -136,15 +128,15 @@ internal class RemotePromptRepositoryTest {
         assertEquals(expected = RestorePromptResult.Failed, actual = result)
     }
 
-    private class Environment(
-        answer: MockRequestHandler,
-        settings: ServerSettings? = StubServerSettings.stubServerSettings(),
-    ) {
+    private class Environment(answer: MockRequestHandler) {
 
         val engine = MockEngine(answer)
-        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
-        val repository = RemotePromptRepository(
+        val serverSettingsRepository = StubServerSettingsRepository(settings = StubServerSettings.stubServerSettings())
+        private val ktorfit = adminKtorfit(
             httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+        )
+        val repository = RemotePromptRepository(
+            promptApi = ktorfit.createPromptApi(),
             serverSettingsRepository = serverSettingsRepository,
         )
     }

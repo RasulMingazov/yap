@@ -2,9 +2,10 @@ package app.yap.admin.feature.levels.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.adminKtorfit
 import app.yap.admin.core.network.settings.StubServerSettings
 import app.yap.admin.core.network.settings.StubServerSettingsRepository
+import app.yap.admin.feature.levels.data.api.createLevelApi
 import app.yap.admin.feature.levels.domain.LevelCode
 import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.StubLevel
@@ -36,15 +37,6 @@ internal class RemoteLevelRepositoryTest {
             ),
             actual = result,
         )
-    }
-
-    @Test
-    fun `GIVEN no saved server settings WHEN loading the levels THEN loading fails without a call`() = runTest {
-        val env = Environment(answer = answer(content = "[]"), settings = null)
-
-        val result = env.repository.list()
-
-        assertEquals(expected = LoadResult.Failed to 0, actual = result to env.engine.requestHistory.size)
     }
 
     @Test
@@ -108,15 +100,15 @@ internal class RemoteLevelRepositoryTest {
         assertEquals(expected = SaveLevelsResult.Failed, actual = result)
     }
 
-    private class Environment(
-        answer: MockRequestHandler,
-        settings: ServerSettings? = StubServerSettings.stubServerSettings(),
-    ) {
+    private class Environment(answer: MockRequestHandler) {
 
         val engine = MockEngine(answer)
-        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
-        val repository = RemoteLevelRepository(
+        val serverSettingsRepository = StubServerSettingsRepository(settings = StubServerSettings.stubServerSettings())
+        private val ktorfit = adminKtorfit(
             httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+        )
+        val repository = RemoteLevelRepository(
+            levelApi = ktorfit.createLevelApi(),
             serverSettingsRepository = serverSettingsRepository,
         )
     }

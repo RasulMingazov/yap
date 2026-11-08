@@ -17,8 +17,10 @@ internal fun featureCharactersModule(): Module = module {
 - The admin app is one Gradle module. Each owner package declares one internal Koin module
   function in its root package: `coreNetworkModule()`, `feature<Name>Module()`, and
   `navigationModule()`.
-- Use `single` for repositories, the HTTP client, and the preferences node. Use `factory` for use
-  cases and view models.
+- Use `single` for repositories, the HTTP client, the Ktorfit instance, the Ktorfit APIs, and the
+  preferences node. Use `factory` for use cases and view models.
+- `coreNetworkModule()` builds Ktorfit once on the HTTP client. Each feature module binds its API
+  from it: `single { get<Ktorfit>().createCharacterApi() }`.
 - A view model that takes a value from its screen, such as `CharacterViewModel` and its
   `characterId`, reads the value from the parameters of a lambda definition:
   `factory { (characterId: CharacterId?) -> CharacterViewModel(...) }`. Koin finds a parameter of

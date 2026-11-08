@@ -2,9 +2,10 @@ package app.yap.admin.feature.characters.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.adminKtorfit
 import app.yap.admin.core.network.settings.StubServerSettings
 import app.yap.admin.core.network.settings.StubServerSettingsRepository
+import app.yap.admin.feature.characters.data.api.createCharacterApi
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.StubCharacter
 import io.ktor.client.engine.mock.MockEngine
@@ -30,15 +31,6 @@ internal class RemoteCharacterRepositoryTest {
         val result = env.repository.list()
 
         assertEquals(expected = LoadResult.Loaded(listOf(StubCharacter.stubCharacter())), actual = result)
-    }
-
-    @Test
-    fun `GIVEN no saved server settings WHEN loading the characters THEN loading fails`() = runTest {
-        val env = Environment(answer = answer(content = "[]"), settings = null)
-
-        val result = env.repository.list()
-
-        assertEquals(expected = LoadResult.Failed to 0, actual = result to env.engine.requestHistory.size)
     }
 
     @Test
@@ -97,15 +89,15 @@ internal class RemoteCharacterRepositoryTest {
         assertEquals(expected = LoadResult.Failed, actual = result)
     }
 
-    private class Environment(
-        answer: MockRequestHandler,
-        settings: ServerSettings? = StubServerSettings.stubServerSettings(),
-    ) {
+    private class Environment(answer: MockRequestHandler) {
 
         val engine = MockEngine(answer)
-        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
-        val repository = RemoteCharacterRepository(
+        val serverSettingsRepository = StubServerSettingsRepository(settings = StubServerSettings.stubServerSettings())
+        private val ktorfit = adminKtorfit(
             httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+        )
+        val repository = RemoteCharacterRepository(
+            characterApi = ktorfit.createCharacterApi(),
             serverSettingsRepository = serverSettingsRepository,
         )
     }

@@ -13,6 +13,8 @@ dependencies {
     implementation(libs.gradle.plugin.kotlin)
     implementation(libs.gradle.plugin.kotlin.compose)
     implementation(libs.gradle.plugin.kotlin.serialization)
+    implementation(libs.gradle.plugin.ksp)
+    implementation(libs.gradle.plugin.ktorfit)
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
 }
 
