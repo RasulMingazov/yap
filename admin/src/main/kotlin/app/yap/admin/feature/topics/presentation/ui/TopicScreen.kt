@@ -130,6 +130,10 @@ private fun TopicForm(
             content = content,
             onEvent = onEvent,
         )
+        StepsSection(
+            content = content,
+            onEvent = onEvent,
+        )
     }
 }
 

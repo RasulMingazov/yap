@@ -93,16 +93,21 @@ internal fun PopupButton(
 internal fun LinkButton(
     onClick: () -> Unit,
     text: String,
+    enabled: Boolean = true,
 ) {
     var baseline by remember { mutableFloatStateOf(0f) }
     Text(
         text = text,
-        color = AdminTheme.Colors.ink,
+        color = if (enabled) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
         style = AdminTheme.Type.body,
         fontWeight = FontWeight.Medium,
         onTextLayout = { layout -> baseline = layout.firstBaseline },
         modifier = Modifier
-            .clickable(role = Role.Button, onClick = onClick)
+            .clickable(
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick,
+            )
             .drawBehind {
                 val underline = baseline + AdminTheme.Sizes.linkUnderlineOffset.toPx()
                 drawLine(
