@@ -15,6 +15,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -118,7 +119,7 @@ internal class ModelsViewModelTest {
         val env = Environment()
         advanceUntilIdle()
 
-        env.changeReview(PRO)
+        env.viewModel.onEvent(REVIEW_PRO)
         advanceUntilIdle()
 
         assertEquals(expected = PRO_REVIEW_MODELS, actual = env.models())
@@ -129,7 +130,7 @@ internal class ModelsViewModelTest {
         val env = Environment()
         advanceUntilIdle()
 
-        env.changeReview(PRO)
+        env.viewModel.onEvent(REVIEW_PRO)
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
@@ -157,7 +158,7 @@ internal class ModelsViewModelTest {
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
-        env.changeReview(PRO)
+        env.viewModel.onEvent(REVIEW_PRO)
         advanceUntilIdle()
 
         assertEquals(expected = null, actual = env.content().saveStatus)
@@ -169,7 +170,7 @@ internal class ModelsViewModelTest {
         advanceUntilIdle()
 
         env.viewModel.onEvent(Event.SaveClicked)
-        env.changeReview(PRO)
+        env.viewModel.onEvent(REVIEW_PRO)
         advanceUntilIdle()
 
         assertEquals(expected = List(size = 5) { StubModels.MODEL }, actual = env.models())
@@ -186,6 +187,20 @@ internal class ModelsViewModelTest {
 
         env.saveModelsUseCase.invokeCall.called(times = 1)
     }
+
+    @Test
+    fun `GIVEN a load that answers during a save WHEN Save is clicked again THEN the models are saved once`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.Opened)
+            launch { env.viewModel.onEvent(Event.SaveClicked) }
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.saveModelsUseCase.invokeCall.called(times = 1)
+        }
 
     @Test
     fun `GIVEN a save in progress WHEN Models opens again THEN it does not load`() = runTest(dispatcher) {
@@ -205,7 +220,7 @@ internal class ModelsViewModelTest {
             val env = Environment(saveResult = SaveModelsResult.Invalid)
             advanceUntilIdle()
 
-            env.changeReview(PRO)
+            env.viewModel.onEvent(REVIEW_PRO)
             env.viewModel.onEvent(Event.SaveClicked)
             advanceUntilIdle()
 
@@ -216,15 +231,20 @@ internal class ModelsViewModelTest {
         }
 
     @Test
-    fun `GIVEN a changed catalog WHEN the server answers 409 THEN Refresh shows`() = runTest(dispatcher) {
-        val env = Environment(saveResult = SaveModelsResult.CatalogChanged)
-        advanceUntilIdle()
+    fun `GIVEN a changed catalog WHEN the server answers 409 THEN Refresh shows and the form stays`() =
+        runTest(dispatcher) {
+            val env = Environment(saveResult = SaveModelsResult.CatalogChanged)
+            advanceUntilIdle()
 
-        env.viewModel.onEvent(Event.SaveClicked)
-        advanceUntilIdle()
+            env.viewModel.onEvent(REVIEW_PRO)
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
 
-        assertEquals(expected = true, actual = env.content().isRefreshShown)
-    }
+            assertEquals(
+                expected = true to PRO_REVIEW_MODELS,
+                actual = env.content().isRefreshShown to env.models(),
+            )
+        }
 
     @Test
     fun `GIVEN a changed catalog WHEN Refresh is clicked THEN the server choices show`() = runTest(dispatcher) {
@@ -244,18 +264,20 @@ internal class ModelsViewModelTest {
     }
 
     @Test
-    fun `GIVEN the server does not answer WHEN saving THEN a snackbar says the save failed`() = runTest(dispatcher) {
-        val env = Environment(saveResult = SaveModelsResult.Failed)
-        advanceUntilIdle()
+    fun `GIVEN the server does not answer WHEN saving THEN a snackbar shows and the form stays`() =
+        runTest(dispatcher) {
+            val env = Environment(saveResult = SaveModelsResult.Failed)
+            advanceUntilIdle()
 
-        env.viewModel.onEvent(Event.SaveClicked)
-        advanceUntilIdle()
+            env.viewModel.onEvent(REVIEW_PRO)
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
 
-        assertEquals(
-            expected = News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."),
-            actual = env.viewModel.news.first(),
-        )
-    }
+            assertEquals(
+                expected = News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз.") to PRO_REVIEW_MODELS to true,
+                actual = env.viewModel.news.first() to env.models() to env.content().isFormEnabled,
+            )
+        }
 
     @Test
     fun `GIVEN the models did not load WHEN Retry is clicked THEN the tasks show`() = runTest(dispatcher) {
@@ -301,15 +323,6 @@ internal class ModelsViewModelTest {
             viewModel.onEvent(Event.Opened)
         }
 
-        fun changeReview(model: String) {
-            viewModel.onEvent(
-                Event.ModelChanged(
-                    model = model,
-                    task = ModelTask.TOPIC_REVIEW,
-                ),
-            )
-        }
-
         fun content(): UiState.Content = viewModel.uiState.value as UiState.Content
 
         fun models(): List<String> = content().tasks.map { row -> row.model }
@@ -320,5 +333,10 @@ internal class ModelsViewModelTest {
         const val PRO = "deepseek-v4-pro"
 
         val PRO_REVIEW_MODELS = listOf(StubModels.MODEL, StubModels.MODEL, StubModels.MODEL, PRO, StubModels.MODEL)
+
+        val REVIEW_PRO = Event.ModelChanged(
+            model = PRO,
+            task = ModelTask.TOPIC_REVIEW,
+        )
     }
 }

@@ -129,7 +129,10 @@ internal class ModelsViewModel(
                 is SaveModelsResult.Saved -> dataState.update { current ->
                     current
                         .loaded(result.models)
-                        .copy(saveResult = result)
+                        .copy(
+                            isSaving = false,
+                            saveResult = result,
+                        )
                 }
             }
         }
@@ -153,7 +156,6 @@ internal class ModelsViewModel(
         choices = models.tasks.associate { taskModel ->
             taskModel.task to taskModel.choice
         },
-        isSaving = false,
         models = models,
     )
 
