@@ -1,11 +1,14 @@
 package app.yap.server.config
 
 import app.yap.server.core.database.DatabaseConfig
+import app.yap.server.core.llm.LlmConfig
+import app.yap.server.core.llm.StubLlmConfig
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 internal class AppConfigLoaderTest {
 
@@ -24,10 +27,23 @@ internal class AppConfigLoaderTest {
                     user = "postgres",
                 ),
                 environment = AppEnvironment.DEVELOPMENT,
+                llm = LlmConfig(deepSeek = null),
                 port = 8080,
             ),
             actual = config,
         )
+    }
+
+    @Test
+    fun `GIVEN a DeepSeek key WHEN loading THEN DeepSeek is configured with it`() {
+        val llm = load(systemEnv = mapOf("DEEPSEEK_API_KEY" to StubLlmConfig.API_KEY)).llm
+
+        assertEquals(expected = StubLlmConfig.stubLlmConfig(), actual = llm)
+    }
+
+    @Test
+    fun `GIVEN a blank DeepSeek key WHEN loading THEN DeepSeek is not configured`() {
+        assertNull(load(systemEnv = mapOf("DEEPSEEK_API_KEY" to " ")).llm.deepSeek)
     }
 
     @Test

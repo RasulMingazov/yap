@@ -41,9 +41,9 @@ Files: `llm/LlmConfig.kt`, `llm/ProviderConnections.kt`, `llm/CoreLlmModule.kt`,
 (Koin, stubcall), `server/feature-models/src/testFixtures/` (`StubTaskModelRepository`), and their
 tests.
 
-- [ ] 3.1 Read `DEEPSEEK_API_KEY` as an optional setting into `LlmConfig`, and bind `ProviderConnections` in `coreLlmModule(config)`; add an empty `DEEPSEEK_API_KEY=` line to `.env.example`; verify with `AppConfigLoaderTest` for a key, no key and a blank key, the `ProviderConnections` test, and `AppModulesTest`
-- [ ] 3.2 Add the shared rule `TaskModelChoice` in `fm/model/`: the stored row when it is in the catalog, else the default; verify with `TaskModelChoiceTest` for no row, a row in the catalog and a row outside it
-- [ ] 3.3 Add `GetModelsUseCase` and `SaveModelsUseCase`, with `TaskModelChoice` in the read and the outcomes `Invalid` and `CatalogChanged`; verify with the use-case tests for the defaults before a save, Connected with and without a key, `Invalid` for a task missing or twice, `CatalogChanged` for a model outside the catalog, a rejected save that saves nothing, and a save with a provider without a key
+- [x] 3.1 Read `DEEPSEEK_API_KEY` as an optional setting into `LlmConfig`, and bind `ProviderConnections` in `coreLlmModule(config)`; add an empty `DEEPSEEK_API_KEY=` line to `.env.example`; verify with `AppConfigLoaderTest` for a key, no key and a blank key, the `ProviderConnections` test, and `AppModulesTest`
+- [x] 3.2 Add the shared rule `TaskModelChoice` in `fm/model/`: the stored row when it is in the catalog, else the default; verify with `TaskModelChoiceTest` for no row, a row in the catalog and a row outside it
+- [x] 3.3 Add `GetModelsUseCase` and `SaveModelsUseCase`, with `TaskModelChoice` in the read and the outcomes `Invalid` and `CatalogChanged`; verify with the use-case tests for the defaults before a save, Connected with and without a key, `Invalid` for a task missing or twice, `CatalogChanged` for a model outside the catalog, a rejected save that saves nothing, and a save with a provider without a key
 
 ## 4. [4/15] Server admin API (about 350 lines)
 

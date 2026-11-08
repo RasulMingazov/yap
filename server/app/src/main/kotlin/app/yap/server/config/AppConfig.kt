@@ -1,11 +1,13 @@
 package app.yap.server.config
 
 import app.yap.server.core.database.DatabaseConfig
+import app.yap.server.core.llm.LlmConfig
 
 internal data class AppConfig(
     val adminApiKey: String,
     val database: DatabaseConfig,
     val environment: AppEnvironment,
+    val llm: LlmConfig,
     val port: Int,
 ) {
 

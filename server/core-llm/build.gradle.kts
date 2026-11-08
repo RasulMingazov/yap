@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.koin.core)
     api(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.content.negotiation)
