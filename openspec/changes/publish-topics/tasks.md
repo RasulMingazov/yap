@@ -16,8 +16,8 @@ before the screen. The captures come in their own part.
 
 ## 2. [2/26] The publish rule and the release state · ~300 · `S/model/` (`TopicField`, `TopicGap`, `TopicStatus`, `ReleaseState`, `TopicDraftRule`, `TopicPublishRule`, the Moscow zone), `S/usecase/` (`CreateTopicUseCase`, `UpdateTopicUseCase`)
 
-- [ ] 2.1 Make `TopicDraftRule` return the gaps, and add `TopicPublishRule` with `Missing`, `IncompleteSteps` (1-based numbers) and `PastDate`; the use cases accept an empty set; verify with the rule tests for each field, no steps, the steps 3 and 5 without an outcome, a guest without a description, an unknown character, a draft with a past date, a published topic that keeps its past date, a published topic moved into the past, and the unchanged use case tests
-- [ ] 2.2 Add `TopicStatus` and `ReleaseState` from the status, the date and today; verify with the tests for Out, Today, Published, a draft of today, and 22:30 UTC on 23 October as 24 October in Moscow
+- [x] 2.1 Make `TopicDraftRule` return the gaps, and add `TopicPublishRule` with `Missing`, `IncompleteSteps` (1-based numbers) and `PastDate`; the use cases accept an empty set; verify with the rule tests for each field, no steps, the steps 3 and 5 without an outcome, a guest without a description, an unknown character, a draft with a past date, a published topic that keeps its past date, a published topic moved into the past, and the unchanged use case tests
+- [x] 2.2 Add `TopicStatus` and `ReleaseState` from the status, the date and today; verify with the tests for Out, Today, Published, a draft of today, and 22:30 UTC on 23 October as 24 October in Moscow
 
 ## 3. [3/26] The status in the database · ~250 · `server/feature-topics/src/main/resources/db/migration/V5__topic_status.sql`, `S/model/Topic.kt`, `S/model/StubTopic.kt`, `S/persistence/` (`TopicsTable`, `TopicRepository`, `DatabaseTopicRepository`, `StubTopicRepository`), `S/usecase/UpdateTopicUseCase.kt`, `S/api/` (`TopicRoutes`, `TopicDtoMapper`: compile only)
 

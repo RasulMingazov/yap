@@ -6,6 +6,9 @@ data class Step(
     val task: String,
 ) {
 
+    internal val isComplete: Boolean
+        get() = outcome.isNotEmpty() && passWhen.isNotEmpty() && task.isNotEmpty()
+
     internal val isEmpty: Boolean
         get() = outcome.isEmpty() && passWhen.isEmpty() && task.isEmpty()
 }

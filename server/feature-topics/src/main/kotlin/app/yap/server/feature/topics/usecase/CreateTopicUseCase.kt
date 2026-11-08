@@ -11,7 +11,7 @@ class CreateTopicUseCase(
 ) {
 
     suspend operator fun invoke(content: TopicContent): CreateTopicOutcome {
-        if (!topicDraftRule.accepts(content)) return CreateTopicOutcome.Invalid
+        if (topicDraftRule.gaps(content).isNotEmpty()) return CreateTopicOutcome.Invalid
         return CreateTopicOutcome.Created(topicRepository.create(content))
     }
 }
