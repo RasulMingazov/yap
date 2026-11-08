@@ -11,6 +11,8 @@ import app.yap.admin.feature.characters.presentation.ui.CharacterScreen
 import app.yap.admin.feature.characters.presentation.ui.CharactersScreen
 import app.yap.admin.feature.levels.presentation.LevelsViewModel
 import app.yap.admin.feature.levels.presentation.ui.LevelsScreen
+import app.yap.admin.feature.models.presentation.ModelsViewModel
+import app.yap.admin.feature.models.presentation.ui.ModelsScreen
 import app.yap.admin.feature.prompts.presentation.PromptsViewModel
 import app.yap.admin.feature.prompts.presentation.ui.PromptsScreen
 import app.yap.admin.feature.server.presentation.ServerViewModel
@@ -30,6 +32,7 @@ internal fun AdminShell(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: CharactersViewModel,
     levelsViewModel: LevelsViewModel,
+    modelsViewModel: ModelsViewModel,
     promptsViewModel: PromptsViewModel,
     serverViewModel: ServerViewModel,
     topicViewModel: (TopicId?) -> TopicViewModel,
@@ -49,6 +52,7 @@ internal fun AdminShell(
                 characterViewModel = characterViewModel,
                 charactersViewModel = charactersViewModel,
                 levelsViewModel = levelsViewModel,
+                modelsViewModel = modelsViewModel,
                 onScreenClick = onScreenClick,
                 promptsViewModel = promptsViewModel,
                 screen = state.screen,
@@ -66,6 +70,7 @@ private fun ScreenContent(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: CharactersViewModel,
     levelsViewModel: LevelsViewModel,
+    modelsViewModel: ModelsViewModel,
     onScreenClick: (Screen) -> Unit,
     promptsViewModel: PromptsViewModel,
     screen: Screen,
@@ -84,6 +89,7 @@ private fun ScreenContent(
             viewModel = charactersViewModel,
         )
         is Screen.Levels -> LevelsScreen(viewModel = levelsViewModel)
+        is Screen.Models -> ModelsScreen(viewModel = modelsViewModel)
         is Screen.Prompts -> PromptsScreen(viewModel = promptsViewModel)
         is Screen.Server -> ServerScreen(viewModel = serverViewModel)
         is Screen.Topic -> TopicScreen(
