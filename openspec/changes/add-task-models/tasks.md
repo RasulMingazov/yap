@@ -100,7 +100,7 @@ Split: the part came to about 400 lines. 7.1 holds the load, the task rows and t
 (about 300 lines); 7.2 holds the save statuses in the same files (about 100 lines).
 
 - [x] 7.1 Add the Models UI state and `ModelsUiStateMapper`; verify with the mapper tests for the loader while loading (m7), the defaults on the first open, the task lines from the prompts and the Calibration line (m8), Not connected with its tone and the step that names `keySetting`, the Not connected mark on a task row (M1), the model choices of the chosen provider, the load error, and a task missing in the answer
-- [ ] 7.2 Add the save facts and statuses to the Models UI state; verify with the mapper tests for the saving, Saved, rejected and catalog-changed statuses with Refresh (M5)
+- [x] 7.2 Add the save facts and statuses to the Models UI state; verify with the mapper tests for the saving, Saved, rejected and catalog-changed statuses with Refresh (M5)
 
 ## 8. [8/15] Admin Models view model (about 300 lines)
 

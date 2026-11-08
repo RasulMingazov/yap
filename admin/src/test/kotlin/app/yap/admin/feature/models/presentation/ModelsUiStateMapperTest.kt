@@ -4,6 +4,7 @@ import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.models.domain.ModelChoice
 import app.yap.admin.feature.models.domain.ModelTask
 import app.yap.admin.feature.models.domain.Models
+import app.yap.admin.feature.models.domain.SaveModelsResult
 import app.yap.admin.feature.models.domain.StubModels
 import app.yap.admin.feature.models.presentation.ModelsViewModel.DataState
 import app.yap.admin.feature.models.presentation.ModelsViewModel.UiState
@@ -133,6 +134,70 @@ internal class ModelsUiStateMapperTest {
                 name = "Other",
             ) to listOf("other-mini"),
             actual = uiState.tasks[ModelTask.TOPIC_REVIEW.ordinal].let { row -> row.provider to row.models },
+        )
+    }
+
+    @Test
+    fun `GIVEN a save in progress WHEN mapping THEN the saving status shows and the form is disabled`() {
+        val state = loaded(StubModels.stubModels())
+            .copy(isSaving = true)
+
+        val uiState = ModelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(
+                text = "Сохранение…",
+                tone = Status.Tone.MUTED,
+            ) to false,
+            actual = uiState.saveStatus to uiState.isFormEnabled,
+        )
+    }
+
+    @Test
+    fun `GIVEN a saved form WHEN mapping THEN the Saved status shows beside an enabled Save`() {
+        val state = loaded(StubModels.stubModels())
+            .copy(saveResult = SaveModelsResult.Saved(StubModels.stubModels()))
+
+        val uiState = ModelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(
+                text = "Сохранено",
+                tone = Status.Tone.SUCCESS,
+            ) to true,
+            actual = uiState.saveStatus to uiState.isFormEnabled,
+        )
+    }
+
+    @Test
+    fun `GIVEN a rejected save WHEN mapping THEN the status asks to choose a model, without Refresh`() {
+        val state = loaded(StubModels.stubModels())
+            .copy(saveResult = SaveModelsResult.Invalid)
+
+        val uiState = ModelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(
+                text = "Сервер не принял модели: выберите модель провайдера для каждой задачи",
+                tone = Status.Tone.ERROR,
+            ) to false,
+            actual = uiState.saveStatus to uiState.isRefreshShown,
+        )
+    }
+
+    @Test
+    fun `GIVEN a changed catalog WHEN mapping THEN the status says the model list changed, with Refresh`() {
+        val state = loaded(StubModels.stubModels())
+            .copy(saveResult = SaveModelsResult.CatalogChanged)
+
+        val uiState = ModelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(
+                text = "Список моделей на сервере изменился",
+                tone = Status.Tone.ERROR,
+            ) to true,
+            actual = uiState.saveStatus to uiState.isRefreshShown,
         )
     }
 

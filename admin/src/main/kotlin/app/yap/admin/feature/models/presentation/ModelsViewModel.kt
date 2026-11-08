@@ -5,20 +5,26 @@ import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.models.domain.ModelChoice
 import app.yap.admin.feature.models.domain.ModelTask
 import app.yap.admin.feature.models.domain.Models
+import app.yap.admin.feature.models.domain.SaveModelsResult
 
 internal class ModelsViewModel : ViewModel() {
 
     data class DataState(
         val choices: Map<ModelTask, ModelChoice> = emptyMap(),
         val isLoadFailed: Boolean = false,
+        val isSaving: Boolean = false,
         val models: Models? = null,
+        val saveResult: SaveModelsResult? = null,
     )
 
     sealed interface UiState {
 
         data class Content(
+            val isFormEnabled: Boolean,
+            val isRefreshShown: Boolean,
             val providerOptions: List<ProviderOption>,
             val providers: List<ProviderRow>,
+            val saveStatus: Status?,
             val tasks: List<TaskRow>,
         ) : UiState
 
