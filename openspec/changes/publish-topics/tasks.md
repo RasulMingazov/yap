@@ -104,11 +104,12 @@ the 400 body and 409, as two PRs.
 - [x] 15.1 Add the `WARNING` tone with its color and its `StatusText` branch; verify with `./gradlew build` and the unchanged capture images; done in #11 (PR 144): `Status.Tone.WARNING`, `AdminTheme.Colors.warn` and the `StatusText` branch already exist, and this part reuses them
 - [x] 15.2 Map the rows, To do, the tones, Led by, 2 of 5, the empty day, the reload banner and nothing to do from the raw facts of [14/26]; `TopicGapText` names the fields and the steps 3–5; verify with the mapper tests for each status, a ready draft, a draft with the steps 3–5 incomplete, an empty day, nothing to do, and the banner over a kept calendar
 
-## 16. [16/26] The Topics screen · ~280 · `A/core/design/` (the column widths), `T/presentation/ui/` (`TopicsScreen`, `TodoSection`)
+## 16. [16/26] The Topics screen · ~350 · `A/core/design/` (the column widths), `T/presentation/` (`TopicsViewModel`, `TopicsUiStateMapper`: the retry state of the banner, the text of an empty day in To do), `T/presentation/ui/` (`TopicsScreen`, `TodoSection`)
 
 Create opens a new topic without a date until [17/26].
 
 - [ ] 16.1 Build To do, the header All topics, the five columns, the empty day row, the note and the reload banner with Retry from the UI state; verify with `./gradlew build` and the UI state tests of [15/26]
+- [ ] 16.2 Moved from [15/26] (UX review of PR 162, M-1 and M-2): a Retry over a kept calendar keeps the banner and marks the retry (Retry disabled, a progress mark), and keeps one load at a time; an empty day in To do has the title and the note of the canvas (`admin.dc.html:515`): no topic, and users see an empty day; verify with the mapper tests for the banner during a retry and for an empty day, and a view model test for a second Retry during a retry
 
 ## 17. [17/26] Create on an empty day · ~150 · `A/Main.kt`, `A/navigation/` (`Screen.Topic` with the date), `T/FeatureTopicsModule.kt`, `T/presentation/TopicViewModel.kt`, `T/presentation/ui/TopicsScreen.kt`
 

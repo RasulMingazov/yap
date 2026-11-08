@@ -21,8 +21,8 @@ internal object TopicGapText {
 
     private fun steps(numbers: List<Int>): String {
         val noun = if (numbers.size == 1) "шаг" else "шаги"
-        val runs = runs(numbers).joinToString(separator = ", ") { run -> run.text() }
-        return "$noun $runs"
+        val runs = runs(numbers)
+        return "$noun ${runs.joinToString(separator = ", ") { run -> run.text() }}"
     }
 
     private fun runs(numbers: List<Int>): List<IntRange> = numbers.fold(emptyList()) { runs, number ->
@@ -42,7 +42,7 @@ internal object TopicGapText {
         TopicField.DURATION -> "длительность"
         TopicField.DESCRIPTION -> "описание"
         TopicField.SETTING -> "обстановку"
-        TopicField.INTERLOCUTOR -> "собеседника"
+        TopicField.INTERLOCUTOR -> "собеседника или описание гостя"
         TopicField.ROLE -> "роль"
         TopicField.OPENING_LINE -> "первую реплику"
         TopicField.TRANSLATION -> "перевод"

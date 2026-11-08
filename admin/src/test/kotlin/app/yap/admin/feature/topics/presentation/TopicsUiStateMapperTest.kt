@@ -18,7 +18,7 @@ import kotlin.test.assertIs
 internal class TopicsUiStateMapperTest {
 
     @Test
-    fun `GIVEN a published topic and an empty day WHEN mapping THEN All topics and To do show them in the server order`() {
+    fun `GIVEN two rows and two To do entries WHEN mapping THEN All topics and To do keep the server order`() {
         val saturday = StubTopic.RELEASE_DATE.plusDays(1)
         val published = StubTopicCalendar.stubCalendarTopic(
             completeSteps = 5,
@@ -34,7 +34,10 @@ internal class TopicsUiStateMapperTest {
                     topic = null,
                 ),
             ),
-            todos = listOf(Todo.EmptyDay(date = saturday)),
+            todos = listOf(
+                StubTopicCalendar.stubTodoDraft(),
+                Todo.EmptyDay(date = saturday),
+            ),
         )
 
         val uiState = TopicsUiStateMapper(DataState(calendar = calendar))
@@ -56,7 +59,17 @@ internal class TopicsUiStateMapperTest {
                     ),
                     UiState.Row.EmptyDay(date = "Сб, 25 окт"),
                 ),
-                todo = UiState.TodoList.Entries(entries = listOf(UiState.TodoEntry.EmptyDay(date = "Сб, 25 окт"))),
+                todo = UiState.TodoList.Entries(
+                    entries = listOf(
+                        UiState.TodoEntry.Draft(
+                            date = "Пт, 24 окт",
+                            note = "Черновик. Опубликуйте.",
+                            title = "At the cafe",
+                            topicId = TopicId(StubTopic.TOPIC_ID),
+                        ),
+                        UiState.TodoEntry.EmptyDay(date = "Сб, 25 окт"),
+                    ),
+                ),
             ),
             actual = uiState,
         )
