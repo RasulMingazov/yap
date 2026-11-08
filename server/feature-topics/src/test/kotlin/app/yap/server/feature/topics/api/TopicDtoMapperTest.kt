@@ -144,8 +144,8 @@ internal class TopicDtoMapperTest {
     }
 
     @Test
-    fun `GIVEN each release state WHEN mapping it to the DTO THEN each state has its status`() {
-        val statuses = ReleaseState.entries.map { state -> state.toDto() }
+    fun `GIVEN each release state WHEN mapping the details to the DTO THEN each state has its status`() {
+        val statuses = ReleaseState.entries.map { state -> details(state = state).toDto().status }
 
         assertEquals(
             expected = listOf(
