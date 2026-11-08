@@ -158,8 +158,8 @@ internal class LevelsUiStateMapperTest {
         val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
-            expected = Status(text = "Введите число в «Слов в фразе»: B1", tone = Status.Tone.ERROR),
-            actual = uiState.saveStatus,
+            expected = Status(text = "Введите число в «Слов в фразе»: B1", tone = Status.Tone.ERROR) to false,
+            actual = uiState.saveStatus to uiState.isRefreshShown,
         )
     }
 
@@ -177,10 +177,35 @@ internal class LevelsUiStateMapperTest {
     }
 
     @Test
+    fun `GIVEN saved levels with a model WHEN mapping THEN every row shows the model`() {
+        val state = loaded(StubLevel.stubLevels(settings = StubLevel.stubSettings(model = PRO)))
+            .copy(models = StubModels.stubModels())
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = List(LevelCode.entries.size) { PRO },
+            actual = uiState.rows.map { row -> row.model.model },
+        )
+    }
+
+    @Test
+    fun `GIVEN the models still load WHEN mapping THEN the choice is disabled with no models error`() {
+        val state = loaded(StubLevel.stubLevels())
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = false to null,
+            actual = uiState.isModelChoiceEnabled to uiState.modelError,
+        )
+    }
+
+    @Test
     fun `GIVEN the catalog WHEN mapping THEN Model offers Default once and the models in the server order`() {
         val other = StubModels.stubProvider(
             code = "OTHER",
-            models = listOf("other-model"),
+            models = listOf("alpha-model"),
         )
         val state = loaded(StubLevel.stubLevels())
             .copy(models = StubModels.stubModels(providers = listOf(StubModels.stubProvider(), other)))
@@ -188,8 +213,8 @@ internal class LevelsUiStateMapperTest {
         val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
-            expected = listOf("по умолчанию", "deepseek-flash", "deepseek-v4-pro", "other-model") to true,
-            actual = uiState.models.map { option -> option.label } to uiState.isModelChoiceEnabled,
+            expected = Triple(listOf("по умолчанию", "deepseek-flash", "deepseek-v4-pro", "alpha-model"), true, null),
+            actual = Triple(uiState.models.map { option -> option.label }, uiState.isModelChoiceEnabled, uiState.modelError),
         )
     }
 
@@ -229,6 +254,7 @@ internal class LevelsUiStateMapperTest {
             .copy(
                 forms = levels.toInputs() + (LevelCode.B1 to StubLevel.stubInput(model = PRO)),
                 isModelsLoadFailed = true,
+                models = StubModels.stubModels(),
             )
 
         val uiState = LevelsUiStateMapper(state) as UiState.Content

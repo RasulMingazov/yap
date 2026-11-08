@@ -143,17 +143,18 @@ Files: `al/domain/LevelSettings.kt` and `al/domain/LevelInput.kt` (`model`), `al
 state types: the facts `models` and `isModelsLoadFailed`, the model choices, the row model and the
 No rating note; and the `ModelUnavailable` branch of the save), `al/presentation/LevelsUiStateMapper.kt`,
 `admin/src/test/.../feature/levels/domain/StubLevel.kt`, `DefaultSaveLevelsUseCaseTest` (the model in
-the save) and `LevelsUiStateMapperTest`. Part 11 keeps the tests of `LevelMapper` and the 409.
+the save), `RemoteLevelRepositoryTest` (a level with a model in the load and the save) and
+`LevelsUiStateMapperTest`. Part 11 holds the 409.
 
 - [x] 10.1 Add the level model to the Levels UI state; verify with the mapper tests for Default before a save, the choices in the server's order with the one name Default (M2), the No rating line on the calibration model (M3), Default disabled and the models error with Retry while the table shows (M4), and the status that a level model is no longer available with Refresh (M6)
 
 ## 11. [11/15] Admin Levels data and view model (about 300 lines)
 
-Files: `al/data/mapper/LevelMapper.kt`, `al/data/repository/RemoteLevelRepository.kt` (409),
+Files: `al/data/repository/RemoteLevelRepository.kt` (409),
 `al/presentation/LevelsViewModel.kt` (logic), `StubGetModelsUseCase` (from part 8),
 `RemoteLevelRepositoryTest`, and `LevelsViewModelTest`.
 
-- [ ] 11.1 Map the level model and 409 in the levels repository; verify with `RemoteLevelRepositoryTest` for a level with a model and without one, and 409 that gives `ModelUnavailable`
+- [ ] 11.1 Map 409 in the levels repository; verify with `RemoteLevelRepositoryTest` for 409 that gives `ModelUnavailable` (part 10 maps and tests the level model)
 - [ ] 11.2 Load the levels and the models together in `LevelsViewModel`, with the models Retry, the model change of a level, the stored model in a save without the models, and Refresh after `ModelUnavailable`; verify with the view-model tests for each of these, a chosen model and Default in the save, and the levels load error
 
 ## 12. [12/15] Admin Levels Model column (about 200 lines)
