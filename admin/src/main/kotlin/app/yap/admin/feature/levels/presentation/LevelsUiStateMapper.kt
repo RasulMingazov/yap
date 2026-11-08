@@ -23,19 +23,18 @@ internal object LevelsUiStateMapper {
         idioms = Idioms.entries.map { idioms -> idioms.option() },
         isSaveEnabled = !isSaving,
         rows = levels.map { level -> row(level) },
-        saveStatus = if (isSaving) Status(text = "Сохранение…", tone = Status.Tone.MUTED) else saveStatus?.status(),
+        saveStatus = saveStatus(),
     )
 
     private fun DataState.block(): UiState.Block {
         val level = levels.first { level -> level.code == chosen }
         return UiState.Block(
-            rating = level.rating(),
-            text = forms.getValue(chosen).block,
+            code = chosen,
+            form = forms.getValue(chosen),
+            rating = level.rangeText()?.let { text -> "рейтинг $text" },
             title = "Блок промпта · ${chosen.label()}",
         )
     }
-
-    private fun Level.rating(): String? = rangeText()?.let { text -> "рейтинг $text" }
 
     private fun DataState.row(level: Level): UiState.Row {
         val form = forms.getValue(level.code)
@@ -68,6 +67,9 @@ internal object LevelsUiStateMapper {
         range.to == null -> "${range.from}+"
         else -> "${range.from}–${range.to}"
     }
+
+    private fun DataState.saveStatus(): Status? =
+        if (isSaving) Status(text = "Сохранение…", tone = Status.Tone.MUTED) else saveStatus?.status()
 
     private fun SaveStatus.status(): Status = when (this) {
         is SaveStatus.Invalid -> Status(

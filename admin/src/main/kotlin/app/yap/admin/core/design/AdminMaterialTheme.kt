@@ -37,6 +37,7 @@ private val COLOR_SCHEME = lightColorScheme(
 private val CORNER = RoundedCornerShape(AdminTheme.Sizes.cornerRadius)
 
 private val SHAPES = Shapes(
+    extraLarge = CORNER,
     extraSmall = CORNER,
     medium = CORNER,
     small = CORNER,

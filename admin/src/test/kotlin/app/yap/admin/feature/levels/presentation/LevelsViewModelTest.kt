@@ -195,7 +195,7 @@ internal class LevelsViewModelTest {
         env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = form.copy(block = "New block")))
         advanceUntilIdle()
 
-        assertEquals(expected = StubLevel.BLOCK, actual = env.content().block.text)
+        assertEquals(expected = StubLevel.BLOCK, actual = env.content().block.form.block)
     }
 
     @Test
@@ -222,6 +222,33 @@ internal class LevelsViewModelTest {
         advanceUntilIdle()
 
         env.saveLevelsUseCase.invokeCall.called(times = 1)
+    }
+
+    @Test
+    fun `GIVEN a save answer without C2 WHEN the save succeeds THEN it shows Saved and loads the levels again`() =
+        runTest(dispatcher) {
+            val levels = StubLevel
+                .stubLevels()
+                .filterNot { level -> level.code == LevelCode.C2 }
+            val env = Environment(saveResult = SaveLevelsResult.Saved(levels))
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.getLevelsUseCase.invokeCall.called(times = 2)
+            assertEquals(expected = "Сохранено", actual = env.content().saveStatus?.text)
+        }
+
+    @Test
+    fun `GIVEN Levels was open WHEN it opens again THEN it loads the levels again`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+
+        env.getLevelsUseCase.invokeCall.called(times = 2)
     }
 
     @Test
@@ -263,6 +290,10 @@ internal class LevelsViewModelTest {
             getLevelsUseCase = getLevelsUseCase,
             saveLevelsUseCase = saveLevelsUseCase,
         )
+
+        init {
+            viewModel.onEvent(Event.Opened)
+        }
 
         fun content(): UiState.Content = viewModel.uiState.value as UiState.Content
     }

@@ -5,6 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 
 @Composable
+internal fun Note(text: String) {
+    Note(text = AnnotatedString(text))
+}
+
+@Composable
 internal fun Note(text: AnnotatedString) {
     Text(
         text = text,

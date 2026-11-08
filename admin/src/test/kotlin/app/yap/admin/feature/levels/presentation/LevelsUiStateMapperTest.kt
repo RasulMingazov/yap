@@ -73,7 +73,12 @@ internal class LevelsUiStateMapperTest {
         val uiState = LevelsUiStateMapper.map(state) as UiState.Content
 
         assertEquals(
-            expected = UiState.Block(rating = "рейтинг 1050–1199", text = StubLevel.BLOCK, title = "Блок промпта · B1"),
+            expected = UiState.Block(
+                code = LevelCode.B1,
+                form = LevelForm.of(StubLevel.stubSettings()),
+                rating = "рейтинг 1050–1199",
+                title = "Блок промпта · B1",
+            ),
             actual = uiState.block,
         )
     }
