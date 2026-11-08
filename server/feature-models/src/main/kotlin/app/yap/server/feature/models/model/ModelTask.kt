@@ -6,8 +6,4 @@ enum class ModelTask {
     TOPIC_HINTS,
     TOPIC_REVIEW,
     CALIBRATION,
-    ;
-
-    val dependsOnLevel: Boolean
-        get() = this == TOPIC_REPLY || this == TOPIC_HINTS
 }

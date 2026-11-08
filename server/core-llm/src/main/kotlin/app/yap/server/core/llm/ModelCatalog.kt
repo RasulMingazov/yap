@@ -2,7 +2,10 @@ package app.yap.server.core.llm
 
 object ModelCatalog {
 
-    val DEFAULT = ModelChoice(provider = ModelProviderId.DEEPSEEK, model = "deepseek-flash")
+    val DEFAULT = ModelChoice(
+        model = "deepseek-flash",
+        provider = ModelProviderId.DEEPSEEK,
+    )
 
     val providers: List<ModelProviderId> = ModelProviderId.entries
 

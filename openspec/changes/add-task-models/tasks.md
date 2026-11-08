@@ -26,7 +26,7 @@ Files: `llm/ModelProviderId.kt`, `llm/ModelChoice.kt`, `llm/ModelCatalog.kt`, `s
 (hot, Flyway), `server/feature-models/src/testFixtures/` (`StubTaskModel`), and their tests.
 
 - [x] 2.1 Add the catalog in `core-llm`: DeepSeek with the exact API ids `deepseek-flash` and `deepseek-v4-pro`, as the `model` row of the DeepSeek pricing page lists them (see `design.md`), the key setting name `DEEPSEEK_API_KEY`, and the default; verify with `ModelCatalogTest`: the order, the default, the key setting name, and each model name in one provider only
-- [x] 2.2 Add `server/feature-models` with `ModelTask` and the save rule; verify with the model tests for the five tasks in order, a missing task, a task twice, an unknown model and a model of another provider
+- [x] 2.2 Add `server/feature-models` with `ModelTask` and the save rule; verify with the model tests for the five tasks in order, a missing task, a task twice and an unknown model; one test covers an unknown model and a model of another provider, because the catalog has one provider
 - [x] 2.3 Add `V6__task_models.sql` and the Exposed repository that saves with an upsert by `task`; verify with the PostgreSQL tests for an empty read, a save, a second save and the clean bootstrap (CI runs them)
 
 ## 3. [3/15] Server Connected and the model use cases (about 310 lines)
@@ -37,8 +37,9 @@ Files: `llm/LlmConfig.kt`, `llm/ProviderConnections.kt`, `llm/CoreLlmModule.kt`,
 `server/app/build.gradle.kts`, `.env.example`, `server/app/src/test/.../StubAppConfig.kt`,
 `server/app/src/test/.../config/AppConfigLoaderTest.kt`, `fm/model/` (`TaskModelChoice`,
 `ModelsOverview`, `ProviderState`, `SaveTaskModelsOutcome`), `fm/usecase/` (`GetModelsUseCase`,
-`SaveModelsUseCase`), `fm/FeatureModelsModule.kt`, `server/feature-models/src/testFixtures/`
-(`StubTaskModelRepository`), and their tests.
+`SaveModelsUseCase`), `fm/FeatureModelsModule.kt`, `server/feature-models/build.gradle.kts`
+(Koin, stubcall), `server/feature-models/src/testFixtures/` (`StubTaskModelRepository`), and their
+tests.
 
 - [ ] 3.1 Read `DEEPSEEK_API_KEY` as an optional setting into `LlmConfig`, and bind `ProviderConnections` in `coreLlmModule(config)`; add an empty `DEEPSEEK_API_KEY=` line to `.env.example`; verify with `AppConfigLoaderTest` for a key, no key and a blank key, the `ProviderConnections` test, and `AppModulesTest`
 - [ ] 3.2 Add the shared rule `TaskModelChoice` in `fm/model/`: the stored row when it is in the catalog, else the default; verify with `TaskModelChoiceTest` for no row, a row in the catalog and a row outside it
@@ -48,7 +49,7 @@ Files: `llm/LlmConfig.kt`, `llm/ProviderConnections.kt`, `llm/CoreLlmModule.kt`,
 
 Files: `contract-admin/src/main/kotlin/app/yap/contract/admin/` `ModelsDto.kt`, `TaskModelDto.kt`,
 `ProviderDto.kt` (hot), `fm/api/TaskModelDtoMapper.kt`, `fm/api/ModelRoutes.kt`,
-`server/feature-models/build.gradle.kts`, `server/app/src/main/kotlin/app/yap/server/Application.kt`
+`server/feature-models/build.gradle.kts` (`yap.ktor.server`, `contract-admin`), `server/app/src/main/kotlin/app/yap/server/Application.kt`
 (hot), and their tests.
 
 - [ ] 4.1 Add the model DTOs with `ProviderDto.keySetting`, the mapper that reads task codes with `entries.find` and keeps an unknown provider code as no provider, the routes, and mount them behind the admin key; verify with the mapper test and the route tests for `GET` 200 with the five tasks and the providers, `keySetting` and no key field in the JSON, `PUT` 200, 400 for an unknown task and for a task missing, 409 for an unknown provider and for a model outside the catalog, and 401
@@ -64,11 +65,11 @@ Files: `server/feature-levels/src/main/resources/db/migration/V7__level_model.sq
 `server/feature-levels/build.gradle.kts` (`core-llm`),
 `contract-admin/src/main/kotlin/app/yap/contract/admin/LevelSettingsDto.kt` (hot),
 `server/feature-levels/src/testFixtures/` (`StubLevel`), `fm/usecase/GetTaskModelUseCase.kt`,
-`fm/FeatureModelsModule.kt`, `server/feature-models/build.gradle.kts` (`feature-levels`), and their
-tests.
+`fm/FeatureModelsModule.kt`, `server/feature-models/build.gradle.kts` (`feature-levels`), `fm/model/ModelTask.kt` (the
+`internal val dependsOnLevel`: Character reply and Hints), and their tests.
 
 - [ ] 5.1 Add the optional level model: the column, the upsert that also sets it, the read that gives no model for a stored model outside the catalog, the outcome `ModelUnavailable` with 409 for a saved model outside the catalog, and `LevelSettingsDto.model` with the default `null`; verify with the use-case test for an unknown model, the mapper test, the route tests for a level model and for 409, and the PostgreSQL tests for a save with a model, a second save without one, and a stored model outside the catalog that reads as no model (CI runs them)
-- [ ] 5.2 Add `GetTaskModelUseCase(task, level)` with `TaskModelChoice` for the task row; verify with the use-case tests for a level without a model, a level model for Character reply and for Hints, a level model that Step check, Review and Calibration ignore, a stored task row outside the catalog that gives the default, and a save between two calls that changes the model of the second call
+- [ ] 5.2 Add `GetTaskModelUseCase(task, level)` with `TaskModelChoice` for the task row; verify with the use-case tests for a level without a model, a level model for Character reply and for Hints, a level model that Step check, Review and Calibration ignore, `dependsOnLevel` for the five tasks, a stored task row outside the catalog that gives the default, and a save between two calls that changes the model of the second call
 
 ## 6. [6/15] Admin models data layer (about 300 lines)
 

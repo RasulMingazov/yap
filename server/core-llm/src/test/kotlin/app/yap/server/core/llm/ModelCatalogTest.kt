@@ -20,7 +20,13 @@ internal class ModelCatalogTest {
     fun `GIVEN the catalog WHEN reading the default THEN it is deepseek-flash of DeepSeek and in the catalog`() {
         val default = ModelCatalog.DEFAULT
 
-        assertEquals(expected = ModelChoice(ModelProviderId.DEEPSEEK, "deepseek-flash"), actual = default)
+        assertEquals(
+            expected = ModelChoice(
+                model = "deepseek-flash",
+                provider = ModelProviderId.DEEPSEEK,
+            ),
+            actual = default,
+        )
         assertTrue(ModelCatalog.contains(default))
     }
 
@@ -38,7 +44,10 @@ internal class ModelCatalogTest {
 
     @Test
     fun `GIVEN a model that is not a model of the provider WHEN asking the catalog THEN it is not in it`() {
-        val choice = ModelChoice(provider = ModelProviderId.DEEPSEEK, model = "deepseek-chat")
+        val choice = ModelChoice(
+            model = "deepseek-chat",
+            provider = ModelProviderId.DEEPSEEK,
+        )
 
         assertFalse(ModelCatalog.contains(choice))
     }
