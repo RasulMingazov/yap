@@ -8,6 +8,7 @@ import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.topics.domain.TopicCalendar
 import app.yap.admin.feature.topics.domain.TopicId
 import app.yap.admin.feature.topics.domain.usecase.GetTopicCalendarUseCase
+import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -72,7 +73,10 @@ internal class TopicsViewModel(
 
         sealed interface Row {
 
-            data class EmptyDay(val date: String) : Row
+            data class EmptyDay(
+                val date: String,
+                val releaseDate: LocalDate,
+            ) : Row
 
             data class Topic(
                 val date: String,
@@ -96,6 +100,7 @@ internal class TopicsViewModel(
             data class EmptyDay(
                 val date: String,
                 val note: String,
+                val releaseDate: LocalDate,
                 val title: String,
             ) : TodoEntry
         }

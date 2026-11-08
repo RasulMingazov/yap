@@ -135,6 +135,18 @@ internal class TopicViewModelTest {
     }
 
     @Test
+    fun `GIVEN a new topic of a day WHEN the screen opens THEN Release date shows the day`() = runTest(dispatcher) {
+        val env = Environment(
+            releaseDate = LocalDate.of(2025, 10, 26),
+            topicId = null,
+        )
+
+        advanceUntilIdle()
+
+        assertEquals(expected = "Воскресенье, 26 октября", actual = env.content().releaseDateText)
+    }
+
+    @Test
     fun `GIVEN a new topic WHEN a day is picked THEN the popup shows it`() = runTest(dispatcher) {
         val env = Environment(topicId = null)
         advanceUntilIdle()
@@ -297,6 +309,7 @@ internal class TopicViewModelTest {
 
     private class Environment(
         topicId: TopicId?,
+        releaseDate: LocalDate? = null,
         saveResult: SaveTopicResult = SaveTopicResult.Saved(StubTopic.stubTopic()),
     ) {
 
@@ -306,6 +319,7 @@ internal class TopicViewModelTest {
         val viewModel = TopicViewModel(
             getCharactersUseCase = getCharactersUseCase,
             getTopicUseCase = getTopicUseCase,
+            releaseDate = releaseDate,
             saveTopicUseCase = saveTopicUseCase,
             topicId = topicId,
         )

@@ -18,7 +18,7 @@ import kotlin.test.assertIs
 internal class TopicsUiStateMapperTest {
 
     @Test
-    fun `GIVEN two rows and two To do entries WHEN mapping THEN All topics and To do keep the server order`() {
+    fun `GIVEN a topic and an empty day WHEN mapping THEN All topics keeps the server order`() {
         val saturday = StubTopic.RELEASE_DATE.plusDays(1)
         val published = StubTopicCalendar.stubCalendarTopic(
             completeSteps = 5,
@@ -34,48 +34,63 @@ internal class TopicsUiStateMapperTest {
                     topic = null,
                 ),
             ),
+        )
+
+        val uiState = assertIs<UiState.Content>(TopicsUiStateMapper(DataState(calendar = calendar)))
+
+        assertEquals(expected = null, actual = uiState.reloadError)
+        assertEquals(
+            expected = listOf(
+                UiState.Row.Topic(
+                    date = "Пт, 24 окт",
+                    ledBy = "Сэм",
+                    status = Status(
+                        text = "Опубликована",
+                        tone = Status.Tone.SUCCESS,
+                    ),
+                    steps = "5",
+                    title = "At the cafe",
+                    topicId = TopicId(StubTopic.TOPIC_ID),
+                ),
+                UiState.Row.EmptyDay(
+                    date = "Сб, 25 окт",
+                    releaseDate = saturday,
+                ),
+            ),
+            actual = uiState.rows,
+        )
+    }
+
+    @Test
+    fun `GIVEN a draft and an empty day WHEN mapping THEN To do keeps the server order`() {
+        val saturday = StubTopic.RELEASE_DATE.plusDays(1)
+        val calendar = StubTopicCalendar.stubTopicCalendar(
             todos = listOf(
                 StubTopicCalendar.stubTodoDraft(),
                 Todo.EmptyDay(date = saturday),
             ),
         )
 
-        val uiState = TopicsUiStateMapper(DataState(calendar = calendar))
+        val uiState = assertIs<UiState.Content>(TopicsUiStateMapper(DataState(calendar = calendar)))
 
         assertEquals(
-            expected = UiState.Content(
-                reloadError = null,
-                rows = listOf(
-                    UiState.Row.Topic(
+            expected = UiState.TodoList.Entries(
+                entries = listOf(
+                    UiState.TodoEntry.Draft(
                         date = "Пт, 24 окт",
-                        ledBy = "Сэм",
-                        status = Status(
-                            text = "Опубликована",
-                            tone = Status.Tone.SUCCESS,
-                        ),
-                        steps = "5",
-                        title = "At the cafe",
+                        note = "Черновик. Опубликуйте.",
+                        title = "At the cafe.",
                         topicId = TopicId(StubTopic.TOPIC_ID),
                     ),
-                    UiState.Row.EmptyDay(date = "Сб, 25 окт"),
-                ),
-                todo = UiState.TodoList.Entries(
-                    entries = listOf(
-                        UiState.TodoEntry.Draft(
-                            date = "Пт, 24 окт",
-                            note = "Черновик. Опубликуйте.",
-                            title = "At the cafe.",
-                            topicId = TopicId(StubTopic.TOPIC_ID),
-                        ),
-                        UiState.TodoEntry.EmptyDay(
-                            date = "Сб, 25 окт",
-                            note = "В этот день пользователи увидят пустой день.",
-                            title = "Темы нет.",
-                        ),
+                    UiState.TodoEntry.EmptyDay(
+                        date = "Сб, 25 окт",
+                        note = "В этот день пользователи увидят пустой день.",
+                        releaseDate = saturday,
+                        title = "Темы нет.",
                     ),
                 ),
             ),
-            actual = uiState,
+            actual = uiState.todo,
         )
     }
 
@@ -216,7 +231,12 @@ internal class TopicsUiStateMapperTest {
                     isRetrying = false,
                     message = "Не удалось обновить темы. Показан прежний список.",
                 ),
-                rows = listOf(UiState.Row.EmptyDay(date = "Пт, 24 окт")),
+                rows = listOf(
+                    UiState.Row.EmptyDay(
+                        date = "Пт, 24 окт",
+                        releaseDate = StubTopic.RELEASE_DATE,
+                    ),
+                ),
                 todo = UiState.TodoList.Empty(message = "Всё сделано"),
             ),
             actual = uiState,

@@ -75,7 +75,10 @@ internal fun TopicContent(
                 onEvent = onEvent,
             )
             is UiState.Error -> {
-                PlaceholderToolbar(back = back)
+                PlaceholderToolbar(
+                    back = back,
+                    toolbar = uiState.toolbar,
+                )
                 ScreenBody {
                     LoadError(
                         message = uiState.message,
@@ -84,7 +87,10 @@ internal fun TopicContent(
                 }
             }
             is UiState.Loading -> {
-                PlaceholderToolbar(back = back)
+                PlaceholderToolbar(
+                    back = back,
+                    toolbar = uiState.toolbar,
+                )
                 ScreenBody {
                     Loader()
                 }
@@ -219,10 +225,14 @@ private fun OpeningLineSection(
 }
 
 @Composable
-private fun PlaceholderToolbar(back: ToolbarBack) {
+private fun PlaceholderToolbar(
+    back: ToolbarBack,
+    toolbar: UiState.Toolbar,
+) {
     ScreenToolbar(
         back = back,
-        title = "Тема",
+        subtitle = toolbar.subtitle,
+        title = toolbar.title,
     )
 }
 

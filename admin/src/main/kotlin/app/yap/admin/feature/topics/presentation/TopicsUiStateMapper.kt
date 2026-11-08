@@ -37,7 +37,10 @@ internal object TopicsUiStateMapper : (DataState) -> UiState {
     }
 
     private fun CalendarRow.toRow(): UiState.Row = when (val topic = topic) {
-        null -> UiState.Row.EmptyDay(date = ReleaseDateFormat.short(date))
+        null -> UiState.Row.EmptyDay(
+            date = ReleaseDateFormat.short(date),
+            releaseDate = date,
+        )
         else -> topic.toRow(date)
     }
 
@@ -92,6 +95,7 @@ internal object TopicsUiStateMapper : (DataState) -> UiState {
         is Todo.EmptyDay -> UiState.TodoEntry.EmptyDay(
             date = ReleaseDateFormat.short(date),
             note = "В этот день пользователи увидят пустой день.",
+            releaseDate = date,
             title = "Темы нет.",
         )
     }

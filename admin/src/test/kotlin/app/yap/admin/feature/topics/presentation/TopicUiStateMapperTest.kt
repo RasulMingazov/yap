@@ -6,10 +6,12 @@ import app.yap.admin.feature.characters.domain.StubCharacter
 import app.yap.admin.feature.characters.domain.StubCharacterSummary
 import app.yap.admin.feature.topics.domain.Interlocutor
 import app.yap.admin.feature.topics.domain.StubTopic
+import app.yap.admin.feature.topics.domain.TopicId
 import app.yap.admin.feature.topics.presentation.TopicViewModel.DataState
 import app.yap.admin.feature.topics.presentation.TopicViewModel.Load
 import app.yap.admin.feature.topics.presentation.TopicViewModel.SaveStatus
 import app.yap.admin.feature.topics.presentation.TopicViewModel.UiState
+import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -135,11 +137,58 @@ internal class TopicUiStateMapperTest {
 
     @Test
     fun `GIVEN the topic or the cast did not load WHEN mapping THEN the screen shows the error`() {
-        val state = DataState(load = Load.FAILED)
+        val state = DataState(
+            load = Load.FAILED,
+            topicId = TopicId(StubTopic.TOPIC_ID),
+        )
 
         val uiState = TopicUiStateMapper(state)
 
-        assertEquals(expected = UiState.Error(message = "Не удалось загрузить тему"), actual = uiState)
+        assertEquals(
+            expected = UiState.Error(
+                message = "Не удалось загрузить тему",
+                toolbar = UiState.Toolbar(
+                    subtitle = null,
+                    title = "Тема",
+                ),
+            ),
+            actual = uiState,
+        )
+    }
+
+    @Test
+    fun `GIVEN a new topic of a day WHEN it loads THEN the toolbar says New topic with the day`() {
+        val state = DataState(form = StubTopic.stubContent(releaseDate = LocalDate.of(2025, 10, 26)))
+
+        val uiState = TopicUiStateMapper(state)
+
+        assertEquals(
+            expected = UiState.Loading(
+                toolbar = UiState.Toolbar(
+                    subtitle = "Воскресенье, 26 октября",
+                    title = "Новая тема",
+                ),
+            ),
+            actual = uiState,
+        )
+    }
+
+    @Test
+    fun `GIVEN a new topic without a day WHEN the cast fails THEN the toolbar says New topic`() {
+        val state = DataState(
+            form = StubTopic.stubContent(releaseDate = null),
+            load = Load.FAILED,
+        )
+
+        val uiState = assertIs<UiState.Error>(TopicUiStateMapper(state))
+
+        assertEquals(
+            expected = UiState.Toolbar(
+                subtitle = null,
+                title = "Новая тема",
+            ),
+            actual = uiState.toolbar,
+        )
     }
 
     private fun contentOf(state: DataState): UiState.Content = assertIs<UiState.Content>(TopicUiStateMapper(state))

@@ -49,7 +49,7 @@ fun main() {
                     modelsViewModel = modelsViewModel,
                     promptsViewModel = promptsViewModel,
                     serverViewModel = serverViewModel,
-                    topicViewModel = { topicId -> koin.get { parametersOf(topicId) } },
+                    topicViewModel = { releaseDate, topicId -> koin.get { parametersOf(releaseDate, topicId) } },
                     topicsViewModel = topicsViewModel,
                     viewModel = navigationViewModel,
                 )
