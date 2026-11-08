@@ -62,6 +62,20 @@ internal class ApplicationTest {
     }
 
     @Test
+    fun `GIVEN a wrong admin key WHEN saving the models THEN the call is unauthorized`() = testApplication {
+        val env = Environment()
+        application { env.install(this) }
+
+        val response = client.put("/admin/models") {
+            bearerAuth("wrong-key")
+            contentType(ContentType.Application.Json)
+            setBody("[]")
+        }
+
+        assertEquals(expected = HttpStatusCode.Unauthorized, actual = response.status)
+    }
+
+    @Test
     fun `GIVEN a wrong admin key WHEN listing the prompts THEN the call is unauthorized`() = testApplication {
         val env = Environment()
         application { env.install(this) }

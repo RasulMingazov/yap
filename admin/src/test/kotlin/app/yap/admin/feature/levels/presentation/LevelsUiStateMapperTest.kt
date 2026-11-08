@@ -4,6 +4,7 @@ import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelCode
+import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.StubLevel
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.DataState
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
@@ -117,6 +118,46 @@ internal class LevelsUiStateMapperTest {
         val uiState = LevelsUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить уровни"), actual = uiState)
+    }
+
+    @Test
+    fun `GIVEN a rating from that is not a number WHEN mapping THEN the status names the field and the level`() {
+        val result = SaveLevelsResult.UnreadNumber(LevelCode.B2, SaveLevelsResult.NumberField.RATING_FROM)
+        val state = loaded(StubLevel.stubLevels())
+            .copy(saveResult = result)
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(text = "Проверьте число в «Рейтинг»: B2", tone = Status.Tone.ERROR),
+            actual = uiState.saveStatus,
+        )
+    }
+
+    @Test
+    fun `GIVEN No rating without idioms WHEN mapping THEN the status asks to choose its idioms`() {
+        val state = loaded(StubLevel.stubLevels())
+            .copy(saveResult = SaveLevelsResult.NoIdioms(LevelCode.NO_RATING))
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(text = "Выберите идиомы: Без рейтинга", tone = Status.Tone.ERROR),
+            actual = uiState.saveStatus,
+        )
+    }
+
+    @Test
+    fun `GIVEN B1 without a word count WHEN mapping THEN the status asks to type the number`() {
+        val state = loaded(StubLevel.stubLevels())
+            .copy(saveResult = SaveLevelsResult.NoWordCount(LevelCode.B1))
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(text = "Введите число в «Слов в фразе»: B1", tone = Status.Tone.ERROR),
+            actual = uiState.saveStatus,
+        )
     }
 
     private fun loaded(levels: List<Level>): DataState = DataState(

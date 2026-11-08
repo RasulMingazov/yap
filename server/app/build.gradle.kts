@@ -20,6 +20,7 @@ dependencies {
     testImplementation(testFixtures(project(":server:core-llm")))
     testImplementation(testFixtures(project(":server:feature-characters")))
     testImplementation(testFixtures(project(":server:feature-levels")))
+    testImplementation(testFixtures(project(":server:feature-models")))
     testImplementation(testFixtures(project(":server:feature-prompts")))
     testImplementation(testFixtures(project(":server:feature-topics")))
     testImplementation(libs.koin.test)

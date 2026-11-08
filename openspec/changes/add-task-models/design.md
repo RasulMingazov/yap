@@ -149,9 +149,9 @@ alter table levels add column model text;
   No key field. The name comes from `core-llm`, so the admin app holds no provider facts.
 - `PUT /admin/models` takes a JSON array of `TaskModelDto` and returns `ModelsDto`. 400 for an
   unknown task code (`entries.find`, as in levels) and for a task missing or twice. 409 for a
-  provider or a model outside the catalog: the mapper keeps an unknown provider code as no
-  provider, and the use case answers `CatalogChanged`. So the admin app can tell a changed catalog
-  from a broken form.
+  provider or a model outside the catalog: an unknown provider code gives no table in the mapper,
+  and the route answers 409 before the save rule, also when a task is missing. So the admin app can
+  tell a changed catalog from a broken form.
 - `LevelSettingsDto` gets `model: String? = null`. The default keeps old clients valid.
 - `PUT /admin/levels` answers 409 for a level model outside the catalog
   (`SaveLevelsOutcome.ModelUnavailable`), and 400 as before for the other rules.
