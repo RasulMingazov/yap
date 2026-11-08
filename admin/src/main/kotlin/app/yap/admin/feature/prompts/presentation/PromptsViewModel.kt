@@ -120,13 +120,13 @@ internal class PromptsViewModel(
                     )
                 }
                 is LoadResult.Loaded -> {
-                    loadPrompt(dataState.value.chosen)
                     dataState.update { state ->
                         state.copy(
                             isListLoading = false,
                             summaries = result.value,
                         )
                     }
+                    loadPrompt(dataState.value.chosen)
                 }
             }
         }
@@ -158,12 +158,11 @@ internal class PromptsViewModel(
     private fun DataState.loaded(prompt: Prompt): DataState = copy(
         isPromptLoading = false,
         prompts = prompts + (prompt.promptKey to prompt),
-        texts = mapOf(prompt.promptKey to prompt.text.orEmpty()) + texts,
     )
 
     private fun onSaveClicked() {
         val state = dataState.value
-        if (isSending() || state.isPromptLoading || state.isPromptLoadFailed) return
+        if (isSending() || !state.isPromptShown()) return
         dataState.update { current ->
             current.copy(
                 isSaving = true,
@@ -172,7 +171,7 @@ internal class PromptsViewModel(
             )
         }
         viewModelScope.launch {
-            when (val result = savePromptUseCase(state.chosen, state.texts.getValue(state.chosen))) {
+            when (val result = savePromptUseCase(state.chosen, state.chosenText())) {
                 is SavePromptResult.Failed -> onSaveFailed(result)
                 is SavePromptResult.Rejected -> endSave(result)
                 is SavePromptResult.Saved -> dataState.update { current ->
@@ -183,6 +182,10 @@ internal class PromptsViewModel(
             }
         }
     }
+
+    private fun DataState.isPromptShown(): Boolean = !isPromptLoading && !isPromptLoadFailed && chosen in prompts
+
+    private fun DataState.chosenText(): String = texts[chosen] ?: prompts.getValue(chosen).text.orEmpty()
 
     private suspend fun onSaveFailed(result: SavePromptResult.Failed) {
         endSave(result)
@@ -202,7 +205,7 @@ internal class PromptsViewModel(
         isRestoring = false,
         isSaving = false,
         prompts = prompts + (prompt.promptKey to prompt),
-        texts = texts + (prompt.promptKey to prompt.text.orEmpty()),
+        texts = texts - prompt.promptKey,
     )
 
     private fun onTextChanged(text: String) {

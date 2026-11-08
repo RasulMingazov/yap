@@ -62,6 +62,20 @@ internal class PromptsViewModelTest {
     }
 
     @Test
+    fun `GIVEN nothing typed WHEN Prompts opens again THEN the editor shows the new server text`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            env.viewModel.onEvent(Event.Opened)
+            advanceUntilIdle()
+            env.getPromptUseCase.invokeCall.returns(LoadResult.Loaded(StubPrompt.stubPrompt(text = "New text")))
+
+            env.viewModel.onEvent(Event.Opened)
+            advanceUntilIdle()
+
+            assertEquals(expected = "New text", actual = env.editor().text)
+        }
+
+    @Test
     fun `GIVEN a save in progress WHEN Prompts opens again THEN the list is not loaded again`() = runTest(dispatcher) {
         val env = Environment()
         env.viewModel.onEvent(Event.Opened)
@@ -276,6 +290,19 @@ internal class PromptsViewModelTest {
     fun `GIVEN the chosen prompt did not load WHEN Save is clicked THEN nothing is sent`() = runTest(dispatcher) {
         val env = Environment()
         env.getPromptUseCase.invokeCall.returns(LoadResult.Failed)
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.savePromptUseCase.invokeCall.notCalled()
+    }
+
+    @Test
+    fun `GIVEN the list did not load WHEN Save is clicked THEN nothing is sent`() = runTest(dispatcher) {
+        val env = Environment()
+        env.getPromptsUseCase.invokeCall.returns(LoadResult.Failed)
         env.viewModel.onEvent(Event.Opened)
         advanceUntilIdle()
 

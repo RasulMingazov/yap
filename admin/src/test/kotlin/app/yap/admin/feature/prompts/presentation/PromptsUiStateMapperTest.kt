@@ -182,6 +182,18 @@ internal class PromptsUiStateMapperTest {
     }
 
     @Test
+    fun `GIVEN the list without the chosen prompt WHEN mapping THEN the editor loads and Save is disabled`() {
+        val state = DataState(summaries = StubPrompt.stubPromptSummaries())
+
+        val uiState = PromptsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = UiState.Editor.Loading to false,
+            actual = uiState.editor to uiState.isSaveEnabled,
+        )
+    }
+
+    @Test
     fun `GIVEN a prompt did not load WHEN mapping THEN the editor shows the error and Save is disabled`() {
         val state = loaded().copy(isPromptLoadFailed = true)
 
@@ -205,7 +217,6 @@ internal class PromptsUiStateMapperTest {
     private fun loaded(prompt: Prompt = StubPrompt.stubPrompt()): DataState = DataState(
         prompts = mapOf(prompt.promptKey to prompt),
         summaries = emptyList(),
-        texts = mapOf(prompt.promptKey to prompt.text.orEmpty()),
     )
 
     private fun editor(state: DataState): UiState.Editor.Loaded {

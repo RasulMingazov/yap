@@ -275,10 +275,7 @@ internal class ScreenCaptureTest {
     @Test
     fun `GIVEN every state of Prompts WHEN capturing THEN each state has an image`() {
         val listed = PromptsViewModel.DataState(summaries = StubPrompt.stubPromptSummaries())
-        val content = listed.copy(
-            prompts = mapOf(PromptKey.TOPIC_REPLY to REPLY_PROMPT),
-            texts = mapOf(PromptKey.TOPIC_REPLY to REPLY_PROMPT.text.orEmpty()),
-        )
+        val content = listed.copy(prompts = mapOf(PromptKey.TOPIC_REPLY to REPLY_PROMPT))
         val restoredPrompt = REPLY_PROMPT.copy(versions = replyVersions(current = RESTORED_NUMBER))
         val states = mapOf(
             "loading" to PromptsViewModel.DataState(),
@@ -290,7 +287,6 @@ internal class ScreenCaptureTest {
             "no-version" to listed.copy(
                 chosen = PromptKey.TOPIC_HINTS,
                 prompts = mapOf(PromptKey.TOPIC_HINTS to NEW_PROMPT),
-                texts = mapOf(PromptKey.TOPIC_HINTS to ""),
             ),
             "prompt-loading" to content.copy(
                 chosen = PromptKey.TOPIC_HINTS,

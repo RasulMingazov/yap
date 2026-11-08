@@ -27,34 +27,39 @@ internal object PromptsUiStateMapper : (DataState) -> UiState {
         }
     }
 
-    private fun DataState.toContent(summaries: List<PromptSummary>): UiState.Content = UiState.Content(
-        editor = editor(),
-        groups = groups(summaries),
-        isListEnabled = isListEnabled(),
-        isSaveEnabled = isSaveEnabled(),
-        saveStatus = saveStatus(),
-    )
-
-    private fun DataState.editor(): UiState.Editor = when {
-        isPromptLoadFailed -> UiState.Editor.Error(message = "Не удалось загрузить промпт")
-        isPromptLoading -> UiState.Editor.Loading
-        else -> toEditor()
-    }
-
-    private fun DataState.toEditor(): UiState.Editor.Loaded {
-        val prompt = prompts.getValue(chosen)
-        return UiState.Editor.Loaded(
-            isEditable = !isSending(),
-            isRestoreEnabled = !isSending(),
-            isTextError = saveResult is SavePromptResult.Rejected,
-            state = prompt.state(),
-            text = texts.getValue(chosen),
-            title = chosen.title(),
-            variables = prompt.variables,
-            versions = prompt.versions.map { version -> version.row() },
-            versionsEmptyMessage = prompt.versionsEmptyMessage(),
+    private fun DataState.toContent(summaries: List<PromptSummary>): UiState.Content {
+        val editor = editor()
+        return UiState.Content(
+            editor = editor,
+            groups = groups(summaries),
+            isListEnabled = isListEnabled(editor),
+            isSaveEnabled = isSaveEnabled(editor),
+            saveStatus = saveStatus(),
         )
     }
+
+    private fun DataState.editor(): UiState.Editor {
+        val prompt = prompts[chosen]
+        return when {
+            isPromptLoadFailed -> UiState.Editor.Error(message = "Не удалось загрузить промпт")
+            isPromptLoading || prompt == null -> UiState.Editor.Loading
+            else -> toEditor(prompt)
+        }
+    }
+
+    private fun DataState.toEditor(prompt: Prompt): UiState.Editor.Loaded = UiState.Editor.Loaded(
+        isEditable = !isSending(),
+        isRestoreEnabled = !isSending(),
+        isTextError = saveResult is SavePromptResult.Rejected,
+        state = prompt.state(),
+        text = text(prompt),
+        title = chosen.title(),
+        variables = prompt.variables,
+        versions = prompt.versions.map { version -> version.row() },
+        versionsEmptyMessage = prompt.versionsEmptyMessage(),
+    )
+
+    private fun DataState.text(prompt: Prompt): String = texts[chosen] ?: prompt.text.orEmpty()
 
     private fun Prompt.state(): String {
         val current = versions.firstOrNull { version -> version.isCurrent }
@@ -102,9 +107,11 @@ internal object PromptsUiStateMapper : (DataState) -> UiState {
         usage = promptKey.usage(),
     )
 
-    private fun DataState.isListEnabled(): Boolean = !isSending() && !isPromptLoading
+    private fun DataState.isListEnabled(editor: UiState.Editor): Boolean =
+        !isSending() && editor !is UiState.Editor.Loading
 
-    private fun DataState.isSaveEnabled(): Boolean = !isSending() && !isPromptLoading && !isPromptLoadFailed
+    private fun DataState.isSaveEnabled(editor: UiState.Editor): Boolean =
+        !isSending() && editor is UiState.Editor.Loaded
 
     private fun DataState.isSending(): Boolean = isRestoring || isSaving
 
