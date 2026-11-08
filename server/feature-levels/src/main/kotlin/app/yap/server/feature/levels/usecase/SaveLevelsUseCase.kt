@@ -1,6 +1,7 @@
 package app.yap.server.feature.levels.usecase
 
 import app.yap.server.feature.levels.model.LevelEntry
+import app.yap.server.feature.levels.model.LevelModelAvailability
 import app.yap.server.feature.levels.model.LevelTableValidity
 import app.yap.server.feature.levels.model.RatingRanges
 import app.yap.server.feature.levels.model.SaveLevelsOutcome
@@ -14,7 +15,7 @@ class SaveLevelsUseCase(
         val normalized = entries.map { entry -> entry.normalized() }
         return when {
             !LevelTableValidity.isValid(normalized) -> SaveLevelsOutcome.Invalid
-            !LevelTableValidity.isInCatalog(normalized) -> SaveLevelsOutcome.ModelUnavailable
+            !LevelModelAvailability.areAvailable(normalized) -> SaveLevelsOutcome.ModelUnavailable
             else -> {
                 levelRepository.save(normalized)
                 SaveLevelsOutcome.Saved(RatingRanges.levelsOf(normalized))

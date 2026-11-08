@@ -1,8 +1,8 @@
 package app.yap.server.feature.levels.persistence
 
 import app.yap.server.core.database.Database
-import app.yap.server.core.llm.ModelCatalog
 import app.yap.server.feature.levels.model.LevelEntry
+import app.yap.server.feature.levels.model.LevelModelAvailability
 import app.yap.server.feature.levels.model.LevelSettings
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
@@ -35,7 +35,7 @@ private fun ResultRow.toEntry(): LevelEntry = LevelEntry(
         idioms = this[LevelsTable.idioms],
         maxWords = this[LevelsTable.maxWords],
         model = this[LevelsTable.model]
-            ?.takeIf { model -> ModelCatalog.choiceOf(model) != null },
+            ?.takeIf { model -> LevelModelAvailability.isAvailable(model) },
         ratingFrom = this[LevelsTable.ratingFrom],
         vocabulary = this[LevelsTable.vocabulary],
     ),
