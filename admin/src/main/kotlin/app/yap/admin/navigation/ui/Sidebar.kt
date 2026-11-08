@@ -62,6 +62,12 @@ internal fun Sidebar(
                 onScreenClick = onScreenClick,
                 screen = Screen.Levels,
             )
+            SidebarItem(
+                current = current,
+                label = "Промпты",
+                onScreenClick = onScreenClick,
+                screen = Screen.Prompts,
+            )
         }
         SidebarGroup(title = "Настройки") {
             SidebarItem(

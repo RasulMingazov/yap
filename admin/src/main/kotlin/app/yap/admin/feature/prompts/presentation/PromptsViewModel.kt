@@ -35,11 +35,8 @@ internal class PromptsViewModel(
     private val newsChannel = Channel<News>(Channel.BUFFERED)
     val news: Flow<News> = newsChannel.receiveAsFlow()
 
-    init {
-        load()
-    }
-
     fun onEvent(event: Event) = when (event) {
+        is Event.Opened -> onOpened()
         is Event.PromptClicked -> onPromptClicked(event.promptKey)
         is Event.RestoreClicked -> onRestoreClicked(event.number)
         is Event.RetryClicked -> onRetryClicked()
@@ -50,6 +47,11 @@ internal class PromptsViewModel(
     override fun onCleared() {
         super.onCleared()
         newsChannel.close()
+    }
+
+    private fun onOpened() {
+        if (dataState.value.isSending) return
+        load()
     }
 
     private fun onPromptClicked(promptKey: PromptKey) {
@@ -272,6 +274,8 @@ internal class PromptsViewModel(
     }
 
     sealed interface Event {
+
+        data object Opened : Event
 
         data class PromptClicked(val promptKey: PromptKey) : Event
 

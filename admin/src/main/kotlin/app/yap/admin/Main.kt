@@ -9,6 +9,7 @@ import app.yap.admin.core.design.AdminMaterialTheme
 import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.feature.characters.presentation.CharactersViewModel
 import app.yap.admin.feature.levels.presentation.LevelsViewModel
+import app.yap.admin.feature.prompts.presentation.PromptsViewModel
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.topics.presentation.TopicsViewModel
 import app.yap.admin.navigation.NavigationViewModel
@@ -22,6 +23,7 @@ fun main() {
         val navigationViewModel = remember { koin.get<NavigationViewModel>() }
         val charactersViewModel = remember { koin.get<CharactersViewModel>() }
         val levelsViewModel = remember { koin.get<LevelsViewModel>() }
+        val promptsViewModel = remember { koin.get<PromptsViewModel>() }
         val serverViewModel = remember { koin.get<ServerViewModel>() }
         val topicsViewModel = remember { koin.get<TopicsViewModel>() }
         Window(
@@ -42,6 +44,7 @@ fun main() {
                     characterViewModel = { characterId -> koin.get { parametersOf(characterId) } },
                     charactersViewModel = charactersViewModel,
                     levelsViewModel = levelsViewModel,
+                    promptsViewModel = promptsViewModel,
                     serverViewModel = serverViewModel,
                     topicViewModel = { topicId -> koin.get { parametersOf(topicId) } },
                     topicsViewModel = topicsViewModel,

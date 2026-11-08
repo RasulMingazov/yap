@@ -58,6 +58,11 @@ internal object AdminTheme {
         val loader = 20.dp
         val loaderStroke = 2.dp
         val popupPadding = 8.dp
+        val promptGroupGap = 16.dp
+        val promptItemVerticalPadding = 8.dp
+        val promptListHorizontalPadding = 12.dp
+        val promptListVerticalPadding = 16.dp
+        val promptListWidth = 220.dp
         val radio = 14.dp
         val radioInset = 4.dp
         val rowGap = 16.dp
@@ -106,6 +111,7 @@ internal object AdminTheme {
 
         val body = TextStyle(fontFamily = inter, fontSize = 14.sp, lineHeight = 20.sp)
         val brand = TextStyle(fontFamily = inter, fontSize = 15.sp, lineHeight = 20.sp)
+        val heading = TextStyle(fontFamily = inter, fontSize = 15.sp, lineHeight = 20.sp)
         val mono = TextStyle(fontFamily = jetBrainsMono, fontSize = 12.sp, lineHeight = 19.sp)
         val small = TextStyle(fontFamily = inter, fontSize = 12.sp, lineHeight = 16.sp)
         val sub = TextStyle(fontFamily = inter, fontSize = 13.sp, lineHeight = 18.sp)
