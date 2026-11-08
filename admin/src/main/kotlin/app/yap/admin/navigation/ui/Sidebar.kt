@@ -99,13 +99,13 @@ private fun Brand() {
         Text(
             text = "Yap",
             color = AdminTheme.Colors.ink,
-            style = AdminTheme.Type.brand,
+            style = AdminTheme.Type.heading,
             fontWeight = FontWeight.SemiBold,
         )
         Text(
             text = "admin",
             color = AdminTheme.Colors.muted,
-            style = AdminTheme.Type.brand,
+            style = AdminTheme.Type.heading,
         )
     }
 }
