@@ -5,5 +5,5 @@ data class LevelEntry(
     val settings: LevelSettings,
 ) {
 
-    fun normalized(): LevelEntry = copy(settings = settings.normalized())
+    internal fun normalized(): LevelEntry = copy(settings = settings.normalized())
 }
