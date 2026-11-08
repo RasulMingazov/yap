@@ -32,14 +32,16 @@ internal class ServerViewModelTest {
 
     @Test
     fun `GIVEN saved settings WHEN the screen opens THEN it connects and shows the server`() = runTest(dispatcher) {
+        val savedSettings = StubServerSettings.stubServerSettings()
         val env = Environment(
             connection = ServerConnection.Connected(environment = "staging"),
-            savedSettings = StubServerSettings.stubServerSettings(),
+            savedSettings = savedSettings,
         )
 
         advanceUntilIdle()
 
         assertEquals(expected = "Сервер: staging", actual = env.viewModel.uiState.value.serverLabel)
+        env.connectToServerUseCase.invokeCall.calledWith(savedSettings)
     }
 
     @Test
