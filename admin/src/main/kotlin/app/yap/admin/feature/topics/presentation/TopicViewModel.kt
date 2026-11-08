@@ -1,15 +1,137 @@
 package app.yap.admin.feature.topics.presentation
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.presentation.Status
+import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.characters.domain.Character
+import app.yap.admin.feature.characters.domain.usecase.GetCharactersUseCase
 import app.yap.admin.feature.topics.domain.Interlocutor
+import app.yap.admin.feature.topics.domain.LoadTopicResult
 import app.yap.admin.feature.topics.domain.OpeningLine
+import app.yap.admin.feature.topics.domain.SaveTopicResult
 import app.yap.admin.feature.topics.domain.Step
 import app.yap.admin.feature.topics.domain.Topic
 import app.yap.admin.feature.topics.domain.TopicContent
+import app.yap.admin.feature.topics.domain.TopicId
+import app.yap.admin.feature.topics.domain.usecase.GetTopicUseCase
+import app.yap.admin.feature.topics.domain.usecase.SaveTopicUseCase
+import java.time.LocalDate
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-internal class TopicViewModel : ViewModel() {
+internal class TopicViewModel(
+    private val topicId: TopicId?,
+    private val getCharactersUseCase: GetCharactersUseCase,
+    private val getTopicUseCase: GetTopicUseCase,
+    private val saveTopicUseCase: SaveTopicUseCase,
+) : ViewModel() {
+
+    private val dataState = MutableStateFlow(DataState())
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicUiStateMapper::map)
+
+    private val newsChannel = Channel<News>(Channel.BUFFERED)
+    val news: Flow<News> = newsChannel.receiveAsFlow()
+
+    init {
+        load()
+    }
+
+    fun onEvent(event: Event) = when (event) {
+        is Event.FormChanged -> edit { event.form }
+        is Event.GuestDescriptionChanged -> edit { form ->
+            form.copy(interlocutor = Interlocutor.Guest(description = event.description))
+        }
+        is Event.InterlocutorChosen -> edit { form -> form.copy(interlocutor = event.interlocutor) }
+        is Event.ReleaseDatePicked -> edit { form -> form.copy(releaseDate = event.date) }
+        is Event.RetryClicked -> onRetryClicked()
+        is Event.SaveClicked -> onSaveClicked()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        newsChannel.close()
+    }
+
+    private fun edit(transform: (TopicContent) -> TopicContent) = dataState.update { state ->
+        state.copy(
+            form = transform(state.form),
+            saveStatus = null,
+        )
+    }
+
+    private fun onRetryClicked() {
+        if (dataState.value.load != Load.FAILED) return
+        load()
+    }
+
+    private fun load() {
+        dataState.update { state -> state.copy(load = Load.LOADING) }
+        viewModelScope.launch {
+            when (val cast = getCharactersUseCase()) {
+                is LoadResult.Failed -> dataState.update { state -> state.copy(load = Load.FAILED) }
+                is LoadResult.Loaded -> onCastLoaded(cast.value)
+            }
+        }
+    }
+
+    private suspend fun onCastLoaded(cast: List<Character>) {
+        if (topicId == null) {
+            dataState.update { state ->
+                state.copy(
+                    cast = cast,
+                    load = Load.LOADED,
+                )
+            }
+            return
+        }
+        when (val result = getTopicUseCase(topicId)) {
+            is LoadTopicResult.Failed -> dataState.update { state -> state.copy(load = Load.FAILED) }
+            is LoadTopicResult.Loaded -> dataState.update { state ->
+                state
+                    .copy(cast = cast)
+                    .saved(result.topic)
+            }
+        }
+    }
+
+    private fun onSaveClicked() {
+        val state = dataState.value
+        if (state.isSaving) return
+        dataState.update { current ->
+            current.copy(
+                isSaving = true,
+                saveStatus = null,
+            )
+        }
+        viewModelScope.launch {
+            when (val result = saveTopicUseCase(state.saved?.topicId, state.form)) {
+                is SaveTopicResult.Failed -> onSaveFailed()
+                is SaveTopicResult.Invalid -> dataState.update { current ->
+                    current.copy(
+                        isSaving = false,
+                        saveStatus = SaveStatus.REJECTED,
+                    )
+                }
+                is SaveTopicResult.Saved -> dataState.update { current ->
+                    current
+                        .saved(result.topic)
+                        .copy(saveStatus = SaveStatus.SAVED)
+                }
+            }
+        }
+    }
+
+    private suspend fun onSaveFailed() {
+        dataState.update { state -> state.copy(isSaving = false) }
+        newsChannel.send(News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."))
+    }
 
     data class DataState(
         val cast: List<Character> = emptyList(),
@@ -18,7 +140,15 @@ internal class TopicViewModel : ViewModel() {
         val load: Load = Load.LOADING,
         val saved: Topic? = null,
         val saveStatus: SaveStatus? = null,
-    )
+    ) {
+
+        fun saved(topic: Topic): DataState = copy(
+            form = topic.content,
+            isSaving = false,
+            load = Load.LOADED,
+            saved = topic,
+        )
+    }
 
     enum class Load {
         FAILED,
@@ -55,6 +185,26 @@ internal class TopicViewModel : ViewModel() {
         data class Error(val message: String) : UiState
 
         data object Loading : UiState
+    }
+
+    sealed interface News {
+
+        data class ShowSnackbar(val message: String) : News
+    }
+
+    sealed interface Event {
+
+        data class FormChanged(val form: TopicContent) : Event
+
+        data class GuestDescriptionChanged(val description: String) : Event
+
+        data class InterlocutorChosen(val interlocutor: Interlocutor) : Event
+
+        data class ReleaseDatePicked(val date: LocalDate) : Event
+
+        data object RetryClicked : Event
+
+        data object SaveClicked : Event
     }
 
     private companion object {
