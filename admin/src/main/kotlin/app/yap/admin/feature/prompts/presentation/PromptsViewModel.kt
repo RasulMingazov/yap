@@ -50,13 +50,13 @@ internal class PromptsViewModel(
     }
 
     private fun onOpened() {
-        if (dataState.value.isSending) return
+        if (isSending()) return
         load()
     }
 
     private fun onPromptClicked(promptKey: PromptKey) {
         val state = dataState.value
-        if (state.isSending || state.promptLoad == Load.LOADING) return
+        if (isSending() || state.isPromptLoading) return
         if (promptKey !in state.prompts) {
             loadPrompt(promptKey)
             return
@@ -64,44 +64,65 @@ internal class PromptsViewModel(
         dataState.update { current ->
             current.copy(
                 chosen = promptKey,
-                promptLoad = Load.LOADED,
-                sendStatus = SendStatus.Idle,
+                isPromptLoadFailed = false,
+                restoredNumber = null,
+                saveResult = null,
             )
         }
     }
 
     private fun onRestoreClicked(number: Int) {
-        val state = dataState.value
-        if (state.isSending) return
-        startSending(SendStatus.Restoring)
+        if (isSending()) return
+        val promptKey = dataState.value.chosen
+        dataState.update { state ->
+            state.copy(
+                isRestoring = true,
+                restoredNumber = null,
+                saveResult = null,
+            )
+        }
         viewModelScope.launch {
-            when (val result = restorePromptUseCase(state.chosen, number)) {
-                is RestorePromptResult.Failed -> onSendFailed("Не удалось вернуть версию. Попробуйте ещё раз.")
-                is RestorePromptResult.Restored -> dataState.update { current ->
-                    current.sent(
-                        prompt = result.prompt,
-                        sendStatus = SendStatus.Restored(number),
-                    )
+            when (val result = restorePromptUseCase(promptKey, number)) {
+                is RestorePromptResult.Failed -> onRestoreFailed()
+                is RestorePromptResult.Restored -> dataState.update { state ->
+                    state
+                        .sent(result.prompt)
+                        .copy(restoredNumber = number)
                 }
             }
         }
     }
 
+    private suspend fun onRestoreFailed() {
+        dataState.update { state -> state.copy(isRestoring = false) }
+        newsChannel.send(News.ShowSnackbar("Не удалось вернуть версию. Попробуйте ещё раз."))
+    }
+
     private fun onRetryClicked() {
         val state = dataState.value
-        if (state.load == Load.FAILED) load()
-        if (state.promptLoad == Load.FAILED) loadPrompt(state.chosen)
+        if (state.isListLoadFailed) load()
+        if (state.isPromptLoadFailed) loadPrompt(state.chosen)
     }
 
     private fun load() {
-        dataState.update { state -> state.copy(load = Load.LOADING) }
+        dataState.update { state ->
+            state.copy(
+                isListLoadFailed = false,
+                isListLoading = true,
+            )
+        }
         viewModelScope.launch {
             when (val result = getPromptsUseCase()) {
-                is LoadResult.Failed -> dataState.update { state -> state.copy(load = Load.FAILED) }
+                is LoadResult.Failed -> dataState.update { state ->
+                    state.copy(
+                        isListLoadFailed = true,
+                        isListLoading = false,
+                    )
+                }
                 is LoadResult.Loaded -> {
                     dataState.update { state ->
                         state.copy(
-                            load = Load.LOADED,
+                            isListLoading = false,
                             summaries = result.value,
                         )
                     }
@@ -115,104 +136,108 @@ internal class PromptsViewModel(
         dataState.update { state ->
             state.copy(
                 chosen = promptKey,
-                promptLoad = Load.LOADING,
-                sendStatus = SendStatus.Idle,
+                isPromptLoadFailed = false,
+                isPromptLoading = true,
+                restoredNumber = null,
+                saveResult = null,
             )
         }
         viewModelScope.launch {
             when (val result = getPromptUseCase(promptKey)) {
-                is LoadResult.Failed -> dataState.update { state -> state.copy(promptLoad = Load.FAILED) }
+                is LoadResult.Failed -> dataState.update { state ->
+                    state.copy(
+                        isPromptLoadFailed = true,
+                        isPromptLoading = false,
+                    )
+                }
                 is LoadResult.Loaded -> dataState.update { state -> state.loaded(result.value) }
             }
         }
     }
 
+    private fun DataState.loaded(prompt: Prompt): DataState = copy(
+        isPromptLoading = false,
+        prompts = prompts + (prompt.promptKey to prompt),
+    )
+
     private fun onSaveClicked() {
         val state = dataState.value
-        if (state.isSending || state.promptLoad != Load.LOADED) return
-        startSending(SendStatus.Saving)
+        if (isSending() || !state.isPromptShown()) return
+        dataState.update { current ->
+            current.copy(
+                isSaving = true,
+                restoredNumber = null,
+                saveResult = null,
+            )
+        }
         viewModelScope.launch {
-            when (val result = savePromptUseCase(state.chosen, state.text)) {
-                is SavePromptResult.EmptyText -> dataState.update { current ->
-                    current.copy(sendStatus = SendStatus.EmptyText)
-                }
-                is SavePromptResult.Failed -> onSendFailed("Не удалось сохранить. Попробуйте ещё раз.")
+            when (val result = savePromptUseCase(state.chosen, state.chosenText())) {
+                is SavePromptResult.Failed -> onSaveFailed(result)
+                is SavePromptResult.Rejected -> endSave(result)
                 is SavePromptResult.Saved -> dataState.update { current ->
-                    current.sent(
-                        prompt = result.prompt,
-                        sendStatus = SendStatus.Saved,
-                    )
+                    current
+                        .sent(result.prompt)
+                        .copy(saveResult = result)
                 }
             }
         }
     }
 
-    private fun startSending(sendStatus: SendStatus) {
-        dataState.update { state -> state.copy(sendStatus = sendStatus) }
+    private fun DataState.isPromptShown(): Boolean = !isPromptLoading && !isPromptLoadFailed && chosen in prompts
+
+    private fun DataState.chosenText(): String = texts[chosen] ?: prompts.getValue(chosen).text.orEmpty()
+
+    private suspend fun onSaveFailed(result: SavePromptResult.Failed) {
+        endSave(result)
+        newsChannel.send(News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."))
     }
 
-    private suspend fun onSendFailed(message: String) {
-        dataState.update { state -> state.copy(sendStatus = SendStatus.Idle) }
-        newsChannel.send(News.ShowSnackbar(message))
-    }
-
-    private fun onTextChanged(text: String) {
-        if (dataState.value.isSending) return
+    private fun endSave(result: SavePromptResult) {
         dataState.update { state ->
             state.copy(
-                sendStatus = SendStatus.Idle,
+                isSaving = false,
+                saveResult = result,
+            )
+        }
+    }
+
+    private fun DataState.sent(prompt: Prompt): DataState = copy(
+        isRestoring = false,
+        isSaving = false,
+        prompts = prompts + (prompt.promptKey to prompt),
+        texts = texts - prompt.promptKey,
+    )
+
+    private fun onTextChanged(text: String) {
+        if (isSending()) return
+        dataState.update { state ->
+            state.copy(
+                restoredNumber = null,
+                saveResult = null,
                 texts = state.texts + (state.chosen to text),
             )
         }
     }
 
+    private fun isSending(): Boolean {
+        val state = dataState.value
+        return state.isRestoring || state.isSaving
+    }
+
     data class DataState(
         val chosen: PromptKey = PromptKey.TOPIC_REPLY,
-        val load: Load = Load.LOADING,
-        val promptLoad: Load = Load.LOADING,
+        val isListLoadFailed: Boolean = false,
+        val isListLoading: Boolean = false,
+        val isPromptLoadFailed: Boolean = false,
+        val isPromptLoading: Boolean = false,
+        val isRestoring: Boolean = false,
+        val isSaving: Boolean = false,
         val prompts: Map<PromptKey, Prompt> = emptyMap(),
-        val sendStatus: SendStatus = SendStatus.Idle,
-        val summaries: List<PromptSummary> = emptyList(),
+        val restoredNumber: Int? = null,
+        val saveResult: SavePromptResult? = null,
+        val summaries: List<PromptSummary>? = null,
         val texts: Map<PromptKey, String> = emptyMap(),
-    ) {
-
-        val isSending: Boolean
-            get() = sendStatus is SendStatus.Restoring || sendStatus is SendStatus.Saving
-
-        val text: String
-            get() = texts[chosen] ?: prompts.getValue(chosen).text.orEmpty()
-
-        fun loaded(prompt: Prompt): DataState = copy(
-            promptLoad = Load.LOADED,
-            prompts = prompts + (prompt.promptKey to prompt),
-        )
-
-        fun sent(prompt: Prompt, sendStatus: SendStatus): DataState = loaded(prompt).copy(
-            sendStatus = sendStatus,
-            texts = texts - prompt.promptKey,
-        )
-    }
-
-    enum class Load {
-        FAILED,
-        LOADED,
-        LOADING,
-    }
-
-    sealed interface SendStatus {
-
-        data object EmptyText : SendStatus
-
-        data object Idle : SendStatus
-
-        data class Restored(val number: Int) : SendStatus
-
-        data object Restoring : SendStatus
-
-        data object Saved : SendStatus
-
-        data object Saving : SendStatus
-    }
+    )
 
     sealed interface UiState {
 
