@@ -193,6 +193,22 @@ that the steps and the check are the same for every rating level.
 - **WHEN** the owner clicks Add step
 - **THEN** the Steps section gets an empty step below the last one
 
+### Requirement: The Interlocutor section guides the owner
+
+Without characters, a note above Guest SHALL say that there are no characters yet and that the
+owner adds them in Characters. A second choice of Guest SHALL bring back the last guest description.
+
+#### Scenario: Guest again
+
+- **WHEN** the owner types a guest description, chooses a character, and then chooses Guest again
+- **THEN** the guest description field shows the description that the owner typed
+
+#### Scenario: No characters yet
+
+- **WHEN** the cast has no characters
+- **THEN** Interlocutor shows a note above Guest that there are no characters yet and that the
+  owner adds them in Characters
+
 ### Requirement: Saving a draft
 
 Save draft SHALL send the topic to the server, with an empty release date and an empty duration as

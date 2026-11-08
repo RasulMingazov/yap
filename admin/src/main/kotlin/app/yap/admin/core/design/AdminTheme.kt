@@ -21,6 +21,7 @@ internal object AdminTheme {
         val lineStrong = Color(0xFFD9D9DD)
         val muted = Color(0xFF6B6B72)
         val ok = Color(0xFF1F7A3F)
+        val radioRing = Color(0xFFB8B8BE)
         val selected = Color(0xFFEDEDF0)
         val side = Color(0xFFFAFAFA)
         val transparent = Color.Transparent
@@ -57,6 +58,9 @@ internal object AdminTheme {
         val loader = 20.dp
         val loaderStroke = 2.dp
         val popupPadding = 8.dp
+        val radio = 14.dp
+        val radioInset = 4.dp
+        val rowGap = 16.dp
         val rowMinHeight = 48.dp
         val rowPadding = 12.dp
         val secondaryButtonPadding = 12.dp

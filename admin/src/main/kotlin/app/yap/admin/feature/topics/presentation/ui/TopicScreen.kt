@@ -122,6 +122,10 @@ private fun TopicForm(
             content = content,
             onEvent = onEvent,
         )
+        InterlocutorSection(
+            content = content,
+            onEvent = onEvent,
+        )
         OpeningLineSection(
             content = content,
             onEvent = onEvent,
