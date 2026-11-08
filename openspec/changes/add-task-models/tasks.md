@@ -114,7 +114,7 @@ Refresh, `StubSaveModelsUseCase` and the save use case in the module, in the sam
 260 lines).
 
 - [x] 8.1 Add the load and choice events of `ModelsViewModel`, and `featureModelsModule()` in `appModules()`; verify with the view-model tests for the load on `Opened` and Opened again, a provider change that sets its first model, a model change, Retry after a load error and after a task missing in the answer, and `AppModulesTest`
-- [ ] 8.2 Add Save, `News` and Refresh to `ModelsViewModel`; verify with the view-model tests for the save of every task, the Saved status and its reset on a change, the guard while saving, 400, 409 and Refresh that loads again (M5), and the save failure snackbar
+- [x] 8.2 Add Save, `News` and Refresh to `ModelsViewModel`; verify with the view-model tests for the save of every task, the Saved status and its reset on a change, the guard while saving, 400, 409 and Refresh that loads again (M5), and the save failure snackbar
 
 ## 9. [9/15] Admin Models screen and the sidebar (about 300 lines)
 
