@@ -42,7 +42,6 @@ internal class PublishTopicUseCaseTest {
     fun `GIVEN a padded title and an empty step WHEN publishing THEN the content is published normalized`() =
         runTest {
             val env = Environment()
-            env.topicRepository.publishCall.returns(TopicPublish.Published(StubTopic.stubTopic()))
 
             env.useCase(content = StubTopic.stubPaddedContent(), topicId = StubTopic.TOPIC_ID)
 

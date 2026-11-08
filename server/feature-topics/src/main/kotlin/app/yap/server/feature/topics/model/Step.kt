@@ -11,4 +11,10 @@ data class Step(
 
     internal val isEmpty: Boolean
         get() = outcome.isEmpty() && passWhen.isEmpty() && task.isEmpty()
+
+    internal fun normalized(): Step = copy(
+        outcome = outcome.trim(),
+        passWhen = passWhen.trim(),
+        task = task.trim(),
+    )
 }
