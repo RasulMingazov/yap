@@ -19,7 +19,7 @@ internal object CharacterUiStateMapper : (DataState) -> UiState {
         isSaveEnabled = !isSaving,
         saveStatus = saveResult?.status(),
         subtitle = subtitle(),
-        title = savedProfile?.name ?: "Новый персонаж",
+        title = title(),
     )
 
     private fun DataState.hint(): String? = if (savedProfile == null) "Заполните поля и нажмите «Сохранить»." else null
@@ -31,4 +31,6 @@ internal object CharacterUiStateMapper : (DataState) -> UiState {
     }
 
     private fun DataState.subtitle(): String = if (savedProfile == null) "Ещё не сохранён" else "Постоянный герой"
+
+    private fun DataState.title(): String = savedProfile?.name ?: "Новый персонаж"
 }

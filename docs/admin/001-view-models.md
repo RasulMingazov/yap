@@ -57,8 +57,8 @@ internal class CharacterViewModel(
 - Keep only raw facts in `DataState`: domain data that is `null` until it loads, busy flags
   (`isLoading`, `isSaving`), failure flags (`isLoadFailed`), the domain result of the last call
   when its kind matters, and the user's input. Do not keep a type that names a screen state, such
-  as a `LOADING`/`LOADED`/`FAILED` enum, a `LoadResult`, or a `Saving` status. Do not add derived
-  getters.
+  as a `LOADING`/`LOADED`/`FAILED` enum, a `LoadResult`, a `SaveStatus` wrapper, or an `Idle`
+  value. Do not add derived getters to `DataState`.
 - Let the mapper decide the screen state and every status text from these facts.
 - A `UiState` mapper object implements `(DataState) -> UiState`. Its only public function is
   `override fun invoke(state: DataState): UiState`, and the view model passes the object to

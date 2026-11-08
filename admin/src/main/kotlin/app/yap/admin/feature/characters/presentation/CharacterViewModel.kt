@@ -78,7 +78,7 @@ internal class CharacterViewModel(
         }
         viewModelScope.launch {
             when (val result = saveCharacterUseCase(state.characterId, state.form)) {
-                is SaveCharacterResult.Failed -> onSaveFailed()
+                is SaveCharacterResult.Failed -> onSaveFailed(result)
                 is SaveCharacterResult.Invalid -> dataState.update { current ->
                     current.copy(
                         isSaving = false,
@@ -97,8 +97,13 @@ internal class CharacterViewModel(
         }
     }
 
-    private suspend fun onSaveFailed() {
-        dataState.update { state -> state.copy(isSaving = false) }
+    private suspend fun onSaveFailed(result: SaveCharacterResult.Failed) {
+        dataState.update { state ->
+            state.copy(
+                isSaving = false,
+                saveResult = result,
+            )
+        }
         newsChannel.send(News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."))
     }
 

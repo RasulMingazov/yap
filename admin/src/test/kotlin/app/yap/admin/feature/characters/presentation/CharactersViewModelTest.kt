@@ -100,6 +100,21 @@ internal class CharactersViewModelTest {
     }
 
     @Test
+    fun `GIVEN a shown list and a failed reload WHEN Retry is clicked THEN nothing loads`() = runTest(dispatcher) {
+        val env = Environment(characters = LoadResult.Loaded(emptyList()))
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+        env.getCharactersUseCase.invokeCall.returns(LoadResult.Failed)
+        env.viewModel.onEvent(Event.Opened)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.RetryClicked)
+        advanceUntilIdle()
+
+        assertEquals(expected = 2, actual = env.getCharactersUseCase.invokeCall.callCount)
+    }
+
+    @Test
     fun `GIVEN the characters are loading WHEN Retry is clicked THEN they load once`() = runTest(dispatcher) {
         val env = Environment(characters = LoadResult.Loaded(emptyList()))
 

@@ -6,6 +6,7 @@ import app.yap.admin.feature.characters.presentation.CharactersViewModel.DataSta
 import app.yap.admin.feature.characters.presentation.CharactersViewModel.UiState
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 internal class CharactersUiStateMapperTest {
 
@@ -48,17 +49,19 @@ internal class CharactersUiStateMapperTest {
     }
 
     @Test
-    fun `GIVEN a shown list WHEN the reload fails THEN the list stays`() {
-        val state = DataState(characters = emptyList(), isLoadFailed = true)
+    fun `GIVEN a shown list and a failed reload WHEN mapping THEN the list stays`() {
+        val state = DataState(characters = listOf(StubCharacter.stubCharacter()), isLoadFailed = true)
 
         val uiState = CharactersUiStateMapper(state)
 
-        assertEquals(expected = UiState.Empty(message = "Персонажей пока нет"), actual = uiState)
+        assertIs<UiState.Content>(uiState)
     }
 
     @Test
     fun `GIVEN the characters are not loaded yet WHEN mapping THEN the screen is loading`() {
-        val uiState = CharactersUiStateMapper(DataState(isLoading = true))
+        val state = DataState(isLoading = true)
+
+        val uiState = CharactersUiStateMapper(state)
 
         assertEquals(expected = UiState.Loading, actual = uiState)
     }

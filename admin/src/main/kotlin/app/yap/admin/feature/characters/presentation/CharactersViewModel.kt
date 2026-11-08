@@ -30,7 +30,8 @@ internal class CharactersViewModel(
     }
 
     private fun onRetryClicked() {
-        if (!dataState.value.isLoadFailed) return
+        val state = dataState.value
+        if (!state.isLoadFailed || state.characters != null) return
         load()
     }
 

@@ -7,6 +7,7 @@ import app.yap.admin.feature.characters.presentation.CharacterViewModel.DataStat
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.UiState
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 internal class CharacterUiStateMapperTest {
 
@@ -67,6 +68,15 @@ internal class CharacterUiStateMapperTest {
         val uiState = CharacterUiStateMapper(state)
 
         assertEquals(expected = UiState.Loading, actual = uiState)
+    }
+
+    @Test
+    fun `GIVEN a failed save WHEN mapping THEN no status shows`() {
+        val state = DataState(characterId = null, saveResult = SaveCharacterResult.Failed)
+
+        val uiState = CharacterUiStateMapper(state)
+
+        assertNull((uiState as UiState.Content).saveStatus)
     }
 
     @Test
