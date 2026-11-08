@@ -81,6 +81,11 @@ Files: `am/domain/` (`ModelTask`, `ModelChoice`, `TaskModel`, `Provider`, `Model
 `am/data/repository/RemoteModelRepository.kt`, `am/domain/usecase/` (`GetModelsUseCase`,
 `SaveModelsUseCase`), `admin/src/test/.../feature/models/domain/StubModels.kt`, and their tests.
 
+The part came to 420 lines, over the admin cap of 300, so it ships as two PRs. The first holds the
+domain types, `ModelRepository` and the two use cases (about 95 lines, no test: the use cases only
+delegate). The second, stacked on it, holds `ModelApi`, `ModelMapper`, `RemoteModelRepository`,
+`StubModels` and `RemoteModelRepositoryTest`, and marks task 6.1.
+
 - [x] 6.1 Add the admin models repository, its mapper and the two use cases; verify with mock engine tests for `GET` 200 with `keySetting`, `PUT` 200, 400, 409 that gives `CatalogChanged`, an unknown task code in the answer, a call without saved settings and a failed call. No use-case test: the use cases only delegate
 
 ## 7. [7/15] Admin Models UI state and its mapper (about 300 lines)
