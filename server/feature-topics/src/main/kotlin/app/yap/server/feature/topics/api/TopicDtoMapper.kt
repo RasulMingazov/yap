@@ -29,9 +29,9 @@ internal fun TopicDetails.toDto(): TopicDto = TopicDto(
     topicId = topic.topicId.value.toString(),
 )
 
-private fun Set<TopicGap>.toDto(): List<TopicGapDto> = map { gap -> gap.toDto() }
+internal fun Set<TopicGap>.toDto(): List<TopicGapDto> = map { gap -> gap.toDto() }
 
-private fun ReleaseState.toDto(): TopicStatusDto = when (this) {
+internal fun ReleaseState.toDto(): TopicStatusDto = when (this) {
     ReleaseState.DRAFT -> TopicStatusDto.DRAFT
     ReleaseState.PUBLISHED -> TopicStatusDto.PUBLISHED
     ReleaseState.TODAY -> TopicStatusDto.TODAY

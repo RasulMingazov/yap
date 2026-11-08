@@ -69,7 +69,7 @@ It merges after the PR of 7.2 (`TopicDetails`, merged), whose use cases read `Re
 
 ### Slice 3 · The calendar DTOs · ~250 · `K/` (`TopicCalendarDto`, `CalendarRowDto`, `CalendarTopicDto`, `LedByDto`, `TodoDto`), `S/api/TopicCalendarDtoMapper.kt` and its test, `S/api/TopicDtoMapper.kt` (`toDto` of the gaps and the state: `internal`)
 
-- [ ] 8.6 Add the calendar DTOs and the server mapper; verify with the mapper tests for both interlocutors, both To do entries and an empty day
+- [x] 8.6 Add the calendar DTOs and the server mapper; verify with the mapper tests for both interlocutors, both To do entries and an empty day
 
 ## 9. [9/26] The topic routes · ~380, at risk · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `S/api/TopicRoutes.kt` and its test
 
