@@ -67,9 +67,10 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 15. [15/16] Topic: Interlocutor and Steps · ~310 · `A/ScreenCaptureTest.kt`, `T/presentation/TopicViewModel.kt` and its test, `T/presentation/ui/` (`InterlocutorSection`, `CastRadioRow`, `StepsSection`)
 
-Two slices: slice 1 (~250) builds Interlocutor with the UX points M5, M10 and m6, the radio tokens in
-`AdminTheme`, `TopicUiStateMapper` and its test, the guest capture and the full-height Topic capture
-in `docs/testing/004-screen-capture.md`. Slice 2 (~220) builds Steps: the step events,
+Two slices: slice 1 (~290) builds Interlocutor with the UX points M5, M10 and m6, the radio tokens in
+`AdminTheme`, `TopicUiStateMapper`, `InterlocutorUiStateMapper` and the mapper test, the section in
+`T/presentation/ui/TopicScreen.kt`, its scenarios in `specs/topics/spec.md`, the guest and new-cast
+captures and the full-height Topic capture in `docs/testing/004-screen-capture.md`. Slice 2 (~220) builds Steps: the step events,
 `StepsSection`, the `note` of `SectionHeader`, `enabled` of `LinkButton`, and five steps in the guest
 capture.
 

@@ -174,6 +174,19 @@ internal class TopicViewModelTest {
     }
 
     @Test
+    fun `GIVEN Saved WHEN the chosen interlocutor is chosen again THEN Saved stays`() = runTest(dispatcher) {
+        val env = Environment(topicId = null)
+        advanceUntilIdle()
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.InterlocutorChosen(env.content().choices.first().interlocutor))
+        advanceUntilIdle()
+
+        assertEquals(expected = Status.Tone.SUCCESS, actual = env.content().saveStatus?.tone)
+    }
+
+    @Test
     fun `GIVEN a guest description WHEN a character and Guest again are chosen THEN it comes back`() =
         runTest(dispatcher) {
             val env = Environment(topicId = TopicId(StubTopic.TOPIC_ID))

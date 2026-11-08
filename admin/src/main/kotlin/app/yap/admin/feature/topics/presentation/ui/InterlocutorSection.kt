@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import app.yap.admin.core.design.AdminTextField
 import app.yap.admin.core.design.AdminTheme
+import app.yap.admin.core.design.Note
 import app.yap.admin.core.design.SectionHeader
 import app.yap.admin.feature.topics.presentation.TopicViewModel.Event
 import app.yap.admin.feature.topics.presentation.TopicViewModel.UiState
@@ -25,13 +25,7 @@ internal fun InterlocutorSection(
             number = 2,
             title = "Собеседник",
         )
-        content.castNote?.let { note ->
-            Text(
-                text = note,
-                color = AdminTheme.Colors.muted,
-                style = AdminTheme.Type.body,
-            )
-        }
+        content.castNote?.let { note -> Note(text = note) }
         Column(modifier = Modifier.selectableGroup()) {
             HorizontalDivider(color = AdminTheme.Colors.line)
             content.choices.forEach { choice ->

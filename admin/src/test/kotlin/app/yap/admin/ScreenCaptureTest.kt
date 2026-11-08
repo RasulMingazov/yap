@@ -72,6 +72,7 @@ internal class ScreenCaptureTest {
             "loading" to TopicViewModel.DataState(),
             "error" to TopicViewModel.DataState(load = TopicViewModel.Load.FAILED),
             "new" to new,
+            "new-cast" to new.copy(cast = CAST),
             "opened" to opened,
             "guest" to TopicViewModel.DataState(cast = CAST).saved(GUEST_TOPIC),
             "rejected" to new.copy(

@@ -49,7 +49,7 @@ internal class TopicViewModel(
         is Event.GuestDescriptionChanged -> edit { form ->
             form.copy(interlocutor = Interlocutor.Guest(description = event.description))
         }
-        is Event.InterlocutorChosen -> edit { form -> form.copy(interlocutor = event.interlocutor) }
+        is Event.InterlocutorChosen -> onInterlocutorChosen(event.interlocutor)
         is Event.ReleaseDatePicked -> onReleaseDatePicked(event.date)
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
@@ -69,6 +69,11 @@ internal class TopicViewModel(
         state
             .withForm(transform(state.form))
             .copy(saveStatus = state.saveStatus.takeIf { status -> status == SaveStatus.REJECTED })
+    }
+
+    private fun onInterlocutorChosen(interlocutor: Interlocutor) {
+        if (interlocutor == dataState.value.form.interlocutor) return
+        edit { form -> form.copy(interlocutor = interlocutor) }
     }
 
     private fun onReleaseDatePicked(date: LocalDate) {
@@ -153,11 +158,12 @@ internal class TopicViewModel(
         val saveStatus: SaveStatus? = null,
     ) {
 
-        fun saved(topic: Topic): DataState = withForm(topic.content).copy(
-            isSaving = false,
-            load = Load.LOADED,
-            saved = topic,
-        )
+        fun saved(topic: Topic): DataState = withForm(topic.content)
+            .copy(
+                isSaving = false,
+                load = Load.LOADED,
+                saved = topic,
+            )
 
         fun withForm(form: TopicContent): DataState = copy(
             form = form,

@@ -39,11 +39,14 @@ internal fun CastRadioRow(
         horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.rowGap),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RadioDot(isSelected = choice.isSelected)
+        RadioDot(
+            enabled = enabled,
+            isSelected = choice.isSelected,
+        )
         Text(
             text = choice.name,
             modifier = Modifier.weight(1f),
-            color = AdminTheme.Colors.ink,
+            color = if (enabled) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
             style = AdminTheme.Type.body,
         )
         choice.meta?.let { meta ->
@@ -57,7 +60,11 @@ internal fun CastRadioRow(
 }
 
 @Composable
-private fun RadioDot(isSelected: Boolean) {
+private fun RadioDot(
+    enabled: Boolean,
+    isSelected: Boolean,
+) {
+    val chosen = if (enabled) AdminTheme.Colors.ink else AdminTheme.Colors.muted
     Box(
         modifier = Modifier
             .size(AdminTheme.Sizes.radio)
@@ -67,12 +74,12 @@ private fun RadioDot(isSelected: Boolean) {
             )
             .border(
                 width = AdminTheme.Sizes.border,
-                color = if (isSelected) AdminTheme.Colors.ink else AdminTheme.Colors.lineStrong,
+                color = if (isSelected) chosen else AdminTheme.Colors.radioRing,
                 shape = CircleShape,
             )
             .padding(AdminTheme.Sizes.radioInset)
             .background(
-                color = if (isSelected) AdminTheme.Colors.ink else AdminTheme.Colors.background,
+                color = if (isSelected) chosen else AdminTheme.Colors.background,
                 shape = CircleShape,
             ),
     )

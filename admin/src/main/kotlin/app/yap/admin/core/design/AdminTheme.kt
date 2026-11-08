@@ -21,6 +21,7 @@ internal object AdminTheme {
         val lineStrong = Color(0xFFD9D9DD)
         val muted = Color(0xFF6B6B72)
         val ok = Color(0xFF1F7A3F)
+        val radioRing = Color(0xFFB8B8BE)
         val selected = Color(0xFFEDEDF0)
         val side = Color(0xFFFAFAFA)
     }
