@@ -80,4 +80,4 @@ and five steps in the guest capture.
 
 ## 16. [16/16] The archive · `openspec/`
 
-- [ ] 16.1 Run `/opsx:archive` as the last commit; verify that `openspec/specs/topics/spec.md` and `openspec/specs/characters/spec.md` update
+- [x] 16.1 Run `/opsx:archive` as the last commit; verify that `openspec/specs/topics/spec.md` and `openspec/specs/characters/spec.md` update

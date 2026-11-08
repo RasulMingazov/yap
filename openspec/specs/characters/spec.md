@@ -67,9 +67,9 @@ Behind the admin key, the server SHALL:
 
 ### Requirement: The sidebar opens the characters
 
-The sidebar of the admin app SHALL show Characters in the group Content and Server in the group
-Settings. The admin app SHALL open on Characters when it has saved server settings, and on Server
-when it has none.
+The sidebar of the admin app SHALL show Topics and Characters in the group Content, in this order,
+and Server in the group Settings. The admin app SHALL open on Topics when it has saved server
+settings, and on Server when it has none.
 
 #### Scenario: The first start
 
@@ -79,7 +79,7 @@ when it has none.
 #### Scenario: A later start
 
 - **WHEN** the owner starts the admin app after a connection to a server
-- **THEN** the admin app opens Characters
+- **THEN** the admin app opens Topics
 
 ### Requirement: The Characters list
 

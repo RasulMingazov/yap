@@ -201,12 +201,18 @@ that the steps and the check are the same for every rating level.
 ### Requirement: The Interlocutor section guides the owner
 
 Without characters, a note above Guest SHALL say that there are no characters yet and that the
-owner adds them in Characters. A second choice of Guest SHALL bring back the last guest description.
+owner adds them in Characters. A second choice of Guest SHALL bring back the last guest description. A choice of the interlocutor
+that is already chosen SHALL change nothing.
 
 #### Scenario: Guest again
 
 - **WHEN** the owner types a guest description, chooses a character, and then chooses Guest again
 - **THEN** the guest description field shows the description that the owner typed
+
+#### Scenario: The same interlocutor
+
+- **WHEN** the Saved status shows, and the owner chooses the interlocutor that is already chosen
+- **THEN** the form does not change and the Saved status stays
 
 #### Scenario: No characters yet
 
