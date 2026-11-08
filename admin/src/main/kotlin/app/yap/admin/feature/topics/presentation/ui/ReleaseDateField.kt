@@ -62,7 +62,7 @@ internal fun ReleaseDateField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ReleaseDatePicker(
+internal fun ReleaseDatePicker(
     date: LocalDate?,
     onDatePick: (LocalDate) -> Unit,
     onDismiss: () -> Unit,

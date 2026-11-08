@@ -21,8 +21,12 @@ import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ui.ServerContent
 import app.yap.admin.feature.topics.domain.LoadTopicsResult
 import app.yap.admin.feature.topics.domain.StubTopic
+import app.yap.admin.feature.topics.presentation.TopicUiStateMapper
+import app.yap.admin.feature.topics.presentation.TopicViewModel
 import app.yap.admin.feature.topics.presentation.TopicsUiStateMapper
 import app.yap.admin.feature.topics.presentation.TopicsViewModel
+import app.yap.admin.feature.topics.presentation.ui.ReleaseDatePicker
+import app.yap.admin.feature.topics.presentation.ui.TopicContent
 import app.yap.admin.feature.topics.presentation.ui.TopicsContent
 import app.yap.admin.navigation.NavigationViewModel.Screen
 import app.yap.admin.navigation.ui.AdminFrame
@@ -55,6 +59,57 @@ internal class ScreenCaptureTest {
         }
 
         assertTrue(images.all { image -> image.length() > 0 })
+    }
+
+    @Test
+    fun `GIVEN every state of the Topic form WHEN capturing THEN each state has an image`() {
+        val new = TopicViewModel.DataState(load = TopicViewModel.Load.LOADED)
+        val opened = TopicViewModel.DataState().saved(SAVED_TOPIC)
+        val states = mapOf(
+            "loading" to TopicViewModel.DataState(),
+            "error" to TopicViewModel.DataState(load = TopicViewModel.Load.FAILED),
+            "new" to new,
+            "opened" to opened,
+            "rejected" to new.copy(
+                form = StubTopic.stubContent(
+                    durationMinutes = 0,
+                    releaseDate = null,
+                ),
+                saveStatus = TopicViewModel.SaveStatus.REJECTED,
+            ),
+            "saving" to opened.copy(isSaving = true),
+            "saved" to opened.copy(saveStatus = TopicViewModel.SaveStatus.SAVED),
+        )
+
+        val images = states.map { (state, dataState) ->
+            capture(name = "topic-$state", current = Screen.Topics) {
+                TopicContent(
+                    back = TOPICS_BACK,
+                    onEvent = {},
+                    uiState = TopicUiStateMapper.map(dataState),
+                )
+            }
+        }
+
+        assertTrue(images.all { image -> image.length() > 0 })
+    }
+
+    @Test
+    fun `GIVEN the release date picker WHEN capturing THEN it has an image`() {
+        val image = capture(name = "topic-date-picker", current = Screen.Topics) {
+            TopicContent(
+                back = TOPICS_BACK,
+                onEvent = {},
+                uiState = TopicUiStateMapper.map(TopicViewModel.DataState().saved(SAVED_TOPIC)),
+            )
+            ReleaseDatePicker(
+                date = StubTopic.RELEASE_DATE,
+                onDatePick = {},
+                onDismiss = {},
+            )
+        }
+
+        assertTrue(image.length() > 0)
     }
 
     @Test
@@ -162,6 +217,8 @@ internal class ScreenCaptureTest {
         }
         val image = try {
             scene.render()
+            scene.render(SETTLED_NANOS)
+            scene.render(2 * SETTLED_NANOS)
         } finally {
             scene.close()
         }
@@ -175,6 +232,7 @@ internal class ScreenCaptureTest {
     private companion object {
 
         const val LONG_ADDRESS = "https://staging.yap-admin.example.com"
+        const val SETTLED_NANOS = 1_000_000_000L
         val CHARACTER_ID = CharacterId(StubCharacter.CHARACTER_ID)
         val CAST = listOf(
             StubCharacter.stubCharacter(),
@@ -197,6 +255,14 @@ internal class ScreenCaptureTest {
         val CONNECTED_LABEL = ServerUiStateMapper
             .map(ServerViewModel.DataState(connection = ServerConnection.Connected(environment = "staging")))
             .serverLabel
+        val SAVED_TOPIC = StubTopic.stubTopic(
+            content = StubTopic.stubContent(
+                setting = "Evening at the airport. The learner gets into a taxi to the Hilton on Park Street. The " +
+                    "driver plays loud music and likes to talk about traffic. The ride takes about 20 minutes " +
+                    "and costs about 30 dollars.",
+                title = "A taxi from the airport to the hotel on a rainy evening, with a driver who talks a lot",
+            ),
+        )
         val SCREENS = File("build/screens")
         val TOPICS = listOf(
             StubTopic.stubTopic(),
@@ -215,6 +281,10 @@ internal class ScreenCaptureTest {
                 ),
                 topicId = "3c2b1a0f-9e8d-4c7b-a6f5-4e3d2c1b0a9f",
             ),
+        )
+        val TOPICS_BACK = ToolbarBack(
+            label = "Темы",
+            onClick = {},
         )
     }
 }
