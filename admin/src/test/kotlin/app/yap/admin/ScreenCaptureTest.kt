@@ -26,6 +26,12 @@ import app.yap.admin.feature.levels.domain.StubLevel
 import app.yap.admin.feature.levels.presentation.LevelsUiStateMapper
 import app.yap.admin.feature.levels.presentation.LevelsViewModel
 import app.yap.admin.feature.levels.presentation.ui.LevelsContent
+import app.yap.admin.feature.prompts.domain.PromptKey
+import app.yap.admin.feature.prompts.domain.PromptVersion
+import app.yap.admin.feature.prompts.domain.StubPrompt
+import app.yap.admin.feature.prompts.presentation.PromptsUiStateMapper
+import app.yap.admin.feature.prompts.presentation.PromptsViewModel
+import app.yap.admin.feature.prompts.presentation.ui.PromptsContent
 import app.yap.admin.feature.server.domain.ServerConnection
 import app.yap.admin.feature.server.presentation.ServerUiStateMapper
 import app.yap.admin.feature.server.presentation.ServerViewModel
@@ -43,6 +49,8 @@ import app.yap.admin.feature.topics.presentation.ui.TopicsContent
 import app.yap.admin.navigation.NavigationViewModel.Screen
 import app.yap.admin.navigation.ui.AdminFrame
 import java.io.File
+import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -255,6 +263,56 @@ internal class ScreenCaptureTest {
         assertTrue(image.length() > 0)
     }
 
+    @Test
+    fun `GIVEN every state of Prompts WHEN capturing THEN each state has an image`() {
+        val listed = PromptsViewModel.DataState(
+            load = PromptsViewModel.Load.LOADED,
+            summaries = StubPrompt.stubPromptSummaries(),
+        )
+        val content = listed.loaded(REPLY_PROMPT)
+        val states = mapOf(
+            "loading" to PromptsViewModel.DataState(),
+            "error" to PromptsViewModel.DataState(load = PromptsViewModel.Load.FAILED),
+            "content" to content,
+            "long-text" to content.copy(
+                texts = mapOf(PromptKey.TOPIC_REPLY to "${REPLY_PROMPT.text}\n\n${REPLY_PROMPT.text}"),
+            ),
+            "no-version" to listed
+                .copy(chosen = PromptKey.TOPIC_HINTS)
+                .loaded(NEW_PROMPT),
+            "prompt-loading" to content.copy(
+                chosen = PromptKey.TOPIC_HINTS,
+                promptLoad = PromptsViewModel.Load.LOADING,
+            ),
+            "prompt-error" to content.copy(
+                chosen = PromptKey.TOPIC_HINTS,
+                promptLoad = PromptsViewModel.Load.FAILED,
+            ),
+            "saving" to content.copy(sendStatus = PromptsViewModel.SendStatus.Saving),
+            "restoring" to content.copy(sendStatus = PromptsViewModel.SendStatus.Restoring),
+            "saved" to content.copy(sendStatus = PromptsViewModel.SendStatus.Saved),
+            "empty-text" to content.copy(
+                sendStatus = PromptsViewModel.SendStatus.EmptyText,
+                texts = mapOf(PromptKey.TOPIC_REPLY to ""),
+            ),
+            "restored" to listed.sent(
+                prompt = REPLY_PROMPT.copy(versions = replyVersions(current = RESTORED_NUMBER)),
+                sendStatus = PromptsViewModel.SendStatus.Restored(RESTORED_NUMBER),
+            ),
+        )
+
+        val images = states.map { (state, dataState) ->
+            capture(name = "prompts-$state", current = Screen.Prompts, height = PROMPTS_HEIGHT) {
+                PromptsContent(
+                    onEvent = {},
+                    uiState = PromptsUiStateMapper(dataState),
+                )
+            }
+        }
+
+        assertTrue(images.all { image -> image.length() > 0 })
+    }
+
     private fun capture(
         name: String,
         current: Screen,
@@ -309,8 +367,11 @@ internal class ScreenCaptureTest {
     private companion object {
 
         const val LONG_ADDRESS = "https://staging.yap-admin.example.com"
+        const val REPLY_VERSIONS = 7
+        const val RESTORED_NUMBER = 5
         const val SETTLED_FRAMES = 5
         const val SETTLED_NANOS = 1_000_000_000L
+        const val VERSION_GAP_DAYS = 3L
         val CHARACTER_ID = CharacterId(StubCharacter.CHARACTER_ID)
         val CAST = listOf(
             StubCharacter.stubCharacter(),
@@ -408,6 +469,40 @@ internal class ScreenCaptureTest {
             ),
         )
         val LEVELS_HEIGHT = 1000.dp
+        val NEW_PROMPT = StubPrompt.stubPrompt(
+            promptKey = PromptKey.TOPIC_HINTS,
+            text = null,
+            variables = listOf("{step.task}", "{topic.setting}", "{level.rules}", "{hint.level}"),
+            versions = emptyList(),
+        )
+        val PROMPTS_HEIGHT = 1400.dp
+        val REPLY_PROMPT = StubPrompt.stubPrompt(
+            text = listOf(
+                "You are {interlocutor}.",
+                "",
+                "Scene: {topic.setting}",
+                "Your role: {topic.role}",
+                "",
+                "{level.rules}",
+                "",
+                "The learner is on step {step.n}: \"{step.task}\". The check said: {check.verdict}.",
+                "- If the step passed, react and move towards the next step.",
+                "- If not, do not react as if it is done.",
+                "",
+                "Never switch to Russian, correct mistakes or leave the role.",
+                "Return JSON: {\"line\": \"...\", \"translation\": \"...\"}",
+            ).joinToString("\n"),
+            variables = listOf(
+                "{interlocutor}",
+                "{topic.setting}",
+                "{topic.role}",
+                "{level.rules}",
+                "{step.n}",
+                "{step.task}",
+                "{check.verdict}",
+            ),
+            versions = replyVersions(current = REPLY_VERSIONS),
+        )
         val SAVED_TOPIC = StubTopic.stubTopic(
             content = StubTopic.stubContent(
                 setting = "Evening at the airport. The learner gets into a taxi to the Hilton on Park Street. The " +
@@ -440,6 +535,16 @@ internal class ScreenCaptureTest {
             onClick = {},
         )
         val TOPIC_FORM_HEIGHT = 1800.dp
+
+        fun replyVersions(current: Int): List<PromptVersion> = (REPLY_VERSIONS downTo 1).map { number ->
+            StubPrompt.stubPromptVersion(
+                isCurrent = number == current,
+                number = number,
+                savedAt = Instant
+                    .parse(StubPrompt.SAVED_AT)
+                    .minus(Duration.ofDays((REPLY_VERSIONS - number) * VERSION_GAP_DAYS)),
+            )
+        }
 
         fun savedLevel(
             code: LevelCode,
