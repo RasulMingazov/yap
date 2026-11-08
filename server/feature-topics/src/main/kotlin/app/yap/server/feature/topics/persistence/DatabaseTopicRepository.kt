@@ -9,12 +9,15 @@ import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
 import app.yap.server.feature.topics.model.TopicId
 import app.yap.server.feature.topics.model.TopicStatus
+import java.time.LocalDate
 import kotlin.uuid.Uuid
+import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.lowerCase
+import org.jetbrains.exposed.v1.core.neq
 import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
 import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
@@ -67,12 +70,36 @@ class DatabaseTopicRepository(
             .map { row -> row.toTopic(steps = stepsByTopic[row[TopicsTable.topicId]].orEmpty()) }
     }
 
-    override suspend fun update(topic: Topic): TopicWrite = try {
+    override suspend fun hasPublishedOn(date: LocalDate, exceptTopicId: TopicId): Boolean = database.transaction {
+        !TopicsTable
+            .selectAll()
+            .where {
+                (TopicsTable.releaseDate eq date) and
+                    (TopicsTable.status eq TopicStatus.PUBLISHED) and
+                    (TopicsTable.topicId neq exceptTopicId.value)
+            }
+            .empty()
+    }
+
+    override suspend fun publish(content: TopicContent, topicId: TopicId): TopicWrite = write(
+        topic = Topic(
+            content = content,
+            status = TopicStatus.PUBLISHED,
+            topicId = topicId,
+        ),
+        where = TopicsTable.topicId eq topicId.value,
+    )
+
+    override suspend fun update(topic: Topic): TopicWrite = write(
+        topic = topic,
+        where = (TopicsTable.topicId eq topic.topicId.value) and (TopicsTable.status eq topic.status),
+    )
+
+    private suspend fun write(topic: Topic, where: Op<Boolean>): TopicWrite = try {
         database.transaction {
             maxAttempts = 1
-            val updatedRows = TopicsTable.update(
-                where = { (TopicsTable.topicId eq topic.topicId.value) and (TopicsTable.status eq topic.status) },
-            ) { statement ->
+            val updatedRows = TopicsTable.update(where = { where }) { statement ->
+                statement[TopicsTable.status] = topic.status
                 statement.write(topic.content)
             }
             when {
