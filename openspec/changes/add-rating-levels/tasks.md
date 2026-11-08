@@ -74,9 +74,10 @@ open, and the navigation files (about 300 lines). Slice 2b holds `core/design/Ad
 `core/design/AdminMaterialTheme.kt`, the table sizes and `Colors.transparent` in `AdminTheme`, the field labels of
 `UiState.Row` in `LevelsViewModel` and `LevelsUiStateMapper` with their tests, the level table in `LevelsScreen`, the
 requirement «The table marks the chosen level» in `specs/rating-levels/spec.md`, and the table cell field rule in
-`docs/admin/002-ui-compose.md` (about 320 lines). Slice 3 holds `ScreenCaptureTest.kt` and the images.
+`docs/admin/002-ui-compose.md` (about 320 lines). Slice 3 holds `ScreenCaptureTest.kt` and the images, and the header cell of
+`core/design/TableCells.kt` on one line, as the canvas `.th` does (the images cut «Слов в фразе, макс.»).
 
-- [ ] 6.1 Add `AdminSelect`, the mono style and the Levels screen with Save in the toolbar; verify with `./gradlew build` and the images of the screen capture for each state
+- [x] 6.1 Add `AdminSelect`, the mono style and the Levels screen with Save in the toolbar; verify with `./gradlew build` and the images of the screen capture for each state
 - [x] 6.2 Add the sidebar group Rules with Levels between Content and Settings; verify with the navigation view-model test for Levels
 - [ ] 6.3 Run the admin app against a server with a database; verify a first save of seven levels, a rejected save and the levels after a server restart
 
