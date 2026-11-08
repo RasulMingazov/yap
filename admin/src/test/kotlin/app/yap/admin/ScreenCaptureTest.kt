@@ -231,7 +231,10 @@ internal class ScreenCaptureTest {
             "chosen-b2" to saved.copy(chosen = LevelCode.B2),
             "saving" to saved.copy(isSaving = true),
             "invalid" to new.copy(saveStatus = LevelsViewModel.SaveStatus.Invalid),
-            "no-idioms" to new.copy(saveStatus = LevelsViewModel.SaveStatus.NoIdioms(LevelCode.A1)),
+            "no-idioms" to new.copy(
+                forms = LevelCode.entries.associateWith { StubLevel.stubInput(idioms = null) },
+                saveStatus = LevelsViewModel.SaveStatus.NoIdioms(LevelCode.A1),
+            ),
             "unread-rating-from" to saved.unread(
                 code = LevelCode.B2,
                 field = LevelsViewModel.NumberField.RATING_FROM,

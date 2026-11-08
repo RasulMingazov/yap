@@ -17,7 +17,9 @@ private fun LevelSettings.toInput(): LevelInput = LevelInput(
     vocabulary = vocabulary,
 )
 
-private fun LevelSettings.ratingFromText(): String = ratingFrom?.toString().orEmpty()
+private fun LevelSettings.ratingFromText(): String = ratingFrom
+    ?.toString()
+    .orEmpty()
 
 private val EMPTY_INPUT = LevelInput(
     block = "",

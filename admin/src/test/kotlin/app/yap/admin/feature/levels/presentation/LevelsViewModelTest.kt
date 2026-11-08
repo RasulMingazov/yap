@@ -121,7 +121,7 @@ internal class LevelsViewModelTest {
             advanceUntilIdle()
 
             assertEquals(
-                expected = "Заполните все уровни, рейтинг должен расти от A1 к C2",
+                expected = "Сервер не принял уровни: заполните все поля, числа больше нуля, рейтинг растёт от A1 к C2",
                 actual = env.content().saveStatus?.text,
             )
         }
@@ -155,6 +155,20 @@ internal class LevelsViewModelTest {
             env.saveLevelsUseCase.invokeCall.notCalled()
             assertEquals(expected = "Проверьте число в «Рейтинг»: A2", actual = env.content().saveStatus?.text)
         }
+
+    @Test
+    fun `GIVEN No rating with an empty block WHEN saving THEN the empty block is sent`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+        val rated = LevelCode.entries.dropLast(1).map { code -> StubLevel.stubEntry(code = code) }
+        val noRating = StubLevel.stubEntry(LevelCode.NO_RATING, StubLevel.stubSettings(block = "", ratingFrom = null))
+
+        env.viewModel.onEvent(Event.FormChanged(LevelCode.NO_RATING, StubLevel.stubInput(block = "", ratingFrom = "")))
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.saveLevelsUseCase.invokeCall.calledWith(rated + noRating)
+    }
 
     @Test
     fun `GIVEN an empty word count WHEN saving THEN it names the level and sends nothing`() = runTest(dispatcher) {
@@ -277,6 +291,23 @@ internal class LevelsViewModelTest {
             actual = env.viewModel.uiState.value,
         )
     }
+
+    @Test
+    fun `GIVEN a server answer without C2 WHEN Retry is clicked THEN the table shows every level`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            val levels = StubLevel
+                .stubLevels()
+                .filterNot { level -> level.code == LevelCode.C2 }
+            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(levels))
+            advanceUntilIdle()
+            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(StubLevel.stubLevels()))
+
+            env.viewModel.onEvent(Event.RetryClicked)
+            advanceUntilIdle()
+
+            assertEquals(expected = LevelCode.entries, actual = env.content().rows.map { row -> row.code })
+        }
 
     private class Environment(
         saveResult: SaveLevelsResult = SaveLevelsResult.Saved(StubLevel.stubLevels()),

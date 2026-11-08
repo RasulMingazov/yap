@@ -99,7 +99,8 @@ internal class LevelsUiStateMapperTest {
 
     @Test
     fun `GIVEN a save in progress WHEN mapping THEN the saving status shows beside a disabled Save`() {
-        val state = loaded(StubLevel.stubLevels()).copy(isSaving = true)
+        val state = loaded(StubLevel.stubLevels())
+            .copy(isSaving = true)
 
         val uiState = LevelsUiStateMapper(state) as UiState.Content
 
