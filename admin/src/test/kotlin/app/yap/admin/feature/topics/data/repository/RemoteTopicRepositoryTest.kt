@@ -46,8 +46,12 @@ internal class RemoteTopicRepositoryTest {
                     date = StubTopic.RELEASE_DATE,
                     topic = StubTopicCalendar.stubCalendarTopic(),
                 ),
+                CalendarRow(
+                    date = StubTopic.RELEASE_DATE.plusDays(1),
+                    topic = null,
+                ),
             ),
-            todos = listOf(Todo.EmptyDay(date = StubTopic.RELEASE_DATE)),
+            todos = listOf(Todo.EmptyDay(date = StubTopic.RELEASE_DATE.plusDays(1))),
         )
         assertEquals(
             expected = listOf(LoadResult.Loaded(calendar), HttpMethod.Get, "${StubServerSettings.ADDRESS}/admin/topics/calendar"),
@@ -202,9 +206,13 @@ internal class RemoteTopicRepositoryTest {
                     "title": "${StubTopic.TITLE}",
                     "topicId": "${StubTopic.TOPIC_ID}"
                   }
+                },
+                {
+                  "date": "2025-10-25",
+                  "topic": null
                 }
               ],
-              "todos": [{"type": "emptyDay", "date": "${StubTopicDto.RELEASE_DATE}"}]
+              "todos": [{"type": "emptyDay", "date": "2025-10-25"}]
             }
         """
         const val CONTENT_JSON = """

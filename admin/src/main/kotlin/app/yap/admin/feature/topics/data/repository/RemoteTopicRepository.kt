@@ -28,7 +28,12 @@ internal class RemoteTopicRepository(
 
     override suspend fun calendar(): LoadResult<TopicCalendar> = serverSettingsRepository.callServer(
         failed = LoadResult.Failed,
-        read = { response -> response.toLoadResult { body<TopicCalendarDto>().toDomain() } },
+        read = { response ->
+            response.toLoadResult {
+                body<TopicCalendarDto>()
+                    .toDomain()
+            }
+        },
         send = { topicApi.calendar() },
     )
 
