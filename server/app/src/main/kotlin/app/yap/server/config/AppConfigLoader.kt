@@ -1,6 +1,9 @@
 package app.yap.server.config
 
 import app.yap.server.core.database.DatabaseConfig
+import app.yap.server.core.llm.LlmConfig
+import app.yap.server.core.llm.ModelProviderId
+import app.yap.server.core.llm.deepseek.DeepSeekConfig
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -24,6 +27,11 @@ internal class AppConfigLoader(
             adminApiKey = env("ADMIN_API_KEY") ?: AppConfig.LOCAL_ADMIN_API_KEY,
             database = database,
             environment = environment,
+            llm = LlmConfig(
+                deepSeek = env(ModelProviderId.DEEPSEEK.keySetting)
+                    ?.takeIf(String::isNotBlank)
+                    ?.let { apiKey -> DeepSeekConfig(apiKey = apiKey) },
+            ),
             port = intEnv(name = "PORT", default = 8080),
         )
     }
