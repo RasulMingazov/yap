@@ -100,6 +100,41 @@ internal class TopicViewModelTest {
     }
 
     @Test
+    fun `GIVEN a duration of three digits WHEN a fourth digit is typed THEN the field does not take it`() =
+        runTest(dispatcher) {
+            val env = Environment(topicId = null)
+            advanceUntilIdle()
+            env.viewModel.onEvent(Event.DurationChanged("120"))
+
+            env.viewModel.onEvent(Event.DurationChanged("1205"))
+            advanceUntilIdle()
+
+            assertEquals(expected = 120, actual = env.content().form.durationMinutes)
+        }
+
+    @Test
+    fun `GIVEN a duration WHEN a letter is typed THEN the field does not take it`() = runTest(dispatcher) {
+        val env = Environment(topicId = TopicId(StubTopic.TOPIC_ID))
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.DurationChanged("5m"))
+        advanceUntilIdle()
+
+        assertEquals(expected = StubTopic.DURATION_MINUTES, actual = env.content().form.durationMinutes)
+    }
+
+    @Test
+    fun `GIVEN a duration WHEN the field is emptied THEN the duration has no value`() = runTest(dispatcher) {
+        val env = Environment(topicId = TopicId(StubTopic.TOPIC_ID))
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.DurationChanged(""))
+        advanceUntilIdle()
+
+        assertEquals(expected = null, actual = env.content().form.durationMinutes)
+    }
+
+    @Test
     fun `GIVEN a new topic WHEN a day is picked THEN the popup shows it`() = runTest(dispatcher) {
         val env = Environment(topicId = null)
         advanceUntilIdle()
