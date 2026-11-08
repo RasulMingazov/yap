@@ -4,29 +4,35 @@ import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelCode
+import app.yap.admin.feature.levels.domain.hasEveryLevel
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.DataState
-import app.yap.admin.feature.levels.presentation.LevelsViewModel.Load
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.NumberField
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.SaveStatus
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
 
 internal object LevelsUiStateMapper : (DataState) -> UiState {
 
-    override fun invoke(state: DataState): UiState = when (state.load) {
-        Load.FAILED -> UiState.Error(message = "Не удалось загрузить уровни")
-        Load.LOADED -> state.toContent()
-        Load.LOADING -> UiState.Loading
+    private const val LOAD_ERROR = "Не удалось загрузить уровни"
+
+    override fun invoke(state: DataState): UiState {
+        val levels = state.levels
+        return when {
+            state.isLoadFailed -> UiState.Error(message = LOAD_ERROR)
+            levels == null -> UiState.Loading
+            !levels.hasEveryLevel() -> UiState.Error(message = LOAD_ERROR)
+            else -> state.toContent(levels)
+        }
     }
 
-    private fun DataState.toContent(): UiState.Content = UiState.Content(
-        block = block(),
+    private fun DataState.toContent(levels: List<Level>): UiState.Content = UiState.Content(
+        block = block(levels),
         idioms = Idioms.entries.map { idioms -> idioms.option() },
         isSaveEnabled = !isSaving,
         rows = levels.map { level -> row(level) },
         saveStatus = saveStatus(),
     )
 
-    private fun DataState.block(): UiState.Block {
+    private fun DataState.block(levels: List<Level>): UiState.Block {
         val level = levels.first { level -> level.code == chosen }
         return UiState.Block(
             code = chosen,
@@ -82,6 +88,7 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
             text = "Заполните все уровни, рейтинг должен расти от A1 к C2",
             tone = Status.Tone.ERROR,
         )
+        is SaveStatus.NoIdioms -> Status(text = "Выберите идиомы: ${code.label()}", tone = Status.Tone.ERROR)
         is SaveStatus.Saved -> Status(text = "Сохранено", tone = Status.Tone.SUCCESS)
         is SaveStatus.UnreadNumber -> Status(
             text = "Проверьте число в «${field.label()}»: ${code.label()}",

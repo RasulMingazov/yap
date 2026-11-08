@@ -22,9 +22,11 @@ import app.yap.admin.feature.characters.presentation.ui.CharactersContent
 import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelCode
+import app.yap.admin.feature.levels.domain.LevelInput
 import app.yap.admin.feature.levels.domain.StubLevel
 import app.yap.admin.feature.levels.presentation.LevelsUiStateMapper
 import app.yap.admin.feature.levels.presentation.LevelsViewModel
+import app.yap.admin.feature.levels.presentation.toInputs
 import app.yap.admin.feature.levels.presentation.ui.LevelsContent
 import app.yap.admin.feature.prompts.domain.PromptKey
 import app.yap.admin.feature.prompts.domain.PromptVersion
@@ -219,16 +221,17 @@ internal class ScreenCaptureTest {
 
     @Test
     fun `GIVEN every state of Levels WHEN capturing THEN each state has an image`() {
-        val new = LevelsViewModel.DataState().loaded(StubLevel.stubLevels(range = null, settings = null))
-        val saved = LevelsViewModel.DataState().loaded(LEVELS)
+        val new = levelsDataState(StubLevel.stubLevels(range = null, settings = null))
+        val saved = levelsDataState(LEVELS)
         val states = mapOf(
             "loading" to LevelsViewModel.DataState(),
-            "error" to LevelsViewModel.DataState(load = LevelsViewModel.Load.FAILED),
+            "error" to LevelsViewModel.DataState(isLoadFailed = true),
             "new" to new,
             "saved" to saved.copy(saveStatus = LevelsViewModel.SaveStatus.Saved),
             "chosen-b2" to saved.copy(chosen = LevelCode.B2),
             "saving" to saved.copy(isSaving = true),
             "invalid" to new.copy(saveStatus = LevelsViewModel.SaveStatus.Invalid),
+            "no-idioms" to new.copy(saveStatus = LevelsViewModel.SaveStatus.NoIdioms(LevelCode.A1)),
             "unread-rating-from" to saved.unread(
                 code = LevelCode.B2,
                 field = LevelsViewModel.NumberField.RATING_FROM,
@@ -256,7 +259,7 @@ internal class ScreenCaptureTest {
         val image = capture(name = "levels-idioms-open", current = Screen.Levels, click = IDIOMS_SELECT) {
             LevelsContent(
                 onEvent = {},
-                uiState = LevelsUiStateMapper(LevelsViewModel.DataState().loaded(LEVELS)),
+                uiState = LevelsUiStateMapper(levelsDataState(LEVELS)),
             )
         }
 
@@ -352,10 +355,15 @@ internal class ScreenCaptureTest {
         }
     }
 
+    private fun levelsDataState(levels: List<Level>): LevelsViewModel.DataState = LevelsViewModel.DataState(
+        forms = levels.toInputs(),
+        levels = levels,
+    )
+
     private fun LevelsViewModel.DataState.unread(
         code: LevelCode,
         field: LevelsViewModel.NumberField,
-        change: (LevelsViewModel.LevelForm) -> LevelsViewModel.LevelForm,
+        change: (LevelInput) -> LevelInput,
     ): LevelsViewModel.DataState = copy(
         forms = forms + (code to change(forms.getValue(code))),
         saveStatus = LevelsViewModel.SaveStatus.UnreadNumber(

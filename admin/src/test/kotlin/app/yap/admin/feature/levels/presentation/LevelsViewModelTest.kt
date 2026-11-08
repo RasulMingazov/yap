@@ -8,7 +8,6 @@ import app.yap.admin.feature.levels.domain.StubLevel
 import app.yap.admin.feature.levels.domain.usecase.StubGetLevelsUseCase
 import app.yap.admin.feature.levels.domain.usecase.StubSaveLevelsUseCase
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.Event
-import app.yap.admin.feature.levels.presentation.LevelsViewModel.LevelForm
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.News
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
 import kotlin.test.AfterTest
@@ -78,21 +77,22 @@ internal class LevelsViewModelTest {
     }
 
     @Test
-    fun `GIVEN A1 without a rating from WHEN saving THEN it asks to fill every level and sends nothing`() =
-        runTest(dispatcher) {
-            val env = Environment()
-            advanceUntilIdle()
-            val form = LevelForm.of(StubLevel.stubSettings())
+    fun `GIVEN A1 without a rating from WHEN saving THEN A1 is sent without it`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+        val withoutRatingFrom = StubLevel.stubSettings(ratingFrom = null)
+        val rated = listOf(LevelCode.A2, LevelCode.B1, LevelCode.B2, LevelCode.C1, LevelCode.C2)
+            .map { code -> StubLevel.stubEntry(code = code) }
 
-            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.A1, form = form.copy(ratingFrom = "")))
-            env.viewModel.onEvent(Event.SaveClicked)
-            advanceUntilIdle()
+        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.A1, form = StubLevel.stubInput(ratingFrom = "")))
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
 
-            env.saveLevelsUseCase.invokeCall.notCalled()
-            assertEquals(
-                expected = "Заполните все уровни, рейтинг должен расти от A1 к C2",
-                actual = env.content().saveStatus?.text,
-            )
+        env.saveLevelsUseCase.invokeCall.calledWith(
+            listOf(StubLevel.stubEntry(LevelCode.A1, withoutRatingFrom)) +
+                rated +
+                StubLevel.stubEntry(LevelCode.NO_RATING, withoutRatingFrom),
+        )
     }
 
     @Test
@@ -131,7 +131,7 @@ internal class LevelsViewModelTest {
         runTest(dispatcher) {
             val env = Environment()
             advanceUntilIdle()
-            val form = LevelForm.of(StubLevel.stubSettings())
+            val form = StubLevel.stubInput()
 
             env.viewModel.onEvent(Event.FormChanged(code = LevelCode.NO_RATING, form = form.copy(maxWords = "16a")))
             env.viewModel.onEvent(Event.SaveClicked)
@@ -146,7 +146,7 @@ internal class LevelsViewModelTest {
         runTest(dispatcher) {
             val env = Environment()
             advanceUntilIdle()
-            val form = LevelForm.of(StubLevel.stubSettings())
+            val form = StubLevel.stubInput()
 
             env.viewModel.onEvent(Event.FormChanged(code = LevelCode.A2, form = form.copy(ratingFrom = "10a")))
             env.viewModel.onEvent(Event.SaveClicked)
@@ -157,46 +157,37 @@ internal class LevelsViewModelTest {
         }
 
     @Test
-    fun `GIVEN an empty word count WHEN saving THEN it asks to fill every level and sends nothing`() =
-        runTest(dispatcher) {
-            val env = Environment()
-            advanceUntilIdle()
-            val form = LevelForm.of(StubLevel.stubSettings())
+    fun `GIVEN an empty word count WHEN saving THEN it names the level and sends nothing`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
 
-            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = form.copy(maxWords = "")))
-            env.viewModel.onEvent(Event.SaveClicked)
-            advanceUntilIdle()
+        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = StubLevel.stubInput(maxWords = "")))
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
 
-            env.saveLevelsUseCase.invokeCall.notCalled()
-            assertEquals(
-                expected = "Заполните все уровни, рейтинг должен расти от A1 к C2",
-                actual = env.content().saveStatus?.text,
-            )
-        }
+        env.saveLevelsUseCase.invokeCall.notCalled()
+        assertEquals(expected = "Проверьте число в «Слов в фразе»: B1", actual = env.content().saveStatus?.text)
+    }
 
     @Test
-    fun `GIVEN a level without idioms WHEN saving THEN it asks to fill every level and sends nothing`() =
+    fun `GIVEN a level without idioms WHEN saving THEN it asks to choose them and sends nothing`() =
         runTest(dispatcher) {
             val env = Environment()
             advanceUntilIdle()
-            val form = LevelForm.of(StubLevel.stubSettings())
 
-            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.C1, form = form.copy(idioms = null)))
+            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.C1, form = StubLevel.stubInput(idioms = null)))
             env.viewModel.onEvent(Event.SaveClicked)
             advanceUntilIdle()
 
             env.saveLevelsUseCase.invokeCall.notCalled()
-            assertEquals(
-                expected = "Заполните все уровни, рейтинг должен расти от A1 к C2",
-                actual = env.content().saveStatus?.text,
-            )
+            assertEquals(expected = "Выберите идиомы: C1", actual = env.content().saveStatus?.text)
         }
 
     @Test
     fun `GIVEN a save in progress WHEN a field changes THEN the edit is ignored`() = runTest(dispatcher) {
         val env = Environment(saveResult = SaveLevelsResult.Invalid)
         advanceUntilIdle()
-        val form = LevelForm.of(StubLevel.stubSettings())
+        val form = StubLevel.stubInput()
 
         env.viewModel.onEvent(Event.SaveClicked)
         env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = form.copy(block = "New block")))
