@@ -20,9 +20,9 @@ internal object LevelsUiStateMapper {
 
     private fun DataState.toContent(): UiState.Content = UiState.Content(
         block = block(),
-        idioms = Idioms.entries.map { idioms -> UiState.IdiomsOption(idioms = idioms, label = idioms.label()) },
+        idioms = idiomsOptions(),
         isSaveEnabled = !isSaving,
-        rows = levels.map { level -> row(level) },
+        rows = rows(),
         saveStatus = saveStatus?.status(),
     )
 
@@ -31,9 +31,18 @@ internal object LevelsUiStateMapper {
             .first { level -> level.code == chosen }
             .range
         return UiState.Block(
-            rating = range?.let { chosenRange -> "рейтинг ${chosenRange.text()}" },
+            rating = range.rating(),
             text = forms.getValue(chosen).block,
             title = "Блок промпта · ${chosen.label()}",
+        )
+    }
+
+    private fun RatingRange?.rating(): String? = if (this == null) null else "рейтинг ${text()}"
+
+    private fun idiomsOptions(): List<UiState.IdiomsOption> = Idioms.entries.map { idioms ->
+        UiState.IdiomsOption(
+            idioms = idioms,
+            label = idioms.label(),
         )
     }
 
@@ -43,6 +52,8 @@ internal object LevelsUiStateMapper {
         Idioms.RARELY -> "редко"
         Idioms.SOMETIMES -> "иногда"
     }
+
+    private fun DataState.rows(): List<UiState.Row> = levels.map { level -> row(level) }
 
     private fun DataState.row(level: Level): UiState.Row = UiState.Row(
         code = level.code,
