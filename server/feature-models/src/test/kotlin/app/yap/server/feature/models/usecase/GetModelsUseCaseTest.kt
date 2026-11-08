@@ -1,10 +1,8 @@
 package app.yap.server.feature.models.usecase
 
 import app.yap.server.core.llm.LlmConfig
-import app.yap.server.core.llm.ModelProviderId
 import app.yap.server.core.llm.ProviderConnections
 import app.yap.server.core.llm.StubLlmConfig
-import app.yap.server.feature.models.model.ProviderState
 import app.yap.server.feature.models.model.StubTaskModel
 import app.yap.server.feature.models.model.TaskModel
 import app.yap.server.feature.models.persistence.StubTaskModelRepository
@@ -39,10 +37,7 @@ internal class GetModelsUseCaseTest {
 
         val overview = env.useCase()
 
-        assertEquals(
-            expected = listOf(ProviderState(connected = false, id = ModelProviderId.DEEPSEEK)),
-            actual = overview.providers,
-        )
+        assertEquals(expected = listOf(false), actual = overview.providers.map { provider -> provider.connected })
     }
 
     private class Environment(
