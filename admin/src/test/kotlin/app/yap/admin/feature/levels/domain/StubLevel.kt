@@ -37,6 +37,20 @@ internal object StubLevel {
         settings = settings,
     )
 
+    fun stubInput(
+        block: String = BLOCK,
+        idioms: Idioms? = Idioms.RARELY,
+        maxWords: String = MAX_WORDS.toString(),
+        ratingFrom: String = RANGE_FROM.toString(),
+        vocabulary: String = VOCABULARY,
+    ): LevelInput = LevelInput(
+        block = block,
+        idioms = idioms,
+        maxWords = maxWords,
+        ratingFrom = ratingFrom,
+        vocabulary = vocabulary,
+    )
+
     fun stubRange(
         from: Int = RANGE_FROM,
         to: Int? = RANGE_TO,
