@@ -148,18 +148,44 @@ internal class PromptsViewModelTest {
         }
 
     @Test
-    fun `GIVEN a typed text WHEN version 1 is restored THEN the editor shows its text`() = runTest(dispatcher) {
+    fun `GIVEN a typed text WHEN version 2 is restored THEN the editor shows its text`() = runTest(dispatcher) {
         val env = Environment()
         advanceUntilIdle()
-        val restored = StubPrompt.stubPrompt(text = "Version 1")
+        val restored = StubPrompt.stubPrompt(text = "Version 2")
         env.restorePromptUseCase.invokeCall.returns(RestorePromptResult.Restored(restored))
 
         env.viewModel.onEvent(Event.TextChanged("Typed text"))
-        env.viewModel.onEvent(Event.RestoreClicked(1))
+        env.viewModel.onEvent(Event.RestoreClicked(2))
         advanceUntilIdle()
 
-        assertEquals(expected = "Version 1", actual = env.content().text)
+        assertEquals(expected = "Version 2", actual = env.content().text)
     }
+
+    @Test
+    fun `GIVEN a prompt WHEN version 2 is restored THEN its key and number are sent`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.RestoreClicked(2))
+        advanceUntilIdle()
+
+        env.restorePromptUseCase.invokeCall.calledWith(PromptKey.TOPIC_REPLY, 2)
+    }
+
+    @Test
+    fun `GIVEN a save in progress WHEN Save and Restore are clicked THEN the prompt is sent once`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.SaveClicked)
+            env.viewModel.onEvent(Event.SaveClicked)
+            env.viewModel.onEvent(Event.RestoreClicked(2))
+            advanceUntilIdle()
+
+            env.savePromptUseCase.invokeCall.called(times = 1)
+            env.restorePromptUseCase.invokeCall.notCalled()
+        }
 
     @Test
     fun `GIVEN the server does not answer WHEN restoring THEN a snackbar says the restore failed`() =

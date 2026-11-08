@@ -29,13 +29,13 @@ Starts after the #9 part with `V3__levels.sql` merges. That part starts after th
 
 ## 6. Admin view model (about 380 lines)
 
-- [x] 6.1 Add `PromptsViewModel`, its UI state and its mapper, with the Russian titles of the keys. Files: `ap/presentation/PromptsViewModel.kt`, `ap/presentation/PromptsUiStateMapper.kt`, `ap/presentation/PromptTitles.kt`, stub use cases in the tests. Verify with the mapper and view-model tests for the first open, a prompt without a version, the typed text on a return, the Saved status, the 400 that asks for the text, Restore, the save failure and the load error
+- [x] 6.1 Add `PromptsViewModel`, its UI state and its mapper, with the Russian titles of the keys. Files: `ap/presentation/PromptsViewModel.kt`, `ap/presentation/PromptsUiStateMapper.kt`, `ap/presentation/PromptTitles.kt`, `ap/FeaturePromptsModule.kt`, `admin/src/main/kotlin/app/yap/admin/AppModules.kt` (hot), `admin/src/main/kotlin/app/yap/admin/core/presentation/ShortMonthName.kt` (the short month names shared with topics), stub use cases in the tests. Verify with the mapper and view-model tests for the first open, a prompt without a version, the typed text on a return, the Saved status, the 400 that asks for the text, Restore, the save failure and the load error
 
 ## 7. Admin Prompts screen (about 350 lines)
 
 Starts after the #7 part with the actions slot of `ScreenToolbar` and the #9 part with the mono style and the sidebar group Rules merge. This part reuses them and does not change them.
 
-- [ ] 7.1 Add `Chip`, the Prompts screen, its graph, and Prompts in the sidebar group Rules after Levels. Files: `admin/src/main/kotlin/app/yap/admin/core/design/Chip.kt` (hot), `ap/presentation/ui/PromptsScreen.kt`, `ap/di/PromptsGraph.kt`, `admin/src/main/kotlin/app/yap/admin/Main.kt` (hot), `admin/src/main/kotlin/app/yap/admin/navigation/` (hot), `admin/src/test/kotlin/app/yap/admin/ScreenCaptureTest.kt`. Verify with the navigation view-model test for Prompts, `./gradlew build` and the images of the screen capture
+- [ ] 7.1 Add `Chip`, the Prompts screen and Prompts in the sidebar group Rules after Levels. Files: `admin/src/main/kotlin/app/yap/admin/core/design/Chip.kt` (hot), `ap/presentation/ui/PromptsScreen.kt`, `admin/src/main/kotlin/app/yap/admin/Main.kt` (hot), `admin/src/main/kotlin/app/yap/admin/navigation/` (hot), `admin/src/test/kotlin/app/yap/admin/ScreenCaptureTest.kt`. Verify with the navigation view-model test for Prompts, `./gradlew build` and the images of the screen capture
 - [ ] 7.2 Run the admin app against a server with a database; verify a first save, a second save, a restore and the versions after a server restart
 
 ## 8. Archive
