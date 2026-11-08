@@ -15,9 +15,13 @@ internal class DefaultConnectToServerUseCase(
     private val serverSettingsRepository: ServerSettingsRepository,
 ) : ConnectToServerUseCase {
 
-    override suspend fun invoke(settings: ServerSettings): ServerConnection = serverRepository
-        .connect(settings)
-        .also { connection ->
-            if (connection is ServerConnection.Connected) serverSettingsRepository.save(settings)
-        }
+    override suspend fun invoke(settings: ServerSettings): ServerConnection {
+        val trimmed = ServerSettings(
+            address = settings.address.trim(),
+            key = settings.key.trim(),
+        )
+        val connection = serverRepository.connect(trimmed)
+        if (connection is ServerConnection.Connected) serverSettingsRepository.save(trimmed)
+        return connection
+    }
 }
