@@ -51,7 +51,8 @@ private fun Route.getTopicsRoute(getTopicsUseCase: GetTopicsUseCase) {
 
 private fun Route.getTopicCalendarRoute(getTopicCalendarUseCase: GetTopicCalendarUseCase) {
     get("/calendar") {
-        call.respond(getTopicCalendarUseCase().toDto())
+        val calendar = getTopicCalendarUseCase()
+        call.respond(calendar.toDto())
     }
 }
 
@@ -93,9 +94,9 @@ private fun Route.updateTopicRoute(updateTopicUseCase: UpdateTopicUseCase) {
 
 private fun Route.publishTopicRoute(publishTopicUseCase: PublishTopicUseCase) {
     post("/{topicId}/publish") {
-        val content = call.receive<TopicContentDto>().toModel()
+        val dto = call.receive<TopicContentDto>()
         val outcome = publishTopicUseCase(
-            content = content,
+            content = dto.toModel(),
             topicId = call.topicId(),
         )
         when (outcome) {

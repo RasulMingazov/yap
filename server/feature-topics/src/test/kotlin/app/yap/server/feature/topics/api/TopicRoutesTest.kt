@@ -101,13 +101,19 @@ internal class TopicRoutesTest {
     }
 
     @Test
-    fun `GIVEN a title of spaces WHEN creating a topic THEN the server answers 400`() = testApplication {
-        application { Environment().install(this) }
+    fun `GIVEN a title of spaces WHEN creating a topic THEN the server answers 400 with the missing title`() =
+        testApplication {
+            application { Environment().install(this) }
 
-        val response = postTopic(Json.encodeToString(StubTopicDto.stubContentDto(title = "  ")))
+            val response = postTopic(Json.encodeToString(StubTopicDto.stubContentDto(title = "  ")))
 
-        assertEquals(expected = HttpStatusCode.BadRequest, actual = response.status)
-    }
+            assertEquals(
+                expected = HttpStatusCode.BadRequest to Json.parseToJsonElement(
+                    """{"gaps": [{"type": "missing", "field": "TITLE"}]}""",
+                ),
+                actual = response.status to response.json(),
+            )
+        }
 
     @Test
     fun `GIVEN no release date WHEN creating a topic THEN the server answers 400`() = testApplication {
@@ -193,6 +199,21 @@ internal class TopicRoutesTest {
         }
 
     @Test
+    fun `GIVEN a date with a published topic WHEN reading a draft THEN the server names the taken date`() =
+        testApplication {
+            val env = Environment()
+            env.topicRepository.hasPublishedOnCall.returns(true)
+            application { env.install(this) }
+
+            val response = client.get("/admin/topics/${StubTopicDto.TOPIC_ID}")
+
+            assertEquals(
+                expected = Json.parseToJsonElement("""[{"type": "dateTaken"}]"""),
+                actual = response.json().jsonObject["gaps"],
+            )
+        }
+
+    @Test
     fun `GIVEN an unknown topic WHEN reading it THEN the server answers 404`() = testApplication {
         val env = Environment()
         env.topicRepository.findCall.returns(null)
@@ -261,7 +282,7 @@ internal class TopicRoutesTest {
 
         val response = client.get("/admin/topics/calendar")
 
-        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        val body = response.json().jsonObject
         assertEquals(
             expected = listOf(
                 HttpStatusCode.OK,
@@ -294,30 +315,20 @@ internal class TopicRoutesTest {
                 response.status,
                 body.getValue("rows").jsonArray.size,
                 body.getValue("rows").jsonArray[1],
-                JsonArray(body.getValue("todos").jsonArray.take(2)),
+                JsonArray(
+                    body
+                        .getValue("todos")
+                        .jsonArray
+                        .take(2),
+                ),
             ),
         )
     }
 
     @Test
-    fun `GIVEN a title of spaces WHEN creating a topic THEN the server answers 400 with the missing title`() =
-        testApplication {
-            application { Environment().install(this) }
-
-            val response = postTopic(Json.encodeToString(StubTopicDto.stubContentDto(title = "  ")))
-
-            assertEquals(
-                expected = HttpStatusCode.BadRequest to Json.parseToJsonElement(
-                    """{"gaps": [{"type": "missing", "field": "TITLE"}]}""",
-                ),
-                actual = response.status to Json.parseToJsonElement(response.bodyAsText()),
-            )
-        }
-
-    @Test
     fun `GIVEN a published topic with a past date WHEN updating it THEN the server answers 400 with the gaps`() =
         testApplication {
-            application { Environment(StubTopic.stubTopic(status = TopicStatus.PUBLISHED)).install(this) }
+            application { Environment(topic = StubTopic.stubTopic(status = TopicStatus.PUBLISHED)).install(this) }
 
             val response = putTopic(
                 Json.encodeToString(StubTopicDto.stubContentDto(releaseDate = PAST_DATE, setting = "")),
@@ -328,7 +339,7 @@ internal class TopicRoutesTest {
 
     @Test
     fun `GIVEN a published topic WHEN updating it to a taken date THEN the server answers 409`() = testApplication {
-        val env = Environment(StubTopic.stubTopic(status = TopicStatus.PUBLISHED))
+        val env = Environment(topic = StubTopic.stubTopic(status = TopicStatus.PUBLISHED))
         env.topicRepository.updateCall.returns(TopicWrite.DateTaken)
         application { env.install(this) }
 
@@ -355,7 +366,7 @@ internal class TopicRoutesTest {
 
     @Test
     fun `GIVEN a published topic WHEN publishing it THEN the server answers with it`() = testApplication {
-        application { Environment(StubTopic.stubTopic(status = TopicStatus.PUBLISHED)).install(this) }
+        application { Environment(topic = StubTopic.stubTopic(status = TopicStatus.PUBLISHED)).install(this) }
 
         val response = publishTopic(contentJson())
 
@@ -402,7 +413,7 @@ internal class TopicRoutesTest {
     private class Environment(topic: Topic = StubTopic.stubTopic()) {
 
         val characterRepository = StubCharacterRepository()
-        val topicRepository = StubTopicRepository(topic)
+        val topicRepository = StubTopicRepository(topic = topic)
 
         fun install(application: Application) {
             val topicDraftRule = TopicDraftRule(
@@ -460,8 +471,8 @@ internal class TopicRoutesTest {
 
         const val CAST_JSON = """{"type": "character", "characterId": "${StubTopicDto.CHARACTER_ID}"}"""
         const val GUEST_DESCRIPTION = "A tourist who asks for directions."
-        const val PAST_DATE = "2026-10-17"
         const val GUEST_JSON = """{"type": "guest", "description": "$GUEST_DESCRIPTION"}"""
+        const val PAST_DATE = "2026-10-17"
 
         val REJECTION = Json.parseToJsonElement(
             """{"gaps": [{"type": "missing", "field": "SETTING"}, {"type": "pastDate"}]}""",
