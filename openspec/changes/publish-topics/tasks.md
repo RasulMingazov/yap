@@ -52,7 +52,7 @@ names the shapes.
 - [x] 7.1 Add `PublishTopicUseCase` and the rule of the status in `UpdateTopicUseCase`, with the stored topic and today for `PastDate`; the outcomes carry the gaps and `DateTaken`; a stale status runs the update once more with the publish rule; move the `date` extension of `TopicCalendarRule` into `Topic` as an `internal` member, with its `requireNotNull`, because `publishedDate` reads the date; verify with the stub tests for a publish, the gaps, a past date, an unknown topic, a taken date, a publish of a published topic, a save of a published topic with an empty setting (stores nothing), a save of a draft that stays a draft, a save of a published topic that is out with its date, and a stale status
 - [x] 7.2 Return `TopicDetails` (the topic, the release state, the publish gaps, and `DateTaken` for a draft whose date has another published topic) from get, create, update and publish; verify with the stub tests with a fixed clock for a ready draft, a taken date and a published topic
 
-## 8. [8/26] The topic DTOs · two slices
+## 8. [8/26] The topic DTOs · three slices
 
 ### Slice 1 · The input rule and the Moscow day · ~160 · `docs/server/001-structure.md` (the mapper rule), `S/api/TopicDtoMapper.kt` (`toModel` 1:1), `S/model/` (`TopicContent.normalized()`, `TopicDraftRule`, `ReleaseState`, `ReleaseDay.kt` with the Moscow zone and `moscowToday(clock)`), `S/usecase/` (`CreateTopicUseCase`, `GetTopicUseCase`, `UpdateTopicUseCase`, `PublishTopicUseCase`, `GetTopicCalendarUseCase`), their tests, `TopicContentTest`, `ReleaseDayTest`, `TopicDetailsRuleTest`, `StubTopic.stubPaddedContent()`
 
@@ -62,10 +62,14 @@ It merges after the PR of 7.2 (`TopicDetails`, merged), whose use cases read `Re
 - [x] 8.2 Write `TopicDraftRule` with `durationMinutes != null && durationMinutes < 1`; a zero duration stays `Missing(DURATION)`; verify with the unchanged tests `GIVEN a duration of 0 minutes WHEN checking THEN the duration is missing` and `GIVEN only a title and a date WHEN checking THEN there are no gaps` (no duration)
 - [x] 8.3 Move `today(clock)` out of the `ReleaseState` enum into `moscowToday(clock)` in `S/model/ReleaseDay.kt` with the `Europe/Moscow` constant; `ReleaseState` keeps only the values and `of`; `CreateTopicUseCase`, `GetTopicUseCase`, `UpdateTopicUseCase`, `PublishTopicUseCase`, `GetTopicCalendarUseCase` and `TopicDetailsRuleTest` call it (`TopicDetailsRule` takes `today` as a parameter and stays); verify with the 22:30 UTC on 23 October test moved to `ReleaseDayTest` and the unchanged `ReleaseState` tests
 
-### Slice 2 · The DTOs · ~360 · `K/` (`TopicDto`, `TopicStatusDto`, `TopicFieldDto`, `TopicGapDto`, `TopicRejectionDto`, `TopicCalendarDto`, `CalendarRowDto`, `CalendarTopicDto`, `LedByDto`, `TodoDto`), `S/api/` (`TopicDtoMapper`, `TopicCalendarDtoMapper`), `T/` tests that build `TopicDto`
+### Slice 2 · The topic DTOs · ~330 · `K/` (`TopicDto`, `TopicStatusDto`, `TopicFieldDto`, `TopicGapDto`, `TopicRejectionDto`), `S/api/` (`TopicDtoMapper`, `TopicRoutes`: compile only), `S/usecase/GetTopicsUseCase.kt` (it returns `TopicDetails`, because `TopicDto` carries the state and the gaps), their tests, `T/` tests that build `TopicDto`
 
-- [ ] 8.4 Add the DTOs and the server mappers; each mapper maps the fields 1:1 and decides nothing; verify with the mapper tests for each status, each field, each gap, both interlocutors, both To do entries and an empty day
-- [ ] 8.5 Fill the new `TopicDto` fields in the admin tests; verify with `./gradlew build`
+- [x] 8.4 Add the topic DTOs and the server mapper of `TopicDetails`; the mapper maps the fields 1:1 and decides nothing; verify with the mapper tests for each status, each field, each gap and both interlocutors, and a test of `GetTopicsUseCase` with a taken date
+- [x] 8.5 Fill the new `TopicDto` fields in the admin tests; verify with `./gradlew build`
+
+### Slice 3 · The calendar DTOs · ~250 · `K/` (`TopicCalendarDto`, `CalendarRowDto`, `CalendarTopicDto`, `LedByDto`, `TodoDto`), `S/api/TopicCalendarDtoMapper.kt` and its test, `S/api/TopicDtoMapper.kt` (`toDto` of the gaps and the state: `internal`)
+
+- [ ] 8.6 Add the calendar DTOs and the server mapper; verify with the mapper tests for both interlocutors, both To do entries and an empty day
 
 ## 9. [9/26] The topic routes · ~380, at risk · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `S/api/TopicRoutes.kt` and its test
 

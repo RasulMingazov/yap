@@ -154,7 +154,14 @@ internal class RemoteTopicRepositoryTest {
               "title": "${StubTopic.TITLE}"
             }
         """
-        const val TOPIC_JSON = """{"content": $CONTENT_JSON, "topicId": "${StubTopic.TOPIC_ID}"}"""
+        const val TOPIC_JSON = """
+            {
+              "content": $CONTENT_JSON,
+              "gaps": [],
+              "status": "DRAFT",
+              "topicId": "${StubTopic.TOPIC_ID}"
+            }
+        """
 
         fun answer(content: String, status: HttpStatusCode = HttpStatusCode.OK): MockRequestHandler = {
             respond(

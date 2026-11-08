@@ -237,7 +237,11 @@ internal class TopicRoutesTest {
                         topicDetailsRule = topicDetailsRule,
                         topicRepository = topicRepository,
                     ),
-                    getTopicsUseCase = GetTopicsUseCase(topicRepository = topicRepository),
+                    getTopicsUseCase = GetTopicsUseCase(
+                        clock = StubTopic.CLOCK,
+                        topicDetailsRule = topicDetailsRule,
+                        topicRepository = topicRepository,
+                    ),
                     updateTopicUseCase = UpdateTopicUseCase(
                         clock = StubTopic.CLOCK,
                         topicDetailsRule = topicDetailsRule,
@@ -270,8 +274,14 @@ internal class TopicRoutesTest {
             }
         """
 
-        fun topicJson(interlocutor: String = CAST_JSON): String =
-            """{"content": ${contentJson(interlocutor)}, "topicId": "${StubTopicDto.TOPIC_ID}"}"""
+        fun topicJson(interlocutor: String = CAST_JSON): String = """
+            {
+              "content": ${contentJson(interlocutor)},
+              "gaps": [],
+              "status": "DRAFT",
+              "topicId": "${StubTopicDto.TOPIC_ID}"
+            }
+        """
     }
 }
 
