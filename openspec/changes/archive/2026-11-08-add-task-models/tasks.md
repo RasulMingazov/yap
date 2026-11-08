@@ -194,4 +194,4 @@ spec `specs/rating-levels/spec.md`; for 14.3 `core/design/Buttons.kt` (`PopupBut
 Files: `openspec/changes/add-task-models/`, `openspec/specs/task-models/spec.md`,
 `openspec/specs/rating-levels/spec.md`, `openspec/changes/archive/`.
 
-- [ ] 15.1 Run `/opsx:archive` as the last commit of the last PR for #11, so `openspec/specs/` updates at the merge; verify that `openspec/specs/task-models/spec.md` and `openspec/specs/rating-levels/spec.md` hold the requirements of this change, with `openspec validate --strict`
+- [x] 15.1 Run `/opsx:archive` as the last commit of the last PR for #11, so `openspec/specs/` updates at the merge; verify that `openspec/specs/task-models/spec.md` and `openspec/specs/rating-levels/spec.md` hold the requirements of this change, with `openspec validate --strict`
