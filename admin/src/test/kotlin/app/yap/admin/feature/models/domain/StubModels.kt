@@ -27,13 +27,17 @@ internal object StubModels {
         name = name,
     )
 
-    fun stubTasks(): List<TaskModel> = ModelTask.entries.map { task ->
-        TaskModel(
-            choice = ModelChoice(
-                model = MODEL,
-                provider = PROVIDER,
-            ),
-            task = task,
-        )
-    }
+    fun stubTask(
+        task: ModelTask,
+        model: String = MODEL,
+        provider: String = PROVIDER,
+    ): TaskModel = TaskModel(
+        choice = ModelChoice(
+            model = model,
+            provider = provider,
+        ),
+        task = task,
+    )
+
+    fun stubTasks(): List<TaskModel> = ModelTask.entries.map { task -> stubTask(task = task) }
 }
