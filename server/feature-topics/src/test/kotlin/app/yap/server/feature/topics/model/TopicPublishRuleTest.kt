@@ -13,7 +13,7 @@ internal class TopicPublishRuleTest {
     fun `GIVEN a topic with every field WHEN publishing THEN there are no gaps`() = runTest {
         val env = Environment()
 
-        val gaps = env.gaps(StubTopic.stubContent())
+        val gaps = env.rule.gaps(StubTopic.stubContent(), publishedDate = null, today = StubTopic.RELEASE_DATE)
 
         assertEquals(expected = emptySet(), actual = gaps)
     }
@@ -32,7 +32,7 @@ internal class TopicPublishRuleTest {
                 steps = emptyList(),
             )
 
-            val gaps = env.gaps(content)
+            val gaps = env.rule.gaps(content, publishedDate = null, today = StubTopic.RELEASE_DATE)
 
             assertEquals(
                 expected = setOf(
@@ -64,7 +64,7 @@ internal class TopicPublishRuleTest {
                 ),
             )
 
-            val gaps = env.gaps(content)
+            val gaps = env.rule.gaps(content, publishedDate = null, today = StubTopic.RELEASE_DATE)
 
             assertEquals(
                 expected = setOf(TopicGap.Missing(TopicField.SETTING), TopicGap.IncompleteSteps(listOf(3, 5))),
@@ -76,7 +76,11 @@ internal class TopicPublishRuleTest {
     fun `GIVEN a guest without a description WHEN publishing THEN the interlocutor is missing`() = runTest {
         val env = Environment()
 
-        val gaps = env.gaps(StubTopic.stubContent(interlocutor = Interlocutor.Guest(description = "")))
+        val gaps = env.rule.gaps(
+            StubTopic.stubContent(interlocutor = Interlocutor.Guest(description = "")),
+            publishedDate = null,
+            today = StubTopic.RELEASE_DATE,
+        )
 
         assertEquals(expected = setOf(TopicGap.Missing(TopicField.INTERLOCUTOR)), actual = gaps)
     }
@@ -85,7 +89,11 @@ internal class TopicPublishRuleTest {
     fun `GIVEN a draft with a past date WHEN publishing THEN the date is past`() = runTest {
         val env = Environment()
 
-        val gaps = env.gaps(StubTopic.stubContent(), today = StubTopic.RELEASE_DATE.plusDays(1))
+        val gaps = env.rule.gaps(
+            StubTopic.stubContent(),
+            publishedDate = null,
+            today = StubTopic.RELEASE_DATE.plusDays(1),
+        )
 
         assertEquals(expected = setOf(TopicGap.PastDate), actual = gaps)
     }
@@ -94,7 +102,7 @@ internal class TopicPublishRuleTest {
     fun `GIVEN a published topic that keeps its past date WHEN saving THEN there are no gaps`() = runTest {
         val env = Environment()
 
-        val gaps = env.gaps(
+        val gaps = env.rule.gaps(
             StubTopic.stubContent(),
             publishedDate = StubTopic.RELEASE_DATE,
             today = StubTopic.RELEASE_DATE.plusDays(1),
@@ -107,13 +115,23 @@ internal class TopicPublishRuleTest {
     fun `GIVEN a published topic moved into the past WHEN saving THEN the date is past`() = runTest {
         val env = Environment()
 
-        val gaps = env.gaps(
+        val gaps = env.rule.gaps(
             StubTopic.stubContent(releaseDate = LocalDate.of(2026, 10, 22)),
             publishedDate = LocalDate.of(2026, 10, 25),
             today = LocalDate.of(2026, 10, 23),
         )
 
         assertEquals(expected = setOf(TopicGap.PastDate), actual = gaps)
+    }
+
+    @Test
+    fun `GIVEN a character that does not exist WHEN publishing THEN the interlocutor is missing`() = runTest {
+        val env = Environment()
+        env.characterRepository.findCall.returns(null)
+
+        val gaps = env.rule.gaps(StubTopic.stubContent(), publishedDate = null, today = StubTopic.RELEASE_DATE)
+
+        assertEquals(expected = setOf(TopicGap.Missing(TopicField.INTERLOCUTOR)), actual = gaps)
     }
 
     private class Environment {
@@ -124,11 +142,5 @@ internal class TopicPublishRuleTest {
                 getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
             ),
         )
-
-        suspend fun gaps(
-            content: TopicContent,
-            publishedDate: LocalDate? = null,
-            today: LocalDate = StubTopic.RELEASE_DATE,
-        ): Set<TopicGap> = rule.gaps(content = content, publishedDate = publishedDate, today = today)
     }
 }

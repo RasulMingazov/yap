@@ -11,7 +11,8 @@ class UpdateTopicUseCase(
 ) {
 
     suspend operator fun invoke(topic: Topic): UpdateTopicOutcome {
-        if (topicDraftRule.gaps(topic.content).isNotEmpty()) return UpdateTopicOutcome.Invalid
+        val gaps = topicDraftRule.gaps(topic.content)
+        if (gaps.isNotEmpty()) return UpdateTopicOutcome.Invalid
         return if (topicRepository.update(topic)) {
             UpdateTopicOutcome.Updated(topic)
         } else {

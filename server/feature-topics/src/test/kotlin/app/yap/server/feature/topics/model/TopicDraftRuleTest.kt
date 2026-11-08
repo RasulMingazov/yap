@@ -94,6 +94,15 @@ internal class TopicDraftRuleTest {
         assertEquals(expected = emptySet(), actual = gaps)
     }
 
+    @Test
+    fun `GIVEN a guest with an empty description WHEN checking THEN there are no gaps`() = runTest {
+        val env = Environment()
+
+        val gaps = env.rule.gaps(StubTopic.stubContent(interlocutor = Interlocutor.Guest(description = "")))
+
+        assertEquals(expected = emptySet(), actual = gaps)
+    }
+
     private class Environment {
 
         val characterRepository = StubCharacterRepository()

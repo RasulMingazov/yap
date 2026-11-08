@@ -12,22 +12,24 @@ class TopicPublishRule(
         today: LocalDate,
     ): Set<TopicGap> = buildSet {
         addAll(topicDraftRule.gaps(content))
-        addAll(missingFields(content).map { field -> TopicGap.Missing(field) })
+        addAll(missingFields(content))
         if (isPastDate(content.releaseDate, publishedDate, today)) add(TopicGap.PastDate)
         val numbers = incompleteStepNumbers(content.steps)
         if (numbers.isNotEmpty()) add(TopicGap.IncompleteSteps(numbers))
     }
 
-    private fun missingFields(content: TopicContent): List<TopicField> = listOfNotNull(
-        TopicField.DURATION.takeIf { content.durationMinutes == null },
-        TopicField.DESCRIPTION.takeIf { content.description.isEmpty() },
-        TopicField.SETTING.takeIf { content.setting.isEmpty() },
-        TopicField.INTERLOCUTOR.takeIf { isMissing(content.interlocutor) },
-        TopicField.ROLE.takeIf { content.role.isEmpty() },
-        TopicField.OPENING_LINE.takeIf { content.openingLine.english.isEmpty() },
-        TopicField.TRANSLATION.takeIf { content.openingLine.translation.isEmpty() },
-        TopicField.STEPS.takeIf { content.steps.isEmpty() },
+    private fun missingFields(content: TopicContent): List<TopicGap.Missing> = listOf(
+        TopicField.DURATION to (content.durationMinutes == null),
+        TopicField.DESCRIPTION to content.description.isEmpty(),
+        TopicField.SETTING to content.setting.isEmpty(),
+        TopicField.INTERLOCUTOR to isMissing(content.interlocutor),
+        TopicField.ROLE to content.role.isEmpty(),
+        TopicField.OPENING_LINE to content.openingLine.english.isEmpty(),
+        TopicField.TRANSLATION to content.openingLine.translation.isEmpty(),
+        TopicField.STEPS to content.steps.isEmpty(),
     )
+        .filter { (_, isEmpty) -> isEmpty }
+        .map { (field, _) -> TopicGap.Missing(field) }
 
     private fun isMissing(interlocutor: Interlocutor?): Boolean = when (interlocutor) {
         null -> true
