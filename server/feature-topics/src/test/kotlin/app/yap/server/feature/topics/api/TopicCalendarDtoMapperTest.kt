@@ -8,14 +8,11 @@ import app.yap.contract.admin.TopicCalendarDto
 import app.yap.contract.admin.TopicGapDto
 import app.yap.contract.admin.TopicStatusDto
 import app.yap.server.feature.topics.model.CalendarRow
-import app.yap.server.feature.topics.model.CalendarTopic
 import app.yap.server.feature.topics.model.LedBy
 import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.StubTopic
 import app.yap.server.feature.topics.model.Todo
-import app.yap.server.feature.topics.model.TopicCalendar
 import app.yap.server.feature.topics.model.TopicGap
-import app.yap.server.feature.topics.model.TopicId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -23,11 +20,11 @@ internal class TopicCalendarDtoMapperTest {
 
     @Test
     fun `GIVEN a row with a topic and an empty row WHEN mapping the calendar THEN both rows keep their data`() {
-        val calendar = calendarOf(
+        val calendar = StubTopic.stubCalendar(
             rows = listOf(
                 CalendarRow(
                     date = StubTopic.RELEASE_DATE,
-                    topic = calendarTopic(
+                    topic = StubTopic.stubCalendarTopic(
                         completeSteps = 2,
                         ledBy = LedBy.Cast(name = "Sam"),
                         state = ReleaseState.TODAY,
@@ -63,11 +60,11 @@ internal class TopicCalendarDtoMapperTest {
     }
 
     @Test
-    fun `GIVEN topics led by a guest and by no one WHEN mapping the calendar THEN led by is a guest and null`() {
-        val calendar = calendarOf(
+    fun `GIVEN topics led by a guest and by no one WHEN mapping the calendar THEN one is led by a guest and the other by no one`() {
+        val calendar = StubTopic.stubCalendar(
             rows = listOf(
-                CalendarRow(date = StubTopic.RELEASE_DATE, topic = calendarTopic(ledBy = LedBy.Guest)),
-                CalendarRow(date = StubTopic.RELEASE_DATE, topic = calendarTopic(ledBy = null)),
+                CalendarRow(date = StubTopic.RELEASE_DATE, topic = StubTopic.stubCalendarTopic(ledBy = LedBy.Guest)),
+                CalendarRow(date = StubTopic.RELEASE_DATE, topic = StubTopic.stubCalendarTopic(ledBy = null)),
             ),
         )
 
@@ -81,7 +78,7 @@ internal class TopicCalendarDtoMapperTest {
 
     @Test
     fun `GIVEN a draft with gaps and an empty day WHEN mapping the calendar THEN both to do entries keep their data`() {
-        val calendar = calendarOf(
+        val calendar = StubTopic.stubCalendar(
             todos = listOf(
                 Todo.Draft(
                     date = StubTopic.RELEASE_DATE,
@@ -108,28 +105,4 @@ internal class TopicCalendarDtoMapperTest {
             actual = dto.todos,
         )
     }
-
-    private fun calendarOf(
-        rows: List<CalendarRow> = emptyList(),
-        todos: List<Todo> = emptyList(),
-    ): TopicCalendar = TopicCalendar(
-        rows = rows,
-        todos = todos,
-    )
-
-    private fun calendarTopic(
-        completeSteps: Int = 0,
-        ledBy: LedBy? = null,
-        state: ReleaseState = ReleaseState.DRAFT,
-        steps: Int = 0,
-        title: String = StubTopic.TITLE,
-        topicId: TopicId = StubTopic.TOPIC_ID,
-    ): CalendarTopic = CalendarTopic(
-        completeSteps = completeSteps,
-        ledBy = ledBy,
-        state = state,
-        steps = steps,
-        title = title,
-        topicId = topicId,
-    )
 }
