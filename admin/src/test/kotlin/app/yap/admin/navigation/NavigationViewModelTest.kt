@@ -60,6 +60,17 @@ internal class NavigationViewModelTest {
         assertEquals(expected = Screen.Server, actual = env.screen())
     }
 
+    @Test
+    fun `GIVEN Topics is open WHEN Levels is clicked THEN Levels opens`() = runTest(dispatcher) {
+        val env = Environment(settings = StubServerSettings.stubServerSettings())
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.ScreenClicked(Screen.Levels))
+        advanceUntilIdle()
+
+        assertEquals(expected = Screen.Levels, actual = env.screen())
+    }
+
     private class Environment(
         settings: ServerSettings?,
     ) {
