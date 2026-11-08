@@ -55,6 +55,11 @@ object StubTopic {
         title = title,
     )
 
+    fun stubPaddedContent(): TopicContent = stubContent(
+        steps = listOf(stubStep(), stubStep(outcome = " ", passWhen = "", task = "")),
+        title = " $TITLE ",
+    )
+
     fun stubOpeningLine(
         english: String = ENGLISH,
         translation: String = TRANSLATION,

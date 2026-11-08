@@ -13,7 +13,7 @@ import kotlin.test.assertNull
 internal class TopicDtoMapperTest {
 
     @Test
-    fun `GIVEN texts with spaces around WHEN mapping the content THEN every text is trimmed`() {
+    fun `GIVEN texts with spaces around WHEN mapping the content THEN every text stays as it is`() {
         val dto = StubTopicDto.stubContentDto(
             description = " Order a coffee. ",
             interlocutor = InterlocutorDto.GuestDto(description = " A tourist. "),
@@ -30,30 +30,35 @@ internal class TopicDtoMapperTest {
 
         assertEquals(
             expected = StubTopic.stubContent(
-                description = "Order a coffee.",
-                interlocutor = Interlocutor.Guest(description = "A tourist."),
-                openingLine = StubTopic.stubOpeningLine(english = "Hello!", translation = "Привет!"),
-                role = "A barista.",
-                setting = "A cafe.",
-                steps = listOf(StubTopic.stubStep(outcome = "Ordered.", passWhen = "Names it.", task = "Order.")),
-                title = "At the cafe",
+                description = " Order a coffee. ",
+                interlocutor = Interlocutor.Guest(description = " A tourist. "),
+                openingLine = StubTopic.stubOpeningLine(english = " Hello! ", translation = " Привет! "),
+                role = " A barista. ",
+                setting = " A cafe. ",
+                steps = listOf(
+                    StubTopic.stubStep(outcome = " Ordered. ", passWhen = " Names it. ", task = " Order. "),
+                ),
+                title = " At the cafe ",
             ),
             actual = content,
         )
     }
 
     @Test
-    fun `GIVEN a filled step and an empty step after it WHEN mapping the content THEN only the filled step stays`() {
+    fun `GIVEN a filled step and an empty step after it WHEN mapping the content THEN both steps stay`() {
         val dto = StubTopicDto.stubContentDto(
             steps = listOf(
                 StubTopicDto.stubStepDto(),
-                StubTopicDto.stubStepDto(outcome = "  ", passWhen = "", task = " "),
+                StubTopicDto.stubStepDto(outcome = "", passWhen = "", task = ""),
             ),
         )
 
         val content = dto.toModel()
 
-        assertEquals(expected = listOf(StubTopic.stubStep()), actual = content.steps)
+        assertEquals(
+            expected = listOf(StubTopic.stubStep(), StubTopic.stubStep(outcome = "", passWhen = "", task = "")),
+            actual = content.steps,
+        )
     }
 
     @Test
@@ -68,17 +73,6 @@ internal class TopicDtoMapperTest {
             expected = Interlocutor.Cast(characterId = StubCharacter.CHARACTER_ID),
             actual = content.interlocutor,
         )
-    }
-
-    @Test
-    fun `GIVEN a guest with a description of spaces WHEN mapping the content THEN the guest stays with no text`() {
-        val dto = StubTopicDto.stubContentDto(
-            interlocutor = InterlocutorDto.GuestDto(description = "   "),
-        )
-
-        val content = dto.toModel()
-
-        assertEquals(expected = Interlocutor.Guest(description = ""), actual = content.interlocutor)
     }
 
     @Test
