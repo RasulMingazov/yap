@@ -71,12 +71,12 @@ It merges after the PR of 7.2 (`TopicDetails`, merged), whose use cases read `Re
 
 - [x] 8.6 Add the calendar DTOs and the server mapper; verify with the mapper tests for both interlocutors, both To do entries and an empty day
 
-## 9. [9/26] The topic routes · ~380, at risk · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `K/TopicRejectionDto.kt`, `S/api/TopicRoutes.kt` and its test
+## 9. [9/26] The topic routes · ~380, at risk · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `K/TopicRejectionDto.kt`, `S/api/TopicRoutes.kt` and its test, `server/app/src/test/kotlin/app/yap/server/ApplicationTest.kt`
 
 At risk: if it grows over 400, slice 1 is the calendar route and slice 2 is the publish route with
 the 400 body and 409, as two PRs.
 
-- [ ] 9.1 Add `TopicRejectionDto`, `GET /admin/topics/calendar`, `POST /admin/topics/{topicId}/publish`, the 400 body and 409; keep `GET /admin/topics` until [14/26]; verify with the route tests for the calendar with a fixed clock, publish 200, a publish of a published topic, 400 with the gaps and a past date, 401, 404 and 409, a GET of a draft with a taken date, and a PUT of a published topic with 400 and 409
+- [x] 9.1 Add `TopicRejectionDto`, `GET /admin/topics/calendar`, `POST /admin/topics/{topicId}/publish`, the 400 body and 409; keep `GET /admin/topics` until [14/26]; verify with the route tests for the calendar with a fixed clock, publish 200, a publish of a published topic, 400 with the gaps and a past date, 401, 404 and 409, a GET of a draft with a taken date, and a PUT of a published topic with 400 and 409
 
 ## 10. [10/26] The admin topic counts · ~260 · `H/domain/` (`CharacterSummary`, the repository, `GetCharactersUseCase`), `H/data/`, `H/presentation/` (`CharactersUiStateMapper`, `TopicCountText`), `H/presentation/ui/CharactersScreen.kt` (the count on the right), `T/presentation/` (`TopicViewModel`, `TopicUiStateMapper`)
 

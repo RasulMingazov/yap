@@ -4,7 +4,6 @@ import app.yap.admin.core.common.LoadResult
 import app.yap.admin.feature.models.domain.ModelTask
 import app.yap.admin.feature.models.domain.SaveModelsResult
 import app.yap.admin.feature.models.domain.StubModels
-import app.yap.admin.feature.models.domain.TaskModel
 import app.yap.admin.feature.models.domain.usecase.StubGetModelsUseCase
 import app.yap.admin.feature.models.domain.usecase.StubSaveModelsUseCase
 import app.yap.admin.feature.models.presentation.ModelsViewModel.Event
@@ -26,6 +25,17 @@ internal class ModelsViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
 
+    private val proReviewTasks = listOf(
+        StubModels.stubTask(task = ModelTask.TOPIC_REPLY),
+        StubModels.stubTask(task = ModelTask.TOPIC_CHECK),
+        StubModels.stubTask(task = ModelTask.TOPIC_HINTS),
+        StubModels.stubTask(
+            model = PRO,
+            task = ModelTask.TOPIC_REVIEW,
+        ),
+        StubModels.stubTask(task = ModelTask.CALIBRATION),
+    )
+
     @BeforeTest
     fun setMain() {
         Dispatchers.setMain(dispatcher)
@@ -37,13 +47,13 @@ internal class ModelsViewModelTest {
     }
 
     @Test
-    fun `GIVEN saved models WHEN Models opens THEN Review shows the saved model`() = runTest(dispatcher) {
+    fun `GIVEN saved models WHEN Models opens THEN every task shows its saved model`() = runTest(dispatcher) {
         val env = Environment()
-        env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels(tasks = tasksWithReview(PRO))))
+        env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels(tasks = proReviewTasks)))
 
         advanceUntilIdle()
 
-        assertEquals(expected = PRO, actual = env.reviewRow().model)
+        assertEquals(expected = PRO_REVIEW_MODELS, actual = env.models())
     }
 
     @Test
@@ -58,40 +68,60 @@ internal class ModelsViewModelTest {
     }
 
     @Test
-    fun `GIVEN two providers WHEN Review gets the other one THEN it takes its first model`() = runTest(dispatcher) {
-        val env = Environment()
-        val other = StubModels.stubProvider(
-            code = "OTHER",
-            models = listOf("other-mini", "other-max"),
-            name = "Other",
-        )
-        val providers = listOf(StubModels.stubProvider(), other)
-        env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels(providers = providers)))
-        advanceUntilIdle()
+    fun `GIVEN two providers WHEN Review gets the other one THEN only Review takes its first model`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            val other = StubModels.stubProvider(
+                code = "OTHER",
+                models = listOf("other-mini", "other-max"),
+                name = "Other",
+            )
+            val providers = listOf(StubModels.stubProvider(), other)
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels(providers = providers)))
+            advanceUntilIdle()
 
-        env.viewModel.onEvent(
-            Event.ProviderChanged(
-                provider = "OTHER",
-                task = ModelTask.TOPIC_REVIEW,
-            ),
-        )
-        advanceUntilIdle()
+            env.viewModel.onEvent(
+                Event.ProviderChanged(
+                    provider = "OTHER",
+                    task = ModelTask.TOPIC_REVIEW,
+                ),
+            )
+            advanceUntilIdle()
 
-        assertEquals(
-            expected = "other-mini" to "OTHER",
-            actual = env.reviewRow().model to env.reviewRow().provider.code,
-        )
-    }
+            val deepSeek = StubModels.MODEL to StubModels.PROVIDER
+            assertEquals(
+                expected = listOf(deepSeek, deepSeek, deepSeek, "other-mini" to "OTHER", deepSeek),
+                actual = env.content().tasks.map { row -> row.model to row.provider.code },
+            )
+        }
 
     @Test
-    fun `GIVEN the models WHEN Review gets another model THEN its row shows it`() = runTest(dispatcher) {
+    fun `GIVEN Review has deepseek-v4-pro WHEN DeepSeek is chosen again THEN it keeps deepseek-v4-pro`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels(tasks = proReviewTasks)))
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(
+                Event.ProviderChanged(
+                    provider = StubModels.PROVIDER,
+                    task = ModelTask.TOPIC_REVIEW,
+                ),
+            )
+            advanceUntilIdle()
+
+            assertEquals(expected = PRO_REVIEW_MODELS, actual = env.models())
+        }
+
+    @Test
+    fun `GIVEN the models WHEN Review gets another model THEN only its row shows it`() = runTest(dispatcher) {
         val env = Environment()
         advanceUntilIdle()
 
         env.changeReview(PRO)
         advanceUntilIdle()
 
-        assertEquals(expected = PRO, actual = env.reviewRow().model)
+        assertEquals(expected = PRO_REVIEW_MODELS, actual = env.models())
     }
 
     @Test
@@ -103,20 +133,20 @@ internal class ModelsViewModelTest {
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
-        env.saveModelsUseCase.invokeCall.calledWith(tasksWithReview(PRO))
+        env.saveModelsUseCase.invokeCall.calledWith(proReviewTasks)
     }
 
     @Test
     fun `GIVEN the server accepts WHEN saving THEN its choices and Saved show`() = runTest(dispatcher) {
-        val env = Environment(saveResult = SaveModelsResult.Saved(StubModels.stubModels(tasks = tasksWithReview(PRO))))
+        val env = Environment(saveResult = SaveModelsResult.Saved(StubModels.stubModels(tasks = proReviewTasks)))
         advanceUntilIdle()
 
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
         assertEquals(
-            expected = PRO to "Сохранено",
-            actual = env.reviewRow().model to env.content().saveStatus?.text,
+            expected = PRO_REVIEW_MODELS to "Сохранено",
+            actual = env.models() to env.content().saveStatus?.text,
         )
     }
 
@@ -142,7 +172,7 @@ internal class ModelsViewModelTest {
         env.changeReview(PRO)
         advanceUntilIdle()
 
-        assertEquals(expected = StubModels.MODEL, actual = env.reviewRow().model)
+        assertEquals(expected = List(size = 5) { StubModels.MODEL }, actual = env.models())
     }
 
     @Test
@@ -180,8 +210,8 @@ internal class ModelsViewModelTest {
             advanceUntilIdle()
 
             assertEquals(
-                expected = "Сервер не принял модели: выберите модель провайдера для каждой задачи" to PRO,
-                actual = env.content().saveStatus?.text to env.reviewRow().model,
+                expected = "Сервер не принял модели: выберите модель провайдера для каждой задачи" to PRO_REVIEW_MODELS,
+                actual = env.content().saveStatus?.text to env.models(),
             )
         }
 
@@ -202,14 +232,14 @@ internal class ModelsViewModelTest {
         advanceUntilIdle()
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
-        env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels(tasks = tasksWithReview(PRO))))
+        env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels(tasks = proReviewTasks)))
 
         env.viewModel.onEvent(Event.RefreshClicked)
         advanceUntilIdle()
 
         assertEquals(
-            expected = PRO to false,
-            actual = env.reviewRow().model to env.content().isRefreshShown,
+            expected = PRO_REVIEW_MODELS to false,
+            actual = env.models() to env.content().isRefreshShown,
         )
     }
 
@@ -256,16 +286,6 @@ internal class ModelsViewModelTest {
         assertEquals(expected = ModelTask.entries, actual = env.content().tasks.map { row -> row.task })
     }
 
-    private fun tasksWithReview(model: String): List<TaskModel> = StubModels
-        .stubTasks()
-        .map { taskModel ->
-            if (taskModel.task == ModelTask.TOPIC_REVIEW) {
-                taskModel.copy(choice = taskModel.choice.copy(model = model))
-            } else {
-                taskModel
-            }
-        }
-
     private class Environment(
         saveResult: SaveModelsResult = SaveModelsResult.Saved(StubModels.stubModels()),
     ) {
@@ -292,11 +312,13 @@ internal class ModelsViewModelTest {
 
         fun content(): UiState.Content = viewModel.uiState.value as UiState.Content
 
-        fun reviewRow(): UiState.TaskRow = content().tasks.first { row -> row.task == ModelTask.TOPIC_REVIEW }
+        fun models(): List<String> = content().tasks.map { row -> row.model }
     }
 
     private companion object {
 
         const val PRO = "deepseek-v4-pro"
+
+        val PRO_REVIEW_MODELS = listOf(StubModels.MODEL, StubModels.MODEL, StubModels.MODEL, PRO, StubModels.MODEL)
     }
 }

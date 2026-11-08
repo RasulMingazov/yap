@@ -59,6 +59,7 @@ internal class ModelsViewModel(
     }
 
     private fun onProviderChanged(event: Event.ProviderChanged) {
+        if (dataState.value.choices.getValue(event.task).provider == event.provider) return
         val provider = checkNotNull(dataState.value.models)
             .providers
             .first { provider -> provider.code == event.provider }
