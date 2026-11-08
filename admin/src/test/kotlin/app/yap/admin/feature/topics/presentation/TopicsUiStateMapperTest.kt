@@ -1,7 +1,13 @@
 package app.yap.admin.feature.topics.presentation
 
+import app.yap.admin.core.presentation.Status
+import app.yap.admin.feature.topics.domain.LedBy
+import app.yap.admin.feature.topics.domain.ReleaseState
 import app.yap.admin.feature.topics.domain.StubTopic
 import app.yap.admin.feature.topics.domain.StubTopicCalendar
+import app.yap.admin.feature.topics.domain.Todo
+import app.yap.admin.feature.topics.domain.TopicField
+import app.yap.admin.feature.topics.domain.TopicGap
 import app.yap.admin.feature.topics.domain.TopicId
 import app.yap.admin.feature.topics.presentation.TopicsViewModel.DataState
 import app.yap.admin.feature.topics.presentation.TopicsViewModel.UiState
@@ -12,54 +18,189 @@ import kotlin.test.assertIs
 internal class TopicsUiStateMapperTest {
 
     @Test
-    fun `GIVEN topics on two days WHEN mapping THEN the rows keep the server order with their short dates`() {
-        val saturday = StubTopicCalendar.stubCalendarRow(
-            date = StubTopic.RELEASE_DATE.plusDays(1),
-            topic = StubTopicCalendar.stubCalendarTopic(topicId = "saturday-topic"),
+    fun `GIVEN a published topic and an empty day WHEN mapping THEN All topics and To do show them in the server order`() {
+        val saturday = StubTopic.RELEASE_DATE.plusDays(1)
+        val published = StubTopicCalendar.stubCalendarTopic(
+            completeSteps = 5,
+            ledBy = LedBy.Cast(name = "Сэм"),
+            state = ReleaseState.PUBLISHED,
+            steps = 5,
         )
-        val calendar = StubTopicCalendar.stubTopicCalendar(rows = listOf(StubTopicCalendar.stubCalendarRow(), saturday))
+        val calendar = StubTopicCalendar.stubTopicCalendar(
+            rows = listOf(
+                StubTopicCalendar.stubCalendarRow(topic = published),
+                StubTopicCalendar.stubCalendarRow(
+                    date = saturday,
+                    topic = null,
+                ),
+            ),
+            todos = listOf(Todo.EmptyDay(date = saturday)),
+        )
 
         val uiState = TopicsUiStateMapper(DataState(calendar = calendar))
 
         assertEquals(
             expected = UiState.Content(
+                reloadError = null,
                 rows = listOf(
-                    UiState.Content.Row(
+                    UiState.Row.Topic(
                         date = "Пт, 24 окт",
+                        ledBy = "Сэм",
+                        status = Status(
+                            text = "Опубликована",
+                            tone = Status.Tone.SUCCESS,
+                        ),
+                        steps = "5",
                         title = "At the cafe",
                         topicId = TopicId(StubTopic.TOPIC_ID),
                     ),
-                    UiState.Content.Row(
-                        date = "Сб, 25 окт",
-                        title = "At the cafe",
-                        topicId = TopicId("saturday-topic"),
-                    ),
+                    UiState.Row.EmptyDay(date = "Сб, 25 окт"),
                 ),
+                todo = UiState.TodoList.Entries(entries = listOf(UiState.TodoEntry.EmptyDay(date = "Сб, 25 окт"))),
             ),
             actual = uiState,
         )
     }
 
     @Test
-    fun `GIVEN an empty day WHEN mapping THEN only the days with a topic have rows`() {
-        val emptyDay = StubTopicCalendar.stubCalendarRow(
-            date = StubTopic.RELEASE_DATE.plusDays(1),
-            topic = null,
+    fun `GIVEN a topic of each release state WHEN mapping THEN each status has its text and tone`() {
+        val calendar = StubTopicCalendar.stubTopicCalendar(
+            rows = ReleaseState.entries.map { state ->
+                StubTopicCalendar.stubCalendarRow(topic = StubTopicCalendar.stubCalendarTopic(state = state))
+            },
         )
-        val calendar = StubTopicCalendar.stubTopicCalendar(rows = listOf(StubTopicCalendar.stubCalendarRow(), emptyDay))
 
         val uiState = assertIs<UiState.Content>(TopicsUiStateMapper(DataState(calendar = calendar)))
 
-        assertEquals(expected = listOf("Пт, 24 окт"), actual = uiState.rows.map { row -> row.date })
+        assertEquals(
+            expected = listOf(
+                Status(
+                    text = "Черновик",
+                    tone = Status.Tone.WARNING,
+                ),
+                Status(
+                    text = "Опубликована",
+                    tone = Status.Tone.SUCCESS,
+                ),
+                Status(
+                    text = "Сегодня",
+                    tone = Status.Tone.SUCCESS,
+                ),
+                Status(
+                    text = "Вышла",
+                    tone = Status.Tone.MUTED,
+                ),
+            ),
+            actual = uiState.rows.map { row -> assertIs<UiState.Row.Topic>(row).status },
+        )
     }
 
     @Test
-    fun `GIVEN no topics WHEN mapping THEN the screen says that there are none yet`() {
-        val state = DataState(calendar = StubTopicCalendar.stubTopicCalendar())
+    fun `GIVEN a guest and no interlocutor WHEN mapping THEN Led by shows Guest and nothing`() {
+        val calendar = StubTopicCalendar.stubTopicCalendar(
+            rows = listOf(
+                StubTopicCalendar.stubCalendarRow(topic = StubTopicCalendar.stubCalendarTopic(ledBy = LedBy.Guest)),
+                StubTopicCalendar.stubCalendarRow(topic = StubTopicCalendar.stubCalendarTopic(ledBy = null)),
+            ),
+        )
+
+        val uiState = assertIs<UiState.Content>(TopicsUiStateMapper(DataState(calendar = calendar)))
+
+        assertEquals(
+            expected = listOf("Гость", ""),
+            actual = uiState.rows.map { row -> assertIs<UiState.Row.Topic>(row).ledBy },
+        )
+    }
+
+    @Test
+    fun `GIVEN 5 steps and 2 complete steps WHEN mapping THEN Steps shows 2 of 5`() {
+        val topic = StubTopicCalendar.stubCalendarTopic(
+            completeSteps = 2,
+            steps = 5,
+        )
+        val calendar = StubTopicCalendar.stubTopicCalendar(rows = listOf(StubTopicCalendar.stubCalendarRow(topic = topic)))
+
+        val uiState = assertIs<UiState.Content>(TopicsUiStateMapper(DataState(calendar = calendar)))
+
+        assertEquals(
+            expected = listOf("2 из 5"),
+            actual = uiState.rows.map { row -> assertIs<UiState.Row.Topic>(row).steps },
+        )
+    }
+
+    @Test
+    fun `GIVEN a draft that publishing needs nothing more for WHEN mapping THEN To do says it is a draft to publish`() {
+        val calendar = StubTopicCalendar.stubTopicCalendar(todos = listOf(StubTopicCalendar.stubTodoDraft()))
+
+        val uiState = assertIs<UiState.Content>(TopicsUiStateMapper(DataState(calendar = calendar)))
+
+        assertEquals(
+            expected = UiState.TodoList.Entries(
+                entries = listOf(
+                    UiState.TodoEntry.Draft(
+                        date = "Пт, 24 окт",
+                        note = "Черновик. Опубликуйте.",
+                        title = "At the cafe",
+                        topicId = TopicId(StubTopic.TOPIC_ID),
+                    ),
+                ),
+            ),
+            actual = uiState.todo,
+        )
+    }
+
+    @Test
+    fun `GIVEN a draft without a description and with the steps 3–5 incomplete WHEN mapping THEN its note names both`() {
+        val gaps = listOf(
+            TopicGap.Missing(field = TopicField.DESCRIPTION),
+            TopicGap.IncompleteSteps(numbers = listOf(3, 4, 5)),
+        )
+        val calendar = StubTopicCalendar.stubTopicCalendar(todos = listOf(StubTopicCalendar.stubTodoDraft(gaps = gaps)))
+
+        val uiState = assertIs<UiState.Content>(TopicsUiStateMapper(DataState(calendar = calendar)))
+
+        assertEquals(
+            expected = UiState.TodoList.Entries(
+                entries = listOf(
+                    UiState.TodoEntry.Draft(
+                        date = "Пт, 24 окт",
+                        note = "Дописать описание и шаги 3–5.",
+                        title = "At the cafe",
+                        topicId = TopicId(StubTopic.TOPIC_ID),
+                    ),
+                ),
+            ),
+            actual = uiState.todo,
+        )
+    }
+
+    @Test
+    fun `GIVEN a calendar without To do WHEN mapping THEN To do says that there is nothing to do`() {
+        val calendar = StubTopicCalendar.stubTopicCalendar(rows = listOf(StubTopicCalendar.stubCalendarRow()))
+
+        val uiState = assertIs<UiState.Content>(TopicsUiStateMapper(DataState(calendar = calendar)))
+
+        assertEquals(expected = UiState.TodoList.Empty(message = "Всё сделано"), actual = uiState.todo)
+    }
+
+    @Test
+    fun `GIVEN a kept calendar and a failed reload WHEN mapping THEN the banner shows above the kept calendar`() {
+        val emptyDay = StubTopicCalendar.stubCalendarRow(topic = null)
+        val state = DataState(
+            calendar = StubTopicCalendar.stubTopicCalendar(rows = listOf(emptyDay)),
+            isLoadFailed = true,
+        )
 
         val uiState = TopicsUiStateMapper(state)
 
-        assertEquals(expected = UiState.Empty(message = "Тем пока нет"), actual = uiState)
+        assertEquals(
+            expected = UiState.Content(
+                reloadError = "Не удалось обновить темы",
+                rows = listOf(UiState.Row.EmptyDay(date = "Пт, 24 окт")),
+                todo = UiState.TodoList.Empty(message = "Всё сделано"),
+            ),
+            actual = uiState,
+        )
     }
 
     @Test
@@ -69,19 +210,6 @@ internal class TopicsUiStateMapperTest {
         val uiState = TopicsUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить темы"), actual = uiState)
-    }
-
-    @Test
-    fun `GIVEN a kept calendar and a failed reload WHEN mapping THEN the screen shows the kept calendar`() {
-        val calendar = StubTopicCalendar.stubTopicCalendar(rows = listOf(StubTopicCalendar.stubCalendarRow()))
-        val state = DataState(
-            calendar = calendar,
-            isLoadFailed = true,
-        )
-
-        val uiState = TopicsUiStateMapper(state)
-
-        assertIs<UiState.Content>(uiState)
     }
 
     @Test

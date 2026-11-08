@@ -99,10 +99,10 @@ the 400 body and 409, as two PRs.
 - [x] 14.1 Load the calendar in `TopicsViewModel`, keep it on a failed reload and hold the reload failure for the banner; `DataState` holds raw facts only, as `CharactersViewModel` does: `calendar: TopicCalendar?`, `isLoadFailed`, `isLoading`; no stored load result, no `null` that means Loading, no `loaded()` that decides what to keep; the mapper decides Loading, Error, Content and the banner; verify with the view model tests for the load, a return, a failed reload that keeps the calendar, Retry after a failed load and Retry after a failed reload, and the unchanged Topics capture images
 - [x] 14.2 Remove the list route, its use cases and the admin `list`; verify with `./gradlew build`
 
-## 15. [15/26] The Topics UI state · ~300 · `A/core/design/` (`AdminTheme` `warn`, the `WARNING` branch of `StatusText`), `A/core/presentation/Status.kt` (`WARNING`), `T/presentation/` (`TopicsViewModel.UiState`, `TopicsUiStateMapper`, `TopicGapText`), `T/presentation/ui/TopicsScreen.kt` (compile only)
+## 15. [15/26] The Topics UI state · ~300 · `A/core/design/` (`AdminTheme` `warn`, the `WARNING` branch of `StatusText`), `A/core/presentation/Status.kt` (`WARNING`), `T/presentation/` (`TopicsViewModel.UiState`, `TopicsUiStateMapper`, `TopicGapText`), `T/presentation/ui/TopicsScreen.kt` (compile only), `T/domain/StubTopicCalendar.kt` (`stubTodoDraft`)
 
-- [ ] 15.1 Add the `WARNING` tone with its color and its `StatusText` branch; verify with `./gradlew build` and the unchanged capture images
-- [ ] 15.2 Map the rows, To do, the tones, Led by, 2 of 5, the empty day, the reload banner and nothing to do from the raw facts of [14/26]; `TopicGapText` names the fields and the steps 3–5; verify with the mapper tests for each status, a ready draft, a draft with the steps 3–5 incomplete, an empty day, nothing to do, and the banner over a kept calendar
+- [x] 15.1 Add the `WARNING` tone with its color and its `StatusText` branch; verify with `./gradlew build` and the unchanged capture images; done in #11 (PR 144): `Status.Tone.WARNING`, `AdminTheme.Colors.warn` and the `StatusText` branch already exist, and this part reuses them
+- [x] 15.2 Map the rows, To do, the tones, Led by, 2 of 5, the empty day, the reload banner and nothing to do from the raw facts of [14/26]; `TopicGapText` names the fields and the steps 3–5; verify with the mapper tests for each status, a ready draft, a draft with the steps 3–5 incomplete, an empty day, nothing to do, and the banner over a kept calendar
 
 ## 16. [16/26] The Topics screen · ~280 · `A/core/design/` (the column widths), `T/presentation/ui/` (`TopicsScreen`, `TodoSection`)
 

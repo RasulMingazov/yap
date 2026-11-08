@@ -3,6 +3,7 @@ package app.yap.admin.feature.topics.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.yap.admin.core.common.LoadResult
+import app.yap.admin.core.presentation.Status
 import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.topics.domain.TopicCalendar
 import app.yap.admin.feature.topics.domain.TopicId
@@ -67,20 +68,48 @@ internal class TopicsViewModel(
 
     sealed interface UiState {
 
-        data class Content(val rows: List<Row>) : UiState {
-
-            data class Row(
-                val date: String,
-                val title: String,
-                val topicId: TopicId,
-            )
-        }
-
-        data class Empty(val message: String) : UiState
+        data class Content(
+            val reloadError: String?,
+            val rows: List<Row>,
+            val todo: TodoList,
+        ) : UiState
 
         data class Error(val message: String) : UiState
 
         data object Loading : UiState
+
+        sealed interface Row {
+
+            data class EmptyDay(val date: String) : Row
+
+            data class Topic(
+                val date: String,
+                val ledBy: String,
+                val status: Status,
+                val steps: String,
+                val title: String,
+                val topicId: TopicId,
+            ) : Row
+        }
+
+        sealed interface TodoEntry {
+
+            data class Draft(
+                val date: String,
+                val note: String,
+                val title: String,
+                val topicId: TopicId,
+            ) : TodoEntry
+
+            data class EmptyDay(val date: String) : TodoEntry
+        }
+
+        sealed interface TodoList {
+
+            data class Empty(val message: String) : TodoList
+
+            data class Entries(val entries: List<TodoEntry>) : TodoList
+        }
     }
 
     sealed interface Event {

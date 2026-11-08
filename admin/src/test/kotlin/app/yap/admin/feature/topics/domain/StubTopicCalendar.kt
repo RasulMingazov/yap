@@ -35,4 +35,16 @@ internal object StubTopicCalendar {
         title = title,
         topicId = TopicId(topicId),
     )
+
+    fun stubTodoDraft(
+        date: LocalDate = StubTopic.RELEASE_DATE,
+        gaps: List<TopicGap> = emptyList(),
+        title: String = StubTopic.TITLE,
+        topicId: String = StubTopic.TOPIC_ID,
+    ): Todo.Draft = Todo.Draft(
+        date = date,
+        gaps = gaps,
+        title = title,
+        topicId = TopicId(topicId),
+    )
 }
