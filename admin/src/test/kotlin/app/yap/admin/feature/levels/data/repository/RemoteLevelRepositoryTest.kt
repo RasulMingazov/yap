@@ -133,6 +133,16 @@ internal class RemoteLevelRepositoryTest {
         assertEquals(expected = SaveLevelsResult.Failed, actual = result)
     }
 
+    @Test
+    fun `GIVEN a level model outside the catalog WHEN the server answers 409 THEN the model is unavailable`() =
+        runTest {
+            val env = Environment(answer = answer(content = "", status = HttpStatusCode.Conflict))
+
+            val result = env.repository.save(listOf(StubLevel.stubEntry(settings = StubLevel.stubSettings(model = PRO))))
+
+            assertEquals(expected = SaveLevelsResult.ModelUnavailable, actual = result)
+        }
+
     private class Environment(answer: MockRequestHandler) {
 
         val engine = MockEngine(answer)
