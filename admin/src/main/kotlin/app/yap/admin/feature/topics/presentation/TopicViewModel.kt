@@ -54,7 +54,9 @@ internal class TopicViewModel(
         is Event.ReleaseDatePicked -> onReleaseDatePicked(event.date)
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
-        is Event.StepChanged -> onStepChanged(event.index, event.step)
+        is Event.StepChanged -> edit { form ->
+            form.copy(steps = form.steps.mapIndexed { index, step -> if (index == event.index) event.step else step })
+        }
     }
 
     override fun onCleared() {
@@ -148,13 +150,6 @@ internal class TopicViewModel(
     private suspend fun onSaveFailed() {
         dataState.update { state -> state.copy(isSaving = false) }
         newsChannel.send(News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."))
-    }
-
-    private fun onStepChanged(
-        index: Int,
-        step: Step,
-    ) = edit { form ->
-        form.copy(steps = form.steps.mapIndexed { stepIndex, current -> if (stepIndex == index) step else current })
     }
 
     data class DataState(
