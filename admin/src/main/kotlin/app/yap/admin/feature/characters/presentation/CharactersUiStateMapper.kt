@@ -5,9 +5,9 @@ import app.yap.admin.feature.characters.domain.Character
 import app.yap.admin.feature.characters.presentation.CharactersViewModel.DataState
 import app.yap.admin.feature.characters.presentation.CharactersViewModel.UiState
 
-internal object CharactersUiStateMapper {
+internal object CharactersUiStateMapper : (DataState) -> UiState {
 
-    fun map(state: DataState): UiState = when (val characters = state.characters) {
+    override fun invoke(state: DataState): UiState = when (val characters = state.characters) {
         null -> UiState.Loading
         is LoadResult.Failed -> UiState.Error(message = "Не удалось загрузить персонажей")
         is LoadResult.Loaded -> characters.value.toUiState()

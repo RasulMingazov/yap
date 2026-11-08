@@ -20,7 +20,7 @@ internal class TopicsUiStateMapperTest {
         )
         val state = DataState(topics = LoadTopicsResult.Loaded(listOf(StubTopic.stubTopic(), saturdayTopic)))
 
-        val uiState = TopicsUiStateMapper.map(state)
+        val uiState = TopicsUiStateMapper(state)
 
         assertEquals(
             expected = UiState.Content(
@@ -46,7 +46,7 @@ internal class TopicsUiStateMapperTest {
         val topic = StubTopic.stubTopic(content = StubTopic.stubContent(releaseDate = null))
         val state = DataState(topics = LoadTopicsResult.Loaded(listOf(topic)))
 
-        val uiState = TopicsUiStateMapper.map(state)
+        val uiState = TopicsUiStateMapper(state)
 
         assertEquals(expected = "", actual = assertIs<UiState.Content>(uiState).rows.single().date)
     }
@@ -55,7 +55,7 @@ internal class TopicsUiStateMapperTest {
     fun `GIVEN no topics WHEN mapping THEN the screen says that there are none yet`() {
         val state = DataState(topics = LoadTopicsResult.Loaded(emptyList()))
 
-        val uiState = TopicsUiStateMapper.map(state)
+        val uiState = TopicsUiStateMapper(state)
 
         assertEquals(expected = UiState.Empty(message = "Тем пока нет"), actual = uiState)
     }
@@ -64,7 +64,7 @@ internal class TopicsUiStateMapperTest {
     fun `GIVEN the topics did not load WHEN mapping THEN the screen shows the error`() {
         val state = DataState(topics = LoadTopicsResult.Failed)
 
-        val uiState = TopicsUiStateMapper.map(state)
+        val uiState = TopicsUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить темы"), actual = uiState)
     }

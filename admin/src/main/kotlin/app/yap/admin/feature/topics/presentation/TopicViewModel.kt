@@ -34,7 +34,7 @@ internal class TopicViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicUiStateMapper)
 
     private val newsChannel = Channel<News>(Channel.BUFFERED)
     val news: Flow<News> = newsChannel.receiveAsFlow()
@@ -44,6 +44,7 @@ internal class TopicViewModel(
     }
 
     fun onEvent(event: Event) = when (event) {
+        is Event.AddStepClicked -> edit { form -> form.copy(steps = form.steps + EMPTY_STEP) }
         is Event.DurationChanged -> onDurationChanged(event.text)
         is Event.FormChanged -> edit { event.form }
         is Event.GuestDescriptionChanged -> edit { form ->
@@ -53,6 +54,7 @@ internal class TopicViewModel(
         is Event.ReleaseDatePicked -> onReleaseDatePicked(event.date)
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
+        is Event.StepChanged -> onStepChanged(event.index, event.step)
     }
 
     override fun onCleared() {
@@ -148,6 +150,10 @@ internal class TopicViewModel(
         newsChannel.send(News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."))
     }
 
+    private fun onStepChanged(changedIndex: Int, changedStep: Step) = edit { form ->
+        form.copy(steps = form.steps.mapIndexed { index, step -> if (index == changedIndex) changedStep else step })
+    }
+
     data class DataState(
         val cast: List<Character> = emptyList(),
         val form: TopicContent = EMPTY_CONTENT,
@@ -217,6 +223,8 @@ internal class TopicViewModel(
 
     sealed interface Event {
 
+        data object AddStepClicked : Event
+
         data class DurationChanged(val text: String) : Event
 
         data class FormChanged(val form: TopicContent) : Event
@@ -230,11 +238,22 @@ internal class TopicViewModel(
         data object RetryClicked : Event
 
         data object SaveClicked : Event
+
+        data class StepChanged(
+            val index: Int,
+            val step: Step,
+        ) : Event
     }
 
     private companion object {
 
         const val MAX_DURATION_DIGITS = 3
+
+        val EMPTY_STEP = Step(
+            outcome = "",
+            passWhen = "",
+            task = "",
+        )
 
         val EMPTY_CONTENT = TopicContent(
             description = "",
@@ -247,13 +266,7 @@ internal class TopicViewModel(
             releaseDate = null,
             role = "",
             setting = "",
-            steps = listOf(
-                Step(
-                    outcome = "",
-                    passWhen = "",
-                    task = "",
-                ),
-            ),
+            steps = listOf(EMPTY_STEP),
             title = "",
         )
     }

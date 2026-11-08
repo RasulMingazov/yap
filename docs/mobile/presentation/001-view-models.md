@@ -9,7 +9,7 @@ class TopicOfDayViewModel internal constructor(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(TopicOfDayUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicOfDayUiStateMapper)
 
     private val newsChannel = Channel<News>(Channel.BUFFERED)
     val news: Flow<News> = newsChannel.receiveAsFlow()
@@ -43,6 +43,10 @@ class TopicOfDayViewModel internal constructor(
 - Extend `ViewModel` from `org.jetbrains.androidx.lifecycle` and launch work in `viewModelScope`.
   The SwiftUI screen owns the view model and clears it when the screen goes away.
 - Keep internal facts in an immutable `DataState` and map it to `UiState` with one mapper object.
+- A `UiState` mapper object implements `(DataState) -> UiState`. Its only public function is
+  `override fun invoke(state: DataState): UiState`, and the view model passes the object to
+  `mapState`. Every other function of the mapper is `private`. Do not split a mapper into a second
+  public object to pass Detekt: `TooManyFunctions` does not count private functions.
 - Put every text, order, and visibility in `UiState`. Copy is Russian; count-dependent copy picks
   its one/few/many form in the mapper.
 - `News` is one-shot output. Navigation that follows an outcome, such as opening the dialog after

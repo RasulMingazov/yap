@@ -193,6 +193,11 @@ that the steps and the check are the same for every rating level.
 - **WHEN** the owner clicks Add step
 - **THEN** the Steps section gets an empty step below the last one
 
+#### Scenario: A step edit
+
+- **WHEN** the owner edits a field of the second of two steps
+- **THEN** only the second step changes
+
 ### Requirement: The Interlocutor section guides the owner
 
 Without characters, a note above Guest SHALL say that there are no characters yet and that the
@@ -235,14 +240,14 @@ and a Saved status beside Save draft. A new topic SHALL then become a saved topi
 ### Requirement: The status of a save
 
 While the save runs, the admin app SHALL show Saving… beside Save draft, and SHALL disable Save
-draft, the fields, the date popup and the back arrow. A field edit SHALL remove the Saved status.
+draft, the fields, the date popup, Add step and the back arrow. A field edit SHALL remove the Saved status.
 The error of a rejected draft SHALL stay until the next click on Save draft.
 
 #### Scenario: The save runs
 
 - **WHEN** the owner clicks Save draft and the server has not answered yet
-- **THEN** Saving… shows beside Save draft, and Save draft, the fields, the date popup and the back
-  arrow are disabled
+- **THEN** Saving… shows beside Save draft, and Save draft, the fields, the date popup, Add step
+  and the back arrow are disabled
 
 #### Scenario: An edit after a rejected draft
 

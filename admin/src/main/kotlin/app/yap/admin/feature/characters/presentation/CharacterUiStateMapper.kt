@@ -6,9 +6,9 @@ import app.yap.admin.feature.characters.presentation.CharacterViewModel.Load
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.SaveStatus
 import app.yap.admin.feature.characters.presentation.CharacterViewModel.UiState
 
-internal object CharacterUiStateMapper {
+internal object CharacterUiStateMapper : (DataState) -> UiState {
 
-    fun map(state: DataState): UiState = when (state.load) {
+    override fun invoke(state: DataState): UiState = when (state.load) {
         Load.FAILED -> UiState.Error(message = "Не удалось загрузить персонажа")
         Load.LOADED -> state.toContent()
         Load.LOADING -> UiState.Loading
