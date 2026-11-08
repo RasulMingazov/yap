@@ -37,12 +37,7 @@ internal class LevelsViewModel(
     }
 
     fun onEvent(event: Event) = when (event) {
-        is Event.FormChanged -> dataState.update { state ->
-            state.copy(
-                forms = state.forms + (event.code to event.form),
-                saveStatus = null,
-            )
-        }
+        is Event.FormChanged -> onFormChanged(event)
         is Event.LevelClicked -> dataState.update { state -> state.copy(chosen = event.code) }
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
@@ -51,6 +46,16 @@ internal class LevelsViewModel(
     override fun onCleared() {
         super.onCleared()
         newsChannel.close()
+    }
+
+    private fun onFormChanged(event: Event.FormChanged) {
+        if (dataState.value.isSaving) return
+        dataState.update { state ->
+            state.copy(
+                forms = state.forms + (event.code to event.form),
+                saveStatus = null,
+            )
+        }
     }
 
     private fun onRetryClicked() {
@@ -71,13 +76,12 @@ internal class LevelsViewModel(
     private fun onSaveClicked() {
         val state = dataState.value
         if (state.isSaving) return
-        val entries = state.forms.mapNotNull { (code, form) -> form.toEntry(code) }
-        val unreadCode = state.forms.keys.firstOrNull { code -> entries.none { entry -> entry.code == code } }
-        if (unreadCode == null) {
-            save(entries)
-        } else {
+        val unreadCode = state.forms.entries.firstOrNull { (code, form) -> form.toEntry(code) == null }?.key
+        if (unreadCode != null) {
             dataState.update { current -> current.copy(saveStatus = SaveStatus.UnreadNumber(unreadCode)) }
+            return
         }
+        save(state.forms.mapNotNull { (code, form) -> form.toEntry(code) })
     }
 
     private fun save(entries: List<LevelEntry>) {
@@ -138,7 +142,8 @@ internal class LevelsViewModel(
         fun toEntry(code: LevelCode): LevelEntry? {
             val readMaxWords = maxWords.toIntOrNull()
             val readRatingFrom = ratingFrom.toIntOrNull()
-            if (readMaxWords == null || readRatingFrom == null && ratingFrom.isNotBlank()) return null
+            val isRatingFromUnread = ratingFrom.isNotBlank() && readRatingFrom == null
+            if (readMaxWords == null || isRatingFromUnread) return null
             return LevelEntry(
                 code = code,
                 settings = LevelSettings(
