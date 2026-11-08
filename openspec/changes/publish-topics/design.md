@@ -24,9 +24,14 @@ Options:
 
 Choice: 2. It needs no change to the stored drafts, because no topic is published before `V5`. It
 keeps the owner's drafts. It matches the example in `docs/testing/003-backend-integration.md`.
-PostgreSQL enforces a partial unique index only for the rows that match its predicate [1]. The
-repository maps the unique violation `23505` [2] to a typed `DateTaken` result inside the
-transaction. A PostgreSQL test publishes two drafts of one date at once, with a latch.
+PostgreSQL enforces a partial unique index only for the rows that match its predicate [1].
+
+After a unique violation, PostgreSQL aborts the transaction, and Exposed retries a failed
+transaction by default. So a write that can hit the index sets `maxAttempts = 1` in its
+transaction and runs no statement after the write. The repository catches the
+`ExposedSQLException` with SQLState `23505` [2] outside the transaction block and returns a typed
+`DateTaken`. A PostgreSQL test publishes two drafts of one date at once, with a latch, and checks
+that exactly one is published and the other keeps its stored fields.
 
 ### `V5__topic_status.sql`
 
@@ -37,7 +42,10 @@ create unique index topics_published_release_date on topics (release_date)
     where status = 'published';
 ```
 
-V2 to V4 stay as they are. The reset flag does not run, because no applied migration changes.
+V2 to V4 stay as they are. `docs/server/002-persistence.md` says to edit a migration in place
+until launch, but then the reset flag clears the database, and `yap_prod` holds the owner's drafts.
+A new `V5`, reserved for #8, keeps them. The reset flag does not run, because no applied migration
+changes.
 
 ### The release day
 
@@ -60,12 +68,17 @@ Topic(content, status, topicId)
 - `TopicDraftRule.gaps(content)` returns the draft fields that fail. `TopicPublishRule.gaps(content)`
   adds the publish fields. A use case accepts content when the set is empty. The names follow the
   rule guide in `docs/server/001-structure.md`.
-- Create makes a draft. Update reads the topic, applies the rule of its status, and keeps the
-  status. `PublishTopicUseCase` applies the publish rule, writes the content and the status in one
-  transaction, and returns `Published`, `Invalid(gaps)`, `NotFound` or `DateTaken`.
+- Create makes a draft. Update reads the topic, applies the rule of its status, and writes
+  `where topic_id = ? and status = <the status it read>`. No row written for a topic that exists
+  means a publish came between the read and the write. The status only moves from draft to
+  published, so the use case runs once more with the publish rule, and that run cannot mismatch.
+- `PublishTopicUseCase` applies the publish rule, writes the content and the status in one
+  transaction, and returns `Published`, `Invalid(gaps)`, `NotFound` or `DateTaken`. A publish of a
+  published topic is its save: the same rule, the same write, and the status stays.
 - `TopicCalendar` builds the rows and To do from the topics, the character names, and today. The
-  range is today and the 13 days after it. `GetTopicCalendarUseCase` reads the topics, the
-  characters and the clock.
+  range is today and the 13 days after it. A draft whose date has a published topic is not in To
+  do: its Publish would answer 409. `GetTopicCalendarUseCase` reads the topics, the characters and
+  the clock.
 - Each topic answer carries the release state and the publish gaps, so the Topic screen shows them
   without a second rule in the client.
 
@@ -83,6 +96,13 @@ Topic(content, status, topicId)
 Choice: 1. Only `GET /admin/characters` carries the count, as `CharacterSummaryDto(characterId,
 profile, topicCount)`. One character, create and update keep `CharacterDto`. Both consumers, the
 Characters list and the interlocutor choice, read the list.
+
+- `GetCharacterSummariesUseCase` serves the route and calls the port. `GetCharactersUseCase` stays
+  without counts, so the calendar reads the names with no count query.
+- `docs/server/001-structure.md` allows a feature to use another feature only through its use
+  cases and model types. Part [5/18] adds the port rule there: the feature that needs the data owns
+  the interface in its `usecase/`; the feature that holds the data implements it and binds it in
+  its Koin module; the dependency between the Gradle modules keeps its direction.
 
 ### The DTOs
 
@@ -134,6 +154,9 @@ The admin app maps each field and status to its Russian copy and tone. It derive
 - The calendar shows 14 days ahead, and To do lists drafts from today on. A past draft stays in All
   topics only.
 - Publish is disabled for a new topic: a topic gets its identifier at the first save.
+- A publish of a published topic acts as its save. Options were 409, which makes the API reject a
+  call that changes nothing, and 400.
+- A draft on a date that has a published topic is not in To do. All topics still shows it.
 - The topic count counts drafts too.
 
 ### Deliberate differences from the canvas

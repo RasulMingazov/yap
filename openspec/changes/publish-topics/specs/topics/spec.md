@@ -56,6 +56,12 @@ a date, and SHALL change nothing then.
   24 October
 - **THEN** the server rejects the publish and the draft stays a draft
 
+#### Scenario: A save onto a taken date
+
+- **WHEN** published topics have the dates 24 and 25 October, and the owner saves the topic of
+  25 October with the date 24 October
+- **THEN** the server rejects the save and the topic keeps the date 25 October
+
 #### Scenario: Two publishes at once
 
 - **WHEN** two drafts have the date 24 October, and the owner publishes both at the same time
@@ -87,7 +93,8 @@ topic of the day.
 ### Requirement: Saving a published topic
 
 A save of a published topic SHALL keep it published. The server SHALL apply the publish rule to
-it, and SHALL keep the stored topic when the rule rejects the save.
+it, and SHALL keep the stored topic when the rule rejects the save. A publish of a topic that is
+already published SHALL act as its save.
 
 #### Scenario: A save that empties a field
 
@@ -98,6 +105,11 @@ it, and SHALL keep the stored topic when the rule rejects the save.
 
 - **WHEN** the owner saves a published topic with a new title and every field
 - **THEN** the server stores the title and the topic stays published
+
+#### Scenario: Publish of a published topic
+
+- **WHEN** the admin app publishes a topic that is already published, with a new title
+- **THEN** the server applies the publish rule, stores the title, and the topic stays published
 
 ### Requirement: The calendar
 
@@ -130,8 +142,8 @@ be complete when its task, Pass when and outcome are filled.
 ### Requirement: The To do of the calendar
 
 The calendar SHALL have To do: each day from today to the 13th day after today without a topic,
-and each draft with today's date or a later date, in date order. A draft in To do SHALL name the
-fields that publishing still needs.
+and each draft with today's date or a later date whose date has no published topic, in date order.
+A draft in To do SHALL name the fields that publishing still needs.
 
 #### Scenario: To do
 
@@ -139,6 +151,11 @@ fields that publishing still needs.
   the date 25 October misses Steps
 - **THEN** To do lists the empty days 23 and 24 October, the draft of 25 October with Steps, and
   the empty days from 26 October to 5 November, and does not list the draft of 22 October
+
+#### Scenario: A draft on a date with a published topic
+
+- **WHEN** a published topic and a draft have the date 24 October
+- **THEN** To do does not list the draft, and All topics shows both
 
 ### Requirement: To do
 
@@ -347,6 +364,11 @@ SHALL have New topic.
 - **WHEN** the owner returns to Topics from another screen
 - **THEN** the admin app shows the calendar that it has at once, and replaces it with the calendar
   from the server when the server answers
+
+#### Scenario: The calendar does not update
+
+- **WHEN** the admin app shows a calendar and cannot load it again
+- **THEN** it keeps the calendar
 
 #### Scenario: No topics yet
 

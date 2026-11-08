@@ -25,11 +25,17 @@ drafts early, before a learner gets an empty day (#8).
 
 Out of scope:
 
-- What the mobile app shows for the day: the mobile issues.
-- Unpublish: a later issue.
 - Try on the Topic screen: #15. The To do note of a ready draft does not mention Try until #15.
-- The To do count in the sidebar: a later issue.
-- Delete of a topic: out of scope.
+- The items under Proposals: no issue owns them yet.
+
+## Proposals
+
+Out of scope, with no issue yet. The owner decides whether to open one.
+
+- What the mobile app shows for the day.
+- Unpublish.
+- The To do count in the sidebar, as the canvas shows it.
+- Delete of a topic.
 
 ## Capabilities
 
@@ -47,7 +53,8 @@ None.
 
 - `server/feature-topics`: `V5__topic_status.sql`, the status, the publish rule, the calendar, the
   publish use case and routes. It implements the topic count port of `feature-characters`.
-- `server/feature-characters`: the port for the topic counts and the characters list with counts.
+- `server/feature-characters`: the port for the topic counts, the summaries use case for the list,
+  and the port rule in `docs/server/001-structure.md`.
 - `contract-admin`: the calendar, the status, the field and the rejection DTOs, the character
   summary DTO, and two new fields in `TopicDto`.
 - `admin`: the calendar screen, Publish on the Topic screen, the counts, a `warn` color token, and
