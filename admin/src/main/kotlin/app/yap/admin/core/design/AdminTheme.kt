@@ -23,6 +23,7 @@ internal object AdminTheme {
         val ok = Color(0xFF1F7A3F)
         val selected = Color(0xFFEDEDF0)
         val side = Color(0xFFFAFAFA)
+        val transparent = Color.Transparent
     }
 
     object Sizes {
@@ -44,8 +45,8 @@ internal object AdminTheme {
         val cornerRadius = 6.dp
         val dateColumnWidth = 110.dp
         val dialogPadding = 24.dp
-        val focusBorder = 2.dp
         val fieldWidth = 360.dp
+        val focusBorder = 2.dp
         val gap = 12.dp
         val hintHorizontalPadding = 14.dp
         val hintVerticalPadding = 12.dp

@@ -22,7 +22,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -201,7 +200,7 @@ private fun LevelRow(
     val onFormChange: (LevelForm) -> Unit = { changed -> onEvent(Event.FormChanged(row.code, changed)) }
     Row(
         modifier = Modifier
-            .background(if (row.isChosen) AdminTheme.Colors.fill else Color.Transparent)
+            .background(if (row.isChosen) AdminTheme.Colors.fill else AdminTheme.Colors.transparent)
             .clickable(role = Role.Button) { onEvent(Event.LevelClicked(row.code)) },
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -229,7 +228,7 @@ private fun LevelRow(
                 if (row.isRatingFromShown) {
                     CellTextField(
                         enabled = enabled,
-                        label = "Рейтинг от ${row.label}",
+                        label = row.ratingFromLabel,
                         onValueChange = { ratingFrom -> onFormChange(form.copy(ratingFrom = ratingFrom)) },
                         value = form.ratingFrom,
                         modifier = Modifier.width(AdminTheme.Sizes.cellFieldWidth),
@@ -240,7 +239,7 @@ private fun LevelRow(
         TableCell(modifier = Modifier.width(AdminTheme.Sizes.levelColumnWidth)) {
             CellTextField(
                 enabled = enabled,
-                label = "Лексика ${row.label}",
+                label = row.vocabularyLabel,
                 onValueChange = { vocabulary -> onFormChange(form.copy(vocabulary = vocabulary)) },
                 value = form.vocabulary,
                 modifier = Modifier.fillMaxWidth(),
@@ -249,7 +248,7 @@ private fun LevelRow(
         TableCell(modifier = Modifier.width(AdminTheme.Sizes.levelWordsColumnWidth)) {
             CellTextField(
                 enabled = enabled,
-                label = "Слов в фразе ${row.label}",
+                label = row.maxWordsLabel,
                 onValueChange = { maxWords -> onFormChange(form.copy(maxWords = maxWords)) },
                 value = form.maxWords,
                 modifier = Modifier.width(AdminTheme.Sizes.cellFieldWidth),

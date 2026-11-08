@@ -22,11 +22,11 @@ internal fun <T> AdminSelect(
     var isExpanded by remember { mutableStateOf(false) }
     Box {
         PopupButton(
+            height = AdminTheme.Sizes.cellFieldHeight,
             enabled = enabled,
             onClick = { isExpanded = true },
             placeholder = placeholder,
             text = value?.let(label),
-            height = AdminTheme.Sizes.cellFieldHeight,
         )
         DropdownMenu(
             expanded = isExpanded,

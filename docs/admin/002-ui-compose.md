@@ -45,6 +45,8 @@ system of the mobile app.
   the loader, the toolbar and the body. Do not style a Material component in a screen.
 - A text field keeps its label inside the field. The owner chose this over the label outside the
   field on the canvas. The canvas changes with the next design work on these screens.
+- A table cell field (`CellTextField`) has no label inside. It takes its label from the column
+  header, and its content description names the column and the row.
 
 ## Verification
 
