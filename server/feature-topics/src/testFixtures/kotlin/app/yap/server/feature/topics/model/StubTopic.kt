@@ -1,7 +1,10 @@
 package app.yap.server.feature.topics.model
 
 import app.yap.server.feature.characters.model.StubCharacter
+import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneOffset
 import kotlin.uuid.Uuid
 
 object StubTopic {
@@ -16,6 +19,7 @@ object StubTopic {
     const val TASK = "Order a drink."
     const val TITLE = "At the cafe"
     const val TRANSLATION = "Привет! Что вам предложить?"
+    val CLOCK: Clock = Clock.fixed(Instant.parse("2026-10-22T22:30:00Z"), ZoneOffset.UTC)
     val RELEASE_DATE: LocalDate = LocalDate.of(2026, 10, 24)
     val TOPIC_ID = TopicId(Uuid.parse("7d0c2b8e-4f31-4a6b-9c55-3e1f8a2d6b90"))
 

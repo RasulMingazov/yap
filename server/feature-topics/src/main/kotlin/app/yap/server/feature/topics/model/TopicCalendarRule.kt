@@ -86,9 +86,6 @@ class TopicCalendarRule(
         val days = emptyDays.map(Todo::EmptyDay)
         return (drafts + days).sortedBy { todo -> todo.date }
     }
-
-    private val Topic.date: LocalDate
-        get() = requireNotNull(content.releaseDate) { "A stored topic has a release date" }
 }
 
 private const val DAYS = 14
