@@ -38,6 +38,7 @@ import app.yap.admin.core.design.Note
 import app.yap.admin.core.design.PrimaryButton
 import app.yap.admin.core.design.ScreenBody
 import app.yap.admin.core.design.ScreenToolbar
+import app.yap.admin.core.design.SecondaryButton
 import app.yap.admin.core.design.SectionHeader
 import app.yap.admin.core.design.TableCell
 import app.yap.admin.core.design.TableHeaderCell
@@ -82,6 +83,13 @@ internal fun LevelsContent(
             is UiState.Content -> {
                 LevelsToolbar {
                     ToolbarSaveAction(status = uiState.saveStatus) {
+                        if (uiState.isRefreshShown) {
+                            SecondaryButton(
+                                enabled = true,
+                                onClick = { onEvent(Event.RefreshClicked) },
+                                text = "Обновить",
+                            )
+                        }
                         PrimaryButton(
                             enabled = uiState.isSaveEnabled,
                             onClick = { onEvent(Event.SaveClicked) },
@@ -136,6 +144,13 @@ private fun LevelsForm(
                 content = content,
                 onEvent = onEvent,
             )
+            content.modelProgress?.let { progress -> Note(text = progress) }
+            content.modelError?.let { message ->
+                LoadError(
+                    message = message,
+                    onRetryClick = { onEvent(Event.ModelsRetryClicked) },
+                )
+            }
             Note(text = TABLE_NOTE)
         }
         BlockSection(
@@ -172,6 +187,10 @@ private fun LevelTable(
             )
             TableHeaderCell(
                 text = "Идиомы",
+                modifier = Modifier.width(AdminTheme.Sizes.levelColumnWidth),
+            )
+            TableHeaderCell(
+                text = "Модель",
                 modifier = Modifier.weight(1f),
             )
         }
@@ -234,6 +253,7 @@ private fun LevelRow(
                         modifier = Modifier.width(AdminTheme.Sizes.cellFieldWidth),
                     )
                 }
+                row.ratingNote?.let { note -> Note(text = note) }
             }
         }
         TableCell(modifier = Modifier.width(AdminTheme.Sizes.levelColumnWidth)) {
@@ -254,7 +274,7 @@ private fun LevelRow(
                 modifier = Modifier.width(AdminTheme.Sizes.cellFieldWidth),
             )
         }
-        TableCell(modifier = Modifier.weight(1f)) {
+        TableCell(modifier = Modifier.width(AdminTheme.Sizes.levelColumnWidth)) {
             AdminSelect(
                 enabled = enabled,
                 label = { option -> option.label },
@@ -262,6 +282,16 @@ private fun LevelRow(
                 options = content.idioms,
                 placeholder = "Выберите",
                 value = row.idioms,
+            )
+        }
+        TableCell(modifier = Modifier.weight(1f)) {
+            AdminSelect(
+                enabled = content.isModelChoiceEnabled,
+                label = { option -> option.label },
+                onSelect = { option -> onFormChange(form.copy(model = option.model)) },
+                options = content.models,
+                placeholder = "Выберите",
+                value = row.model,
             )
         }
     }
@@ -304,7 +334,8 @@ private fun BlockSection(
 private const val BLOCK_LINES = 7
 
 private const val TABLE_NOTE =
-    "Одна таблица на все темы и всех персонажей. Нажмите на уровень, чтобы открыть его блок промпта."
+    "Одна таблица на все темы и всех персонажей. Нажмите на уровень, чтобы открыть его блок промпта. " +
+        "Модель уровня работает для реплики персонажа и подсказок, «по умолчанию» — модель задачи из «Моделей»."
 
 private val BLOCK_NOTE = buildAnnotatedString {
     append("Сервер подставляет этот блок вместо ")
