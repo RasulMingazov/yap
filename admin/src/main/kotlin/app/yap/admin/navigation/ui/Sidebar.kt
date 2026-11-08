@@ -62,6 +62,12 @@ internal fun Sidebar(
                 onScreenClick = onScreenClick,
                 screen = Screen.Levels,
             )
+            SidebarItem(
+                current = current,
+                label = "Промпты",
+                onScreenClick = onScreenClick,
+                screen = Screen.Prompts,
+            )
         }
         SidebarGroup(title = "Настройки") {
             SidebarItem(
@@ -93,13 +99,13 @@ private fun Brand() {
         Text(
             text = "Yap",
             color = AdminTheme.Colors.ink,
-            style = AdminTheme.Type.brand,
+            style = AdminTheme.Type.heading,
             fontWeight = FontWeight.SemiBold,
         )
         Text(
             text = "admin",
             color = AdminTheme.Colors.muted,
-            style = AdminTheme.Type.brand,
+            style = AdminTheme.Type.heading,
         )
     }
 }

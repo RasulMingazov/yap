@@ -11,6 +11,8 @@ import app.yap.admin.feature.characters.presentation.ui.CharacterScreen
 import app.yap.admin.feature.characters.presentation.ui.CharactersScreen
 import app.yap.admin.feature.levels.presentation.LevelsViewModel
 import app.yap.admin.feature.levels.presentation.ui.LevelsScreen
+import app.yap.admin.feature.prompts.presentation.PromptsViewModel
+import app.yap.admin.feature.prompts.presentation.ui.PromptsScreen
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ui.ServerScreen
 import app.yap.admin.feature.topics.domain.TopicId
@@ -28,6 +30,7 @@ internal fun AdminShell(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: CharactersViewModel,
     levelsViewModel: LevelsViewModel,
+    promptsViewModel: PromptsViewModel,
     serverViewModel: ServerViewModel,
     topicViewModel: (TopicId?) -> TopicViewModel,
     topicsViewModel: TopicsViewModel,
@@ -47,6 +50,7 @@ internal fun AdminShell(
                 charactersViewModel = charactersViewModel,
                 levelsViewModel = levelsViewModel,
                 onScreenClick = onScreenClick,
+                promptsViewModel = promptsViewModel,
                 screen = state.screen,
                 serverViewModel = serverViewModel,
                 topicViewModel = topicViewModel,
@@ -63,6 +67,7 @@ private fun ScreenContent(
     charactersViewModel: CharactersViewModel,
     levelsViewModel: LevelsViewModel,
     onScreenClick: (Screen) -> Unit,
+    promptsViewModel: PromptsViewModel,
     screen: Screen,
     serverViewModel: ServerViewModel,
     topicViewModel: (TopicId?) -> TopicViewModel,
@@ -79,6 +84,7 @@ private fun ScreenContent(
             viewModel = charactersViewModel,
         )
         is Screen.Levels -> LevelsScreen(viewModel = levelsViewModel)
+        is Screen.Prompts -> PromptsScreen(viewModel = promptsViewModel)
         is Screen.Server -> ServerScreen(viewModel = serverViewModel)
         is Screen.Topic -> TopicScreen(
             onBackClick = { onScreenClick(Screen.Topics) },
