@@ -258,9 +258,9 @@ internal class ScreenCaptureTest {
                 ),
             ),
         )
-        val CONNECTED_LABEL = ServerUiStateMapper
-            .map(ServerViewModel.DataState(connection = ServerConnection.Connected(environment = "staging")))
-            .serverLabel
+        val CONNECTED_LABEL = ServerUiStateMapper(
+            ServerViewModel.DataState(connection = ServerConnection.Connected(environment = "staging")),
+        ).serverLabel
         val GUEST_TOPIC = StubTopic.stubTopic(
             content = StubTopic.stubContent(
                 interlocutor = Interlocutor.Guest(
