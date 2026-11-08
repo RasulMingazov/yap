@@ -58,6 +58,8 @@ None.
   publish use case and routes. It implements the topic count port of `feature-characters`.
 - `server/feature-characters`: the port for the topic counts, the summaries use case for the list,
   and the port rule in `docs/server/001-structure.md`.
+- `docs/server/001-structure.md`: the DTO mapper maps 1:1; a rule in `model/` normalizes the text
+  input (the readability audit of 2026-11-08).
 - `contract-admin`: the calendar, the status, the field and the rejection DTOs, the character
   summary DTO, and two new fields in `TopicDto`.
 - `admin`: the calendar screen, Publish on the Topic screen, the counts, a `warn` color token, and

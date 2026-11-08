@@ -57,8 +57,9 @@ changes.
 The day starts at midnight in `Europe/Moscow`. Moscow time is UTC+3 all year, with no daylight
 saving, since 26 October 2014 [3]. The learners and the server are in Russia. Options were UTC (the
 day changes at 03:00 for the learners) and a setting (no second time zone exists). `feature-topics`
-holds the zone as a constant beside the release rule and binds a `java.time.Clock` [4] with
-`Clock.systemUTC()`; `ReleaseState.today(clock)` reads the Moscow day. Tests bind a fixed clock.
+holds the zone as a constant in `model/ReleaseDay.kt` and binds a `java.time.Clock` [4] with
+`Clock.systemUTC()`; `moscowToday(clock)` in the same file reads the Moscow day. The `ReleaseState`
+enum holds only its values and `of`. Tests bind a fixed clock.
 
 ### The model in `feature-topics`
 
@@ -71,7 +72,11 @@ TopicGap = Missing(field) | IncompleteSteps(numbers) | PastDate | DateTaken
 Topic(content, status, topicId)
 ```
 
-- `TopicDraftRule.gaps(content)` returns the draft gaps. `TopicPublishRule.gaps(content, stored,
+- The use cases normalize the content first: `TopicContent.normalized()` trims every text and
+  drops the empty steps. The DTO mapper maps the fields 1:1.
+- `TopicDraftRule.gaps(content)` returns the draft gaps. A duration is a gap when it is set and
+  below 1: `durationMinutes != null && durationMinutes < 1`. A zero duration stays
+  `Missing(DURATION)`. `TopicPublishRule.gaps(content, stored,
   today)` adds the publish gaps. `Missing(STEPS)` means no step; `IncompleteSteps` holds the
   1-based numbers of the steps that miss a field. `PastDate` comes for a draft with a date before
   today, and for a published topic whose new date is before today; a stored past date of a
@@ -146,6 +151,7 @@ The admin app maps each field and status to its Russian copy and tone. It derive
 
 - `TopicsViewModel` loads the calendar on `Event.Opened` and keeps it on a failed reload, as now.
   `TopicsUiStateMapper` builds the To do entries and the rows; its only public function is `invoke`.
+  The shapes of the view models follow «Readability rules» below.
 - Create passes its date: `Screen.Topic(topicId, releaseDate)` in the navigation, and the
   `TopicViewModel` factory takes the date. `Main.kt` resolves the view models as now.
 - `TopicViewModel` gets `PublishClicked`, `PublishConfirmed`, `SaveConfirmed` and
@@ -169,6 +175,42 @@ The admin app maps each field and status to its Russian copy and tone. It derive
 - `AdminTheme.Colors` gets `warn = #9A5200` from the canvas, and `Status.Tone` gets `WARNING`.
 - `TopicCountText` in `feature/characters/presentation` picks the Russian form: 1 тема, 2 темы,
   5 тем. `feature/topics` already depends on `feature/characters`.
+
+### Readability rules
+
+The owner approved the readability audit of 2026-11-08. The open parts follow it. The behaviour
+does not change.
+
+- `DataState` holds raw facts only (`docs/admin/001-view-models.md`), as `CharactersViewModel`
+  does. The mapper decides every screen state.
+
+  ```text
+  TopicsViewModel.DataState(calendar: TopicCalendar?, isLoadFailed, isLoading)
+  TopicViewModel.DataState(cast: List<Character>?, form: TopicContent, guestDescription,
+      isLoadFailed, isSaving, saveResult: SaveTopicResult?, topic: Topic?, topicId: TopicId?)
+  ```
+
+  No `Load` enum, no `SaveStatus`, no stored `LoadTopicsResult`, no `loaded()`, `saved()` or
+  `withForm()`. The view model sets the facts in named private functions. The private function
+  `SaveTopicResult?.keptAfterEdit()` says that a rejected save stays until the next click and that
+  Saved clears at an edit. [21/26] slice 3 adds `question`, `isPublishing` and `publishResult`;
+  [22/26] adds `isEditedAfterAnswer`.
+- The Topic form sends one `Event` per field: `TitleChanged`, `DescriptionChanged`,
+  `SettingChanged`, `RoleChanged`, `OpeningEnglishChanged`, `OpeningTranslationChanged`,
+  `StepTaskChanged`, `StepPassWhenChanged`, `StepOutcomeChanged`, beside `DurationChanged`,
+  `ReleaseDatePicked`, `InterlocutorChosen`, `GuestDescriptionChanged` and `AddStepClicked`. The
+  view model does the `copy`. `UiState.Content` carries `Fields` with the texts, not the domain
+  `TopicContent`. The Character screen is a separate refactor.
+- The admin loads return the shared `LoadResult<T>`: `LoadResult<TopicCalendar>` and
+  `LoadResult<Topic>`. `LoadTopicResult` and `LoadTopicsResult` go away.
+- The server DTO mappers map the fields 1:1. Normalizing is a rule in `model/`
+  (`TopicContent.normalized()`), and the use cases apply it before the other rules.
+  `docs/server/001-structure.md` changes its mapper rule in [8/26] slice 1. The character, level
+  and prompt mappers still trim; they follow in a separate change.
+- «Today in Moscow» is its own function, `moscowToday(clock)`, not a member of the `ReleaseState`
+  enum.
+- A zero duration stays `Missing(DURATION)`. A separate gap for it would change the spec and is
+  not part of this change.
 
 ### Owner decisions to check
 
