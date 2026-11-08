@@ -12,6 +12,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -47,6 +48,7 @@ internal class RemoteCharacterRepositoryTest {
                 "${StubServerSettings.ADDRESS}/admin/characters",
                 "Bearer ${StubServerSettings.KEY}",
                 Json.parseToJsonElement(PROFILE_JSON),
+                ContentType.Application.Json,
             ),
             actual = listOf(
                 result,
@@ -54,6 +56,7 @@ internal class RemoteCharacterRepositoryTest {
                 request.url.toString(),
                 request.headers[HttpHeaders.Authorization],
                 Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
+                request.body.contentType,
             ),
         )
     }
@@ -66,8 +69,12 @@ internal class RemoteCharacterRepositoryTest {
 
         val request = env.engine.requestHistory.single()
         assertEquals(
-            expected = HttpMethod.Put to "${StubServerSettings.ADDRESS}/admin/characters/${StubCharacter.CHARACTER_ID}",
-            actual = request.method to request.url.toString(),
+            expected = listOf(
+                HttpMethod.Put,
+                "${StubServerSettings.ADDRESS}/admin/characters/${StubCharacter.CHARACTER_ID}",
+                ContentType.Application.Json,
+            ),
+            actual = listOf(request.method, request.url.toString(), request.body.contentType),
         )
     }
 

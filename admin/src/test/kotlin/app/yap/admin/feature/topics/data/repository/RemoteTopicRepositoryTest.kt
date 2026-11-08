@@ -15,6 +15,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -76,6 +77,7 @@ internal class RemoteTopicRepositoryTest {
                 "${StubServerSettings.ADDRESS}/admin/topics",
                 "Bearer ${StubServerSettings.KEY}",
                 Json.parseToJsonElement(CONTENT_JSON),
+                ContentType.Application.Json,
             ),
             actual = listOf(
                 result,
@@ -83,6 +85,7 @@ internal class RemoteTopicRepositoryTest {
                 request.url.toString(),
                 request.headers[HttpHeaders.Authorization],
                 Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
+                request.body.contentType,
             ),
         )
     }
@@ -99,8 +102,9 @@ internal class RemoteTopicRepositoryTest {
                 SaveTopicResult.Saved(StubTopic.stubTopic()),
                 HttpMethod.Put,
                 "${StubServerSettings.ADDRESS}/admin/topics/${StubTopic.TOPIC_ID}",
+                ContentType.Application.Json,
             ),
-            actual = listOf(result, request.method, request.url.toString()),
+            actual = listOf(result, request.method, request.url.toString(), request.body.contentType),
         )
     }
 

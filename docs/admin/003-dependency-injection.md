@@ -6,6 +6,7 @@ adds.
 
 ```kotlin
 internal fun featureCharactersModule(): Module = module {
+    single { get<Ktorfit>().createCharacterApi() }
     singleOf(::RemoteCharacterRepository) { bind<CharacterRepository>() }
 
     factoryOf(::DefaultGetCharactersUseCase) { bind<GetCharactersUseCase>() }

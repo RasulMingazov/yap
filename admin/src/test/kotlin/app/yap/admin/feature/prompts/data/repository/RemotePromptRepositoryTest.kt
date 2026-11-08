@@ -16,6 +16,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -64,6 +65,7 @@ internal class RemotePromptRepositoryTest {
                 "$PROMPTS_URL/TOPIC_REPLY/versions",
                 "Bearer ${StubServerSettings.KEY}",
                 Json.parseToJsonElement("""{"text": "${StubPrompt.TEXT}"}"""),
+                ContentType.Application.Json,
             ),
             actual = listOf(
                 result,
@@ -71,6 +73,7 @@ internal class RemotePromptRepositoryTest {
                 request.url.toString(),
                 request.headers[HttpHeaders.Authorization],
                 Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
+                request.body.contentType,
             ),
         )
     }

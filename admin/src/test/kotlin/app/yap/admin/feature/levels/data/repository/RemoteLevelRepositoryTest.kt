@@ -13,6 +13,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -71,6 +72,7 @@ internal class RemoteLevelRepositoryTest {
                 "${StubServerSettings.ADDRESS}/admin/levels",
                 "Bearer ${StubServerSettings.KEY}",
                 Json.parseToJsonElement("""[{"code": "B1", "settings": $SETTINGS_JSON}]"""),
+                ContentType.Application.Json,
             ),
             actual = listOf(
                 result,
@@ -78,6 +80,7 @@ internal class RemoteLevelRepositoryTest {
                 request.url.toString(),
                 request.headers[HttpHeaders.Authorization],
                 Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
+                request.body.contentType,
             ),
         )
     }
