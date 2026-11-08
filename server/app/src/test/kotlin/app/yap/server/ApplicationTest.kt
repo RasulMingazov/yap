@@ -112,6 +112,26 @@ internal class ApplicationTest {
     }
 
     @Test
+    fun `GIVEN no admin key WHEN reading the topic calendar THEN the call is unauthorized`() = testApplication {
+        val env = Environment()
+        application { env.install(this) }
+
+        val response = client.get("/admin/topics/calendar")
+
+        assertEquals(expected = HttpStatusCode.Unauthorized, actual = response.status)
+    }
+
+    @Test
+    fun `GIVEN no admin key WHEN publishing a topic THEN the call is unauthorized`() = testApplication {
+        val env = Environment()
+        application { env.install(this) }
+
+        val response = client.post("/admin/topics/at-the-cafe/publish")
+
+        assertEquals(expected = HttpStatusCode.Unauthorized, actual = response.status)
+    }
+
+    @Test
     fun `GIVEN a body that is not a profile WHEN creating a character THEN the server answers 400`() = testApplication {
         val env = Environment()
         application { env.install(this) }
