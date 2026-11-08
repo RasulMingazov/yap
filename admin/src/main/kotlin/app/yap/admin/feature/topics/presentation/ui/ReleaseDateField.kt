@@ -2,17 +2,19 @@ package app.yap.admin.feature.topics.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.core.design.PopupButton
 import app.yap.admin.core.design.PrimaryButton
@@ -20,6 +22,7 @@ import app.yap.admin.core.design.SecondaryButton
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.util.Locale
 
 @Composable
 internal fun ReleaseDateField(
@@ -50,7 +53,7 @@ internal fun ReleaseDateField(
             date = date,
             onDatePick = { picked ->
                 isPickerOpen = false
-                onDatePick(picked)
+                if (picked != date) onDatePick(picked)
             },
             onDismiss = { isPickerOpen = false },
         )
@@ -64,7 +67,12 @@ private fun ReleaseDatePicker(
     onDatePick: (LocalDate) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val state = rememberDatePickerState(initialSelectedDateMillis = date?.toUtcMillis())
+    val state = remember {
+        DatePickerState(
+            locale = RUSSIAN,
+            initialSelectedDateMillis = date?.toUtcMillis(),
+        )
+    }
     val selected = state.selectedDateMillis
     DatePickerDialog(
         onDismissRequest = onDismiss,
@@ -79,11 +87,26 @@ private fun ReleaseDatePicker(
             SecondaryButton(
                 enabled = true,
                 onClick = onDismiss,
-                text = "Отмена",
+                text = "Отменить",
             )
         },
     ) {
-        DatePicker(state = state)
+        DatePicker(
+            state = state,
+            title = null,
+            headline = {
+                Text(
+                    text = "Дата выхода",
+                    modifier = Modifier.padding(
+                        start = AdminTheme.Sizes.dialogPadding,
+                        top = AdminTheme.Sizes.dialogPadding,
+                        end = AdminTheme.Sizes.gap,
+                        bottom = AdminTheme.Sizes.gap,
+                    ),
+                )
+            },
+            showModeToggle = false,
+        )
     }
 }
 
@@ -95,3 +118,5 @@ private fun Long.toUtcDate(): LocalDate = Instant
     .ofEpochMilli(this)
     .atOffset(ZoneOffset.UTC)
     .toLocalDate()
+
+private val RUSSIAN = Locale.forLanguageTag("ru")

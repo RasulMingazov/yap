@@ -60,16 +60,16 @@ internal class TopicViewModel(
         newsChannel.close()
     }
 
+    private fun onDurationChanged(text: String) {
+        if (text.length > MAX_DURATION_DIGITS || !text.all(Char::isDigit)) return
+        edit { form -> form.copy(durationMinutes = text.toIntOrNull()) }
+    }
+
     private fun edit(transform: (TopicContent) -> TopicContent) = dataState.update { state ->
         state.copy(
             form = transform(state.form),
             saveStatus = state.saveStatus.takeIf { status -> status == SaveStatus.REJECTED },
         )
-    }
-
-    private fun onDurationChanged(text: String) {
-        if (text.length > MAX_DURATION_DIGITS || !text.all(Char::isDigit)) return
-        edit { form -> form.copy(durationMinutes = text.toIntOrNull()) }
     }
 
     private fun onRetryClicked() {
