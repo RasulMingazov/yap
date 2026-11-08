@@ -75,15 +75,15 @@ internal class LevelsViewModelTest {
     fun `GIVEN a filled form WHEN the save succeeds THEN the table shows the server ranges`() = runTest(dispatcher) {
         val env = Environment()
         advanceUntilIdle()
-        val saved = listOf(StubLevel.stubLevel(range = StubLevel.stubRange(to = null)))
+        val saved = StubLevel.stubLevels(range = StubLevel.stubRange(to = null))
         env.saveLevelsUseCase.invokeCall.returns(SaveLevelsResult.Saved(saved))
 
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
         assertEquals(
-            expected = listOf("1050+") to Status(text = "Сохранено", tone = Status.Tone.SUCCESS),
-            actual = env.content().rows.map { row -> row.range } to env.content().saveStatus,
+            expected = "1050+" to Status(text = "Сохранено", tone = Status.Tone.SUCCESS),
+            actual = env.content().rows.first().range to env.content().saveStatus,
         )
     }
 
@@ -114,7 +114,7 @@ internal class LevelsViewModelTest {
             advanceUntilIdle()
 
             env.saveLevelsUseCase.invokeCall.notCalled()
-            assertEquals(expected = "Проверьте числа: Без рейтинга", actual = env.content().saveStatus?.text)
+            assertEquals(expected = "Проверьте число в «Слов в фразе»: Без рейтинга", actual = env.content().saveStatus?.text)
         }
 
     @Test
@@ -129,7 +129,43 @@ internal class LevelsViewModelTest {
             advanceUntilIdle()
 
             env.saveLevelsUseCase.invokeCall.notCalled()
-            assertEquals(expected = "Проверьте числа: A2", actual = env.content().saveStatus?.text)
+            assertEquals(expected = "Проверьте число в «Рейтинг»: A2", actual = env.content().saveStatus?.text)
+        }
+
+    @Test
+    fun `GIVEN an empty word count WHEN saving THEN it asks to fill every level and sends nothing`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            advanceUntilIdle()
+            val form = LevelForm.of(StubLevel.stubSettings())
+
+            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = form.copy(maxWords = "")))
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.saveLevelsUseCase.invokeCall.notCalled()
+            assertEquals(
+                expected = "Заполните все уровни, рейтинг должен расти от A1 к C2",
+                actual = env.content().saveStatus?.text,
+            )
+        }
+
+    @Test
+    fun `GIVEN a level without idioms WHEN saving THEN it asks to fill every level and sends nothing`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            advanceUntilIdle()
+            val form = LevelForm.of(StubLevel.stubSettings())
+
+            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.C1, form = form.copy(idioms = null)))
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.saveLevelsUseCase.invokeCall.notCalled()
+            assertEquals(
+                expected = "Заполните все уровни, рейтинг должен расти от A1 к C2",
+                actual = env.content().saveStatus?.text,
+            )
         }
 
     @Test
@@ -182,6 +218,22 @@ internal class LevelsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(expected = LevelCode.entries, actual = env.content().rows.map { row -> row.code })
+    }
+
+    @Test
+    fun `GIVEN a server answer without C2 WHEN Levels opens THEN it shows the load error`() = runTest(dispatcher) {
+        val env = Environment()
+        val levels = StubLevel
+            .stubLevels()
+            .filterNot { level -> level.code == LevelCode.C2 }
+        env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(levels))
+
+        advanceUntilIdle()
+
+        assertEquals(
+            expected = UiState.Error(message = "Не удалось загрузить уровни"),
+            actual = env.viewModel.uiState.value,
+        )
     }
 
     private class Environment(

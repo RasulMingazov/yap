@@ -64,6 +64,11 @@ style, unless #10 added it first), `feature/levels/presentation/ui/LevelsScreen.
 `navigation/ui/AdminShell.kt` (hot), `admin/src/test/.../ScreenCaptureTest.kt`, and the navigation
 tests. #7 and #10 change the same navigation and design files.
 
+Slice 1 of this part holds the decisions of the Levels UX review that change the state:
+`feature/levels/domain/LevelCode.kt`, `LevelsViewModel`, `LevelsUiStateMapper`, `StubLevel` and
+their tests (about 190 lines). Slice 2 holds `AdminSelect`, the mono style, `LevelsScreen` and the
+navigation files. Slice 3 holds `ScreenCaptureTest.kt` and the images.
+
 - [ ] 6.1 Add `AdminSelect`, the mono style and the Levels screen with Save in the toolbar; verify with `./gradlew build` and the images of the screen capture for each state
 - [ ] 6.2 Add the sidebar group Rules with Levels between Content and Settings; verify with the navigation view-model test for Levels
 - [ ] 6.3 Run the admin app against a server with a database; verify a first save of seven levels, a rejected save and the levels after a server restart
