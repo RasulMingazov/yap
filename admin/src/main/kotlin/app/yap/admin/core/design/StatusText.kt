@@ -17,6 +17,7 @@ internal fun StatusText(
             Status.Tone.ERROR -> AdminTheme.Colors.bad
             Status.Tone.MUTED -> AdminTheme.Colors.muted
             Status.Tone.SUCCESS -> AdminTheme.Colors.ok
+            Status.Tone.WARNING -> AdminTheme.Colors.warn
         },
         style = AdminTheme.Type.sub,
     )

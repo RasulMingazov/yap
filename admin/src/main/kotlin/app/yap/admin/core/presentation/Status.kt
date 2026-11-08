@@ -9,5 +9,6 @@ internal data class Status(
         ERROR,
         MUTED,
         SUCCESS,
+        WARNING,
     }
 }

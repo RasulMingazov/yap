@@ -92,9 +92,15 @@ m8, before the screen. Split of the view model: this part holds the state types 
 Files: `am/presentation/ModelsViewModel.kt` (the nested `DataState`, `UiState`, `Event` and `News`
 only), `am/presentation/ModelsUiStateMapper.kt`, `am/presentation/ModelTaskTitles.kt` (it calls
 `PromptKey.title()` and `PromptKey.usage()` of `admin/.../feature/prompts/presentation/PromptTitles.kt`),
-and `ModelsUiStateMapperTest`.
+and `ModelsUiStateMapperTest`. `Event` and `News` move to part 8 with `onEvent`, their first
+consumer. The warning tone (`Status.Tone.WARNING`, `AdminTheme.Colors.warn`, `StatusText`) comes
+with Not connected.
 
-- [ ] 7.1 Add the Models UI state and `ModelsUiStateMapper`; verify with the mapper tests for the loader while loading (m7), the defaults on the first open, the task lines from the prompts and the Calibration line (m8), Not connected with its tone and the step that names `keySetting`, the Not connected mark on a task row (M1), the model choices of the chosen provider, the saving, Saved, rejected and catalog-changed statuses with Refresh (M5), the load error, and a task missing in the answer
+Split: the part came to about 400 lines. 7.1 holds the load, the task rows and the providers
+(about 300 lines); 7.2 holds the save statuses in the same files (about 100 lines).
+
+- [x] 7.1 Add the Models UI state and `ModelsUiStateMapper`; verify with the mapper tests for the loader while loading (m7), the defaults on the first open, the task lines from the prompts and the Calibration line (m8), Not connected with its tone and the step that names `keySetting`, the Not connected mark on a task row (M1), the model choices of the chosen provider, the load error, and a task missing in the answer
+- [ ] 7.2 Add the save facts and statuses to the Models UI state; verify with the mapper tests for the saving, Saved, rejected and catalog-changed statuses with Refresh (M5)
 
 ## 8. [8/15] Admin Models view model (about 300 lines)
 
