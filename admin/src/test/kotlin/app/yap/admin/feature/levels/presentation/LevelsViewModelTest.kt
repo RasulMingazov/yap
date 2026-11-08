@@ -47,14 +47,21 @@ internal class LevelsViewModelTest {
     }
 
     @Test
-    fun `GIVEN the levels WHEN B2 is clicked THEN its prompt block shows`() = runTest(dispatcher) {
+    fun `GIVEN the levels WHEN B2 is clicked THEN its row is marked and its block shows`() = runTest(dispatcher) {
         val env = Environment()
         advanceUntilIdle()
 
         env.viewModel.onEvent(Event.LevelClicked(LevelCode.B2))
         advanceUntilIdle()
 
-        assertEquals(expected = "Блок промпта · B2", actual = env.content().block.title)
+        val content = env.content()
+        assertEquals(
+            expected = listOf(LevelCode.B2),
+            actual = content.rows
+                .filter { row -> row.isChosen }
+                .map { row -> row.code },
+        )
+        assertEquals(expected = "Блок промпта · B2", actual = content.block.title)
     }
 
     @Test

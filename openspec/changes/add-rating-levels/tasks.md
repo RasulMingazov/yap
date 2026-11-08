@@ -69,8 +69,12 @@ Slice 1 of this part holds the decisions of the Levels UX review that change the
 tests, and the scenarios of these decisions in `specs/rating-levels/spec.md` (about 250 lines). Slice 2 came to
 about 520 lines and has two PRs. Slice 2a holds the mono style with the bundled JetBrains Mono, `Note`, `AdminTextField(textStyle)`,
 `AdminTheme.Sizes.sectionInnerGap`, `LevelsScreen` with Save and the prompt block, the saving status, the load on
-open, and the navigation files (about 300 lines). Slice 2b holds `AdminSelect`, `CellTextField`,
-the height of `PopupButton` and the level table (about 280 lines). Slice 3 holds `ScreenCaptureTest.kt` and the images.
+open, and the navigation files (about 300 lines). Slice 2b holds `core/design/AdminSelect.kt`,
+`core/design/CellTextField.kt`, the height of `PopupButton` in `core/design/Buttons.kt`, `surfaceContainer` in
+`core/design/AdminMaterialTheme.kt`, the table sizes and `Colors.transparent` in `AdminTheme`, the field labels of
+`UiState.Row` in `LevelsViewModel` and `LevelsUiStateMapper` with their tests, the level table in `LevelsScreen`, the
+requirement «The table marks the chosen level» in `specs/rating-levels/spec.md`, and the table cell field rule in
+`docs/admin/002-ui-compose.md` (about 320 lines). Slice 3 holds `ScreenCaptureTest.kt` and the images.
 
 - [ ] 6.1 Add `AdminSelect`, the mono style and the Levels screen with Save in the toolbar; verify with `./gradlew build` and the images of the screen capture for each state
 - [x] 6.2 Add the sidebar group Rules with Levels between Content and Settings; verify with the navigation view-model test for Levels

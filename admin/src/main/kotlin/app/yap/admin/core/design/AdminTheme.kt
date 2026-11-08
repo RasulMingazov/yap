@@ -23,6 +23,7 @@ internal object AdminTheme {
         val ok = Color(0xFF1F7A3F)
         val selected = Color(0xFFEDEDF0)
         val side = Color(0xFFFAFAFA)
+        val transparent = Color.Transparent
     }
 
     object Sizes {
@@ -34,6 +35,9 @@ internal object AdminTheme {
         val brandGap = 6.dp
         val buttonHeight = 32.dp
         val buttonPadding = 14.dp
+        val cellFieldHeight = 28.dp
+        val cellFieldPadding = 10.dp
+        val cellFieldWidth = 64.dp
         val contentBottomPadding = 40.dp
         val contentMaxWidth = 880.dp
         val contentPadding = 32.dp
@@ -42,9 +46,13 @@ internal object AdminTheme {
         val dateColumnWidth = 110.dp
         val dialogPadding = 24.dp
         val fieldWidth = 360.dp
+        val focusBorder = 2.dp
         val gap = 12.dp
         val hintHorizontalPadding = 14.dp
         val hintVerticalPadding = 12.dp
+        val levelCodeColumnWidth = 120.dp
+        val levelColumnWidth = 110.dp
+        val levelWordsColumnWidth = 130.dp
         val linkUnderlineOffset = 3.dp
         val loader = 20.dp
         val loaderStroke = 2.dp
@@ -66,6 +74,7 @@ internal object AdminTheme {
         val sideWidth = 200.dp
         val tableCellEndPadding = 16.dp
         val tableCellPadding = 12.dp
+        val tableCellStartPadding = 8.dp
         val tableHeaderPadding = 8.dp
         val toolbarActionsGap = 16.dp
         val toolbarHeight = 64.dp

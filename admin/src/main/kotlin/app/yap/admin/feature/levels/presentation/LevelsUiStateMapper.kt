@@ -38,14 +38,18 @@ internal object LevelsUiStateMapper {
 
     private fun DataState.row(level: Level): UiState.Row {
         val form = forms.getValue(level.code)
+        val label = level.code.label()
         return UiState.Row(
             code = level.code,
             form = form,
             idioms = form.idioms?.option(),
             isChosen = level.code == chosen,
             isRatingFromShown = level.code.hasRatingFrom,
-            label = level.code.label(),
+            label = label,
+            maxWordsLabel = "Слов в фразе $label",
             range = level.rangeText(),
+            ratingFromLabel = "Рейтинг от $label",
+            vocabularyLabel = "Лексика $label",
         )
     }
 

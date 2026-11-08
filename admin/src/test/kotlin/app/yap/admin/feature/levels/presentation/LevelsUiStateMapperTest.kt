@@ -27,7 +27,10 @@ internal class LevelsUiStateMapperTest {
                 isChosen = true,
                 isRatingFromShown = true,
                 label = "B1",
+                maxWordsLabel = "Слов в фразе B1",
                 range = null,
+                ratingFromLabel = "Рейтинг от B1",
+                vocabularyLabel = "Лексика B1",
             ),
             actual = uiState.rows[LevelCode.B1.ordinal],
         )

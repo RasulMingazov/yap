@@ -264,7 +264,10 @@ internal class LevelsViewModel(
             val isChosen: Boolean,
             val isRatingFromShown: Boolean,
             val label: String,
+            val maxWordsLabel: String,
             val range: String?,
+            val ratingFromLabel: String,
+            val vocabularyLabel: String,
         )
     }
 
