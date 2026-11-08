@@ -87,20 +87,6 @@ internal class TopicViewModelTest {
     }
 
     @Test
-    fun `GIVEN Duration WHEN text is typed THEN it keeps three digits at most or none`() = runTest(dispatcher) {
-        val env = Environment(topicId = null)
-        advanceUntilIdle()
-
-        val durations = listOf("45", "456a", "4567", "").map { text ->
-            env.viewModel.onEvent(Event.DurationChanged(text))
-            advanceUntilIdle()
-            env.content().form.durationMinutes
-        }
-
-        assertEquals(expected = listOf(45, 45, 45, null), actual = durations)
-    }
-
-    @Test
     fun `GIVEN a new topic WHEN a day is picked THEN the popup shows it`() = runTest(dispatcher) {
         val env = Environment(topicId = null)
         advanceUntilIdle()

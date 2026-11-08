@@ -56,14 +56,14 @@ time from `develop`, so the files that #9 and #10 also change need no lock.
 
 ## 13. [13/16] The Topic view model · ~370, at risk · `T/presentation/TopicViewModel.kt` and its test
 
-- [x] 13.1 Add the view model; verify with the tests for the load, the field edits, a picked date, Guest, Saved, the 400 error, the save failure and the load error. The step events (Add step, a step edit) and their tests moved to [15/16]
+- [x] 13.1 Add the view model; verify with the tests for the load, the field edits, a picked date, Guest, Saved, the 400 error, the save failure and the load error. The Duration event and its tests moved to [14/16], the step events (Add step, a step edit) and their tests to [15/16]
 
-## 14. [14/16] Topic: Scene and Opening line · ~300 · `A/Main.kt`, `A/navigation/`, `A/ScreenCaptureTest.kt`, `T/presentation/ui/` (`TopicScreen`, `ReleaseDateField`, `TopicsScreen`)
+## 14. [14/16] Topic: Scene and Opening line · ~340 · `A/Main.kt`, `A/navigation/`, `A/ScreenCaptureTest.kt`, `T/presentation/TopicViewModel.kt` and its test, `T/presentation/ui/` (`TopicScreen`, `ReleaseDateField`, `TopicsScreen`)
 
-- [ ] 14.1 Add the screen, the two sections and the date popup, and open it from a title and from New topic; verify with `./gradlew build`
+- [ ] 14.1 Add the screen, the two sections, the date popup and the Duration event of `TopicViewModel` (from [13/16]), and open it from a title and from New topic; verify with the view model tests for a fourth digit, a letter and an empty Duration, and `./gradlew build`
 - [ ] 14.2 Capture Topic new, saved, Saved, the 400 error and the load error; verify with the images
 
-## 15. [15/16] Topic: Interlocutor and Steps · ~260 · `A/ScreenCaptureTest.kt`, `T/presentation/ui/` (`InterlocutorSection`, `CastRadioRow`, `StepsSection`)
+## 15. [15/16] Topic: Interlocutor and Steps · ~310 · `A/ScreenCaptureTest.kt`, `T/presentation/TopicViewModel.kt` and its test, `T/presentation/ui/` (`InterlocutorSection`, `CastRadioRow`, `StepsSection`)
 
 - [ ] 15.1 Add the two sections and the step events of `TopicViewModel` (from [13/16]); verify with the view model tests for Add step and a step edit, `./gradlew build` and the capture of Guest and five steps
 - [ ] 15.2 Run the admin app against a server with a database; verify a create, an edit with Add step and Guest, and the topic after a restart

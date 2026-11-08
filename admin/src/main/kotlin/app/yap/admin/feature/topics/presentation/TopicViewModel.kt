@@ -44,7 +44,6 @@ internal class TopicViewModel(
     }
 
     fun onEvent(event: Event) = when (event) {
-        is Event.DurationChanged -> onDurationChanged(event.text)
         is Event.FormChanged -> edit { event.form }
         is Event.GuestDescriptionChanged -> edit { form ->
             form.copy(interlocutor = Interlocutor.Guest(description = event.description))
@@ -58,11 +57,6 @@ internal class TopicViewModel(
     override fun onCleared() {
         super.onCleared()
         newsChannel.close()
-    }
-
-    private fun onDurationChanged(text: String) {
-        if (text.length > MAX_DURATION_DIGITS || !text.all(Char::isDigit)) return
-        edit { form -> form.copy(durationMinutes = text.toIntOrNull()) }
     }
 
     private fun edit(transform: (TopicContent) -> TopicContent) = dataState.update { state ->
@@ -99,7 +93,11 @@ internal class TopicViewModel(
         }
         when (val result = getTopicUseCase(topicId)) {
             is LoadTopicResult.Failed -> dataState.update { state -> state.copy(load = Load.FAILED) }
-            is LoadTopicResult.Loaded -> dataState.update { state -> state.copy(cast = cast).saved(result.topic) }
+            is LoadTopicResult.Loaded -> dataState.update { state ->
+                state
+                    .copy(cast = cast)
+                    .saved(result.topic)
+            }
         }
     }
 
@@ -196,8 +194,6 @@ internal class TopicViewModel(
 
     sealed interface Event {
 
-        data class DurationChanged(val text: String) : Event
-
         data class FormChanged(val form: TopicContent) : Event
 
         data class GuestDescriptionChanged(val description: String) : Event
@@ -212,8 +208,6 @@ internal class TopicViewModel(
     }
 
     private companion object {
-
-        const val MAX_DURATION_DIGITS = 3
 
         val EMPTY_CONTENT = TopicContent(
             description = "",
