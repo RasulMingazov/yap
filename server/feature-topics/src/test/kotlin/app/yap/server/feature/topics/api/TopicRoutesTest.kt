@@ -4,6 +4,7 @@ import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import app.yap.server.feature.characters.usecase.GetCharacterUseCase
 import app.yap.server.feature.topics.model.Interlocutor
 import app.yap.server.feature.topics.model.StubTopic
+import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicPublishRule
 import app.yap.server.feature.topics.persistence.StubTopicRepository
@@ -218,21 +219,30 @@ internal class TopicRoutesTest {
             val topicDraftRule = TopicDraftRule(
                 getCharacterUseCase = GetCharacterUseCase(characterRepository = characterRepository),
             )
+            val topicPublishRule = TopicPublishRule(topicDraftRule = topicDraftRule)
+            val topicDetailsRule = TopicDetailsRule(topicPublishRule = topicPublishRule)
             application.install(ContentNegotiation) {
                 json()
             }
             application.routing {
                 topicRoutes(
                     createTopicUseCase = CreateTopicUseCase(
+                        clock = StubTopic.CLOCK,
+                        topicDetailsRule = topicDetailsRule,
                         topicDraftRule = topicDraftRule,
                         topicRepository = topicRepository,
                     ),
-                    getTopicUseCase = GetTopicUseCase(topicRepository = topicRepository),
+                    getTopicUseCase = GetTopicUseCase(
+                        clock = StubTopic.CLOCK,
+                        topicDetailsRule = topicDetailsRule,
+                        topicRepository = topicRepository,
+                    ),
                     getTopicsUseCase = GetTopicsUseCase(topicRepository = topicRepository),
                     updateTopicUseCase = UpdateTopicUseCase(
                         clock = StubTopic.CLOCK,
+                        topicDetailsRule = topicDetailsRule,
                         topicDraftRule = topicDraftRule,
-                        topicPublishRule = TopicPublishRule(topicDraftRule = topicDraftRule),
+                        topicPublishRule = topicPublishRule,
                         topicRepository = topicRepository,
                     ),
                 )

@@ -1,6 +1,7 @@
 package app.yap.server.feature.topics
 
 import app.yap.server.feature.topics.model.TopicCalendarRule
+import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicPublishRule
 import app.yap.server.feature.topics.persistence.DatabaseTopicRepository
@@ -28,6 +29,7 @@ fun featureTopicsModule(): Module = module {
     factoryOf(::GetTopicsUseCase)
     factoryOf(::PublishTopicUseCase)
     factoryOf(::TopicCalendarRule)
+    factoryOf(::TopicDetailsRule)
     factoryOf(::TopicDraftRule)
     factoryOf(::TopicPublishRule)
     factoryOf(::UpdateTopicUseCase)

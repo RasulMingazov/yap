@@ -3,6 +3,8 @@ package app.yap.server.feature.topics.usecase
 import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
+import app.yap.server.feature.topics.model.TopicDetails
+import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicGap
 import app.yap.server.feature.topics.model.TopicId
@@ -15,6 +17,7 @@ import java.time.Clock
 
 class UpdateTopicUseCase(
     private val clock: Clock,
+    private val topicDetailsRule: TopicDetailsRule,
     private val topicDraftRule: TopicDraftRule,
     private val topicPublishRule: TopicPublishRule,
     private val topicRepository: TopicRepository,
@@ -51,6 +54,12 @@ class UpdateTopicUseCase(
         is TopicWrite.DateTaken -> UpdateTopicOutcome.DateTaken
         is TopicWrite.NotFound -> UpdateTopicOutcome.NotFound
         is TopicWrite.StaleStatus -> invoke(content, topicId)
-        is TopicWrite.Written -> UpdateTopicOutcome.Updated(topic)
+        is TopicWrite.Written -> UpdateTopicOutcome.Updated(details(topic))
     }
+
+    private suspend fun details(topic: Topic): TopicDetails = topicDetailsRule.details(
+        isDateTaken = topicRepository.hasPublishedOn(topic.date, topic.topicId),
+        today = ReleaseState.today(clock),
+        topic = topic,
+    )
 }
