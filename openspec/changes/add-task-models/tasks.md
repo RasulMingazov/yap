@@ -50,7 +50,8 @@ tests.
 Files: `contract-admin/src/main/kotlin/app/yap/contract/admin/` `ModelsDto.kt`, `TaskModelDto.kt`,
 `ProviderDto.kt` (hot), `fm/api/TaskModelDtoMapper.kt`, `fm/api/ModelRoutes.kt`,
 `server/feature-models/build.gradle.kts` (`yap.ktor.server`, `contract-admin`), `server/app/src/main/kotlin/app/yap/server/Application.kt`
-(hot), and their tests.
+(hot), `server/app/build.gradle.kts` (`feature-models` test fixtures),
+`server/app/src/test/kotlin/app/yap/server/StubAppModules.kt`, and their tests.
 
 - [x] 4.1 Add the model DTOs with `ProviderDto.keySetting`, the mapper that reads task codes with `entries.find` and keeps an unknown provider code as no provider, the routes, and mount them behind the admin key; verify with the mapper test and the route tests for `GET` 200 with the five tasks and the providers, `keySetting` and no key field in the JSON, `PUT` 200, 400 for an unknown task and for a task missing, 409 for an unknown provider and for a model outside the catalog, and 401
 

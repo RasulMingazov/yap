@@ -24,14 +24,19 @@ fun Route.modelRoutes(
 
 private fun Route.getModelsRoute(getModelsUseCase: GetModelsUseCase) {
     get {
-        call.respond(getModelsUseCase().toDto())
+        call.respond(
+            getModelsUseCase()
+                .toDto(),
+        )
     }
 }
 
 private fun Route.saveModelsRoute(saveModelsUseCase: SaveModelsUseCase) {
     put {
-        val models = call.receive<List<TaskModelDto>>().toModels()
-            ?: return@put call.respond(HttpStatusCode.Conflict)
+        val models = call
+            .receive<List<TaskModelDto>>()
+            .toModels()
+            ?:return@put call.respond(HttpStatusCode.Conflict)
         when (val outcome = saveModelsUseCase(models)) {
             is SaveTaskModelsOutcome.CatalogChanged -> call.respond(HttpStatusCode.Conflict)
             is SaveTaskModelsOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)

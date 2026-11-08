@@ -85,7 +85,11 @@ internal class ModelRoutesTest {
         val env = Environment()
         application { env.install(this) }
 
-        val response = putModels(StubTaskModelDto.stubTableDtos().filter { dto -> dto.task != "TOPIC_HINTS" })
+        val response = putModels(
+            StubTaskModelDto
+                .stubTableDtos()
+                .filter { dto -> dto.task != "TOPIC_HINTS" },
+        )
 
         assertEquals(expected = HttpStatusCode.BadRequest, actual = response.status)
         env.taskModelRepository.saveCall.notCalled()
