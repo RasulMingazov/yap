@@ -43,6 +43,30 @@ object StubTopic {
         topic = topic,
     )
 
+    fun stubCalendar(
+        rows: List<CalendarRow> = emptyList(),
+        todos: List<Todo> = emptyList(),
+    ): TopicCalendar = TopicCalendar(
+        rows = rows,
+        todos = todos,
+    )
+
+    fun stubCalendarTopic(
+        completeSteps: Int = 0,
+        ledBy: LedBy? = null,
+        state: ReleaseState = ReleaseState.DRAFT,
+        steps: Int = 0,
+        title: String = TITLE,
+        topicId: TopicId = TOPIC_ID,
+    ): CalendarTopic = CalendarTopic(
+        completeSteps = completeSteps,
+        ledBy = ledBy,
+        state = state,
+        steps = steps,
+        title = title,
+        topicId = topicId,
+    )
+
     fun stubContent(
         description: String = DESCRIPTION,
         durationMinutes: Int? = DURATION_MINUTES,

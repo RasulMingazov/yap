@@ -57,7 +57,7 @@ private fun Step.toDto(): StepDto = StepDto(
     task = task,
 )
 
-private fun Set<TopicGap>.toDto(): List<TopicGapDto> = map { gap -> gap.toDto() }
+internal fun Set<TopicGap>.toDto(): List<TopicGapDto> = map { gap -> gap.toDto() }
 
 private fun TopicGap.toDto(): TopicGapDto = when (this) {
     is TopicGap.DateTaken -> TopicGapDto.DateTakenDto
@@ -79,7 +79,7 @@ private fun TopicField.toDto(): TopicFieldDto = when (this) {
     TopicField.STEPS -> TopicFieldDto.STEPS
 }
 
-private fun ReleaseState.toDto(): TopicStatusDto = when (this) {
+internal fun ReleaseState.toDto(): TopicStatusDto = when (this) {
     ReleaseState.DRAFT -> TopicStatusDto.DRAFT
     ReleaseState.PUBLISHED -> TopicStatusDto.PUBLISHED
     ReleaseState.TODAY -> TopicStatusDto.TODAY
