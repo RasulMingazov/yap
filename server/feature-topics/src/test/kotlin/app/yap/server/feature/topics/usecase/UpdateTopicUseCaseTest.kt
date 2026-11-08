@@ -7,7 +7,6 @@ import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicField
 import app.yap.server.feature.topics.model.TopicGap
-import app.yap.server.feature.topics.model.TopicId
 import app.yap.server.feature.topics.model.TopicPublishRule
 import app.yap.server.feature.topics.model.TopicStatus
 import app.yap.server.feature.topics.model.UpdateTopicOutcome
@@ -81,6 +80,18 @@ internal class UpdateTopicUseCaseTest {
     }
 
     @Test
+    fun `GIVEN a published topic that is out WHEN saving it with the same date THEN it is stored`() = runTest {
+        val env = Environment()
+        val content = StubTopic.stubContent(releaseDate = LocalDate.of(2026, 10, 22))
+        val out = StubTopic.stubTopic(content = content, status = TopicStatus.PUBLISHED)
+        env.topicRepository.findCall.returns(out)
+
+        env.useCase(content = content.copy(title = "Changed"), topicId = StubTopic.TOPIC_ID)
+
+        env.topicRepository.updateCall.calledWith(out.copy(content = content.copy(title = "Changed")))
+    }
+
+    @Test
     fun `GIVEN a date with a published topic WHEN updating THEN the date is taken`() = runTest {
         val env = Environment()
         env.topicRepository.updateCall.returns(TopicWrite.DateTaken)
@@ -143,18 +154,10 @@ internal class UpdateTopicUseCaseTest {
         private val stub: StubTopicRepository,
     ) : TopicRepository by stub {
 
-        private var isPublished = false
-
-        override suspend fun find(topicId: TopicId): Topic? =
-            stub.find(topicId)?.copy(status = if (isPublished) TopicStatus.PUBLISHED else TopicStatus.DRAFT)
-
-        override suspend fun update(topic: Topic): TopicWrite =
-            if (isPublished) {
-                stub.update(topic)
-            } else {
-                isPublished = true
-                TopicWrite.StaleStatus
-            }
+        override suspend fun update(topic: Topic): TopicWrite {
+            stub.findCall.returns(StubTopic.stubTopic(status = TopicStatus.PUBLISHED))
+            return TopicWrite.StaleStatus
+        }
     }
 
     private class Environment(wrap: (StubTopicRepository) -> TopicRepository = { stub -> stub }) {

@@ -47,6 +47,7 @@ internal class PublishTopicUseCaseTest {
     fun `GIVEN a draft with a past date WHEN publishing THEN nothing is published`() = runTest {
         val env = Environment()
         val content = StubTopic.stubContent(releaseDate = LocalDate.of(2026, 10, 22))
+        env.topicRepository.findCall.returns(StubTopic.stubTopic(content = content))
 
         val outcome = env.useCase(content = content, topicId = StubTopic.TOPIC_ID)
 
