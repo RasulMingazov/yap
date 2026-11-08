@@ -34,7 +34,12 @@ internal object ModelsUiStateMapper : (DataState) -> UiState {
     private fun DataState.toContent(models: Models): UiState.Content = UiState.Content(
         providerOptions = models.providers.map { provider -> provider.option() },
         providers = models.providers.map { provider -> provider.row() },
-        tasks = ModelTask.entries.map { task -> taskRow(providers = models.providers, task = task) },
+        tasks = ModelTask.entries.map { task ->
+            taskRow(
+                providers = models.providers,
+                task = task,
+            )
+        },
     )
 
     private fun Provider.row(): UiState.ProviderRow = UiState.ProviderRow(
