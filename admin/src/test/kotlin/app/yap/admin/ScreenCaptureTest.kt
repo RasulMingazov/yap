@@ -56,7 +56,7 @@ internal class ScreenCaptureTest {
                     onEvent = {},
                     onNewTopicClick = {},
                     onTopicClick = {},
-                    uiState = TopicsUiStateMapper.map(dataState),
+                    uiState = TopicsUiStateMapper(dataState),
                 )
             }
         }
@@ -91,7 +91,7 @@ internal class ScreenCaptureTest {
                 TopicContent(
                     back = TOPICS_BACK,
                     onEvent = {},
-                    uiState = TopicUiStateMapper.map(dataState),
+                    uiState = TopicUiStateMapper(dataState),
                 )
             }
         }
@@ -105,7 +105,7 @@ internal class ScreenCaptureTest {
             TopicContent(
                 back = TOPICS_BACK,
                 onEvent = {},
-                uiState = TopicUiStateMapper.map(TopicViewModel.DataState().saved(SAVED_TOPIC)),
+                uiState = TopicUiStateMapper(TopicViewModel.DataState().saved(SAVED_TOPIC)),
             )
             ReleaseDatePicker(
                 date = StubTopic.RELEASE_DATE,
@@ -132,7 +132,7 @@ internal class ScreenCaptureTest {
                     onCharacterClick = {},
                     onEvent = {},
                     onNewCharacterClick = {},
-                    uiState = CharactersUiStateMapper.map(dataState),
+                    uiState = CharactersUiStateMapper(dataState),
                 )
             }
         }
@@ -164,7 +164,7 @@ internal class ScreenCaptureTest {
                         onClick = {},
                     ),
                     onEvent = {},
-                    uiState = CharacterUiStateMapper.map(dataState),
+                    uiState = CharacterUiStateMapper(dataState),
                 )
             }
         }
@@ -188,7 +188,7 @@ internal class ScreenCaptureTest {
         )
 
         val images = states.map { (state, dataState) ->
-            val uiState = ServerUiStateMapper.map(dataState)
+            val uiState = ServerUiStateMapper(dataState)
             capture(name = "server-$state", current = Screen.Server, serverLabel = uiState.serverLabel) {
                 ServerContent(
                     onEvent = {},

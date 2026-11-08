@@ -34,7 +34,7 @@ internal class TopicViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicUiStateMapper)
 
     private val newsChannel = Channel<News>(Channel.BUFFERED)
     val news: Flow<News> = newsChannel.receiveAsFlow()

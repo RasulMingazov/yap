@@ -6,9 +6,9 @@ import app.yap.admin.feature.topics.presentation.TopicsViewModel.DataState
 import app.yap.admin.feature.topics.presentation.TopicsViewModel.UiState
 import java.time.LocalDate
 
-internal object TopicsUiStateMapper {
+internal object TopicsUiStateMapper : (DataState) -> UiState {
 
-    fun map(state: DataState): UiState = when (val result = state.topics) {
+    override fun invoke(state: DataState): UiState = when (val result = state.topics) {
         null -> UiState.Loading
         is LoadTopicsResult.Failed -> UiState.Error(message = "Не удалось загрузить темы")
         is LoadTopicsResult.Loaded -> result.topics.toUiState()

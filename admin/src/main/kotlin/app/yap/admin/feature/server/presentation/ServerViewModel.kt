@@ -19,7 +19,7 @@ internal class ServerViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, ServerUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, ServerUiStateMapper)
 
     init {
         loadSettings()

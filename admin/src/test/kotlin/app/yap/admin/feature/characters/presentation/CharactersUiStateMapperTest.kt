@@ -14,7 +14,7 @@ internal class CharactersUiStateMapperTest {
     fun `GIVEN loaded characters WHEN mapping THEN each character is a row with its name and personality`() {
         val state = DataState(characters = LoadResult.Loaded(listOf(StubCharacter.stubCharacter())))
 
-        val uiState = CharactersUiStateMapper.map(state)
+        val uiState = CharactersUiStateMapper(state)
 
         assertEquals(
             expected = UiState.Content(
@@ -34,7 +34,7 @@ internal class CharactersUiStateMapperTest {
     fun `GIVEN no characters WHEN mapping THEN the screen says that there are none yet`() {
         val state = DataState(characters = LoadResult.Loaded(emptyList()))
 
-        val uiState = CharactersUiStateMapper.map(state)
+        val uiState = CharactersUiStateMapper(state)
 
         assertEquals(expected = UiState.Empty(message = "Персонажей пока нет"), actual = uiState)
     }
@@ -43,7 +43,7 @@ internal class CharactersUiStateMapperTest {
     fun `GIVEN the characters did not load WHEN mapping THEN the screen shows the error`() {
         val state = DataState(characters = LoadResult.Failed)
 
-        val uiState = CharactersUiStateMapper.map(state)
+        val uiState = CharactersUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить персонажей"), actual = uiState)
     }

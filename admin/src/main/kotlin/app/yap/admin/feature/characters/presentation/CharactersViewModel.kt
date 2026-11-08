@@ -17,7 +17,7 @@ internal class CharactersViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, CharactersUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, CharactersUiStateMapper)
 
     fun onEvent(event: Event) = when (event) {
         is Event.Opened -> onOpened()

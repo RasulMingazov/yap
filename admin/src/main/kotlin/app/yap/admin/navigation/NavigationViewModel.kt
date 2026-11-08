@@ -16,7 +16,7 @@ internal class NavigationViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, NavigationUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, NavigationUiStateMapper)
 
     init {
         openStartScreen()

@@ -1,6 +1,8 @@
 complexity:
   LongMethod:
     ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    ignorePrivate: true
 
 naming:
   FunctionNaming:

@@ -17,7 +17,7 @@ internal class ServerUiStateMapperTest {
             key = "key",
         )
 
-        val uiState = ServerUiStateMapper.map(state)
+        val uiState = ServerUiStateMapper(state)
 
         assertEquals(
             expected = UiState(
@@ -34,7 +34,7 @@ internal class ServerUiStateMapperTest {
 
     @Test
     fun `GIVEN a rejected key WHEN mapping THEN the status says so and the server is not connected`() {
-        val uiState = ServerUiStateMapper.map(DataState(connection = ServerConnection.Unauthorized, key = "key"))
+        val uiState = ServerUiStateMapper(DataState(connection = ServerConnection.Unauthorized, key = "key"))
 
         assertEquals(
             expected = "Сервер: не подключён" to Status(text = "Сервер не принял ключ", tone = Status.Tone.ERROR),
@@ -44,14 +44,14 @@ internal class ServerUiStateMapperTest {
 
     @Test
     fun `GIVEN a connection in progress WHEN mapping THEN connect is disabled`() {
-        val uiState = ServerUiStateMapper.map(DataState(isConnecting = true, key = "key"))
+        val uiState = ServerUiStateMapper(DataState(isConnecting = true, key = "key"))
 
         assertEquals(expected = "Подключаемся…" to false, actual = uiState.connectLabel to uiState.isConnectEnabled)
     }
 
     @Test
     fun `GIVEN no key WHEN mapping THEN connect is disabled`() {
-        val uiState = ServerUiStateMapper.map(DataState())
+        val uiState = ServerUiStateMapper(DataState())
 
         assertEquals(expected = false, actual = uiState.isConnectEnabled)
     }

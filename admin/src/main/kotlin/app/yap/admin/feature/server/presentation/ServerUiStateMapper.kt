@@ -5,9 +5,9 @@ import app.yap.admin.feature.server.domain.ServerConnection
 import app.yap.admin.feature.server.presentation.ServerViewModel.DataState
 import app.yap.admin.feature.server.presentation.ServerViewModel.UiState
 
-internal object ServerUiStateMapper {
+internal object ServerUiStateMapper : (DataState) -> UiState {
 
-    fun map(state: DataState): UiState = UiState(
+    override fun invoke(state: DataState): UiState = UiState(
         address = state.address,
         connectLabel = state.connectLabel(),
         isConnectEnabled = state.isConnectEnabled(),

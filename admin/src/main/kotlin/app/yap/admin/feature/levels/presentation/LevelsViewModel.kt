@@ -27,7 +27,7 @@ internal class LevelsViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, LevelsUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, LevelsUiStateMapper)
 
     private val newsChannel = Channel<News>(Channel.BUFFERED)
     val news: Flow<News> = newsChannel.receiveAsFlow()
