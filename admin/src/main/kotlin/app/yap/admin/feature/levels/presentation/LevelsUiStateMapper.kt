@@ -4,15 +4,24 @@ import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelCode
+import app.yap.admin.feature.levels.domain.LevelInput
 import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.SaveLevelsResult.NumberField
 import app.yap.admin.feature.levels.domain.hasEveryLevel
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.DataState
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
+import app.yap.admin.feature.models.domain.Models
 
 internal object LevelsUiStateMapper : (DataState) -> UiState {
 
     private const val LOAD_ERROR = "Не удалось загрузить уровни"
+
+    private const val MODELS_LOAD_ERROR = "Не удалось загрузить модели"
+
+    private val DEFAULT_MODEL = UiState.ModelOption(
+        label = "по умолчанию",
+        model = null,
+    )
 
     override fun invoke(state: DataState): UiState {
         val levels = state.levels
@@ -27,7 +36,11 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
     private fun DataState.toContent(levels: List<Level>): UiState.Content = UiState.Content(
         block = block(levels),
         idioms = Idioms.entries.map { idioms -> idioms.option() },
+        isModelChoiceEnabled = loadedModels() != null,
+        isRefreshShown = saveResult is SaveLevelsResult.ModelUnavailable,
         isSaveEnabled = !isSaving,
+        modelError = modelError(),
+        models = modelOptions(),
         rows = levels.map { level -> row(level) },
         saveStatus = saveStatus(),
     )
@@ -44,6 +57,16 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
 
     private fun Level.rating(): String? = rangeText()?.let { text -> "рейтинг $text" }
 
+    private fun DataState.modelError(): String? = if (isModelsLoadFailed) MODELS_LOAD_ERROR else null
+
+    private fun DataState.modelOptions(): List<UiState.ModelOption> {
+        val catalog = loadedModels()
+            ?.providers
+            .orEmpty()
+            .flatMap { provider -> provider.models }
+        return listOf(DEFAULT_MODEL) + catalog.map { model -> modelOption(model) }
+    }
+
     private fun DataState.row(level: Level): UiState.Row {
         val form = forms.getValue(level.code)
         val label = level.code.label()
@@ -55,8 +78,10 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
             isRatingFromShown = level.code.hasRatingFrom,
             label = label,
             maxWordsLabel = "Слов в фразе $label",
+            model = chosenModel(form),
             range = level.rangeText(),
             ratingFromLabel = "Рейтинг от $label",
+            ratingNote = level.code.ratingNote(),
             vocabularyLabel = "Лексика $label",
         )
     }
@@ -73,12 +98,26 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
         Idioms.SOMETIMES -> "иногда"
     }
 
+    private fun DataState.chosenModel(form: LevelInput): UiState.ModelOption {
+        val model = form.model
+        return if (loadedModels() == null || model == null) DEFAULT_MODEL else modelOption(model)
+    }
+
+    private fun DataState.loadedModels(): Models? = if (isModelsLoadFailed) null else models
+
+    private fun modelOption(model: String): UiState.ModelOption = UiState.ModelOption(
+        label = model,
+        model = model,
+    )
+
     private fun Level.rangeText(): String? = when {
         !code.hasRatingFrom -> "и калибровка"
         range == null -> null
         range.to == null -> "${range.from}+"
         else -> "${range.from}–${range.to}"
     }
+
+    private fun LevelCode.ratingNote(): String? = if (hasRatingFrom) null else "Модель калибровки задаётся в «Моделях»"
 
     private fun DataState.saveStatus(): Status? =
         if (isSaving) Status(text = "Сохранение…", tone = Status.Tone.MUTED) else saveResult?.status()
@@ -87,6 +126,10 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
         is SaveLevelsResult.Failed -> null
         is SaveLevelsResult.Invalid -> Status(
             text = "Сервер не принял уровни: заполните все поля, числа больше нуля, рейтинг растёт от A1 к C2",
+            tone = Status.Tone.ERROR,
+        )
+        is SaveLevelsResult.ModelUnavailable -> Status(
+            text = "Модель уровня больше недоступна — обновите экран",
             tone = Status.Tone.ERROR,
         )
         is SaveLevelsResult.NoIdioms -> Status(text = "Выберите идиомы: ${code.label()}", tone = Status.Tone.ERROR)

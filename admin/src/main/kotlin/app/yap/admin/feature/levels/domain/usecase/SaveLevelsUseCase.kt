@@ -46,6 +46,7 @@ internal class DefaultSaveLevelsUseCase(
                         block = input.block,
                         idioms = idioms,
                         maxWords = maxWords.toInt(),
+                        model = input.model,
                         ratingFrom = ratingFrom.toIntOrNull(),
                         vocabulary = input.vocabulary,
                     ),

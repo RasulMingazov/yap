@@ -41,6 +41,18 @@ internal class RemoteLevelRepositoryTest {
     }
 
     @Test
+    fun `GIVEN a level with a model WHEN loading the levels THEN the level has the model`() = runTest {
+        val env = Environment(answer = answer(content = "[${LEVEL_JSON.replace(NO_MODEL_JSON, PRO_MODEL_JSON)}]"))
+
+        val result = env.repository.list()
+
+        assertEquals(
+            expected = LoadResult.Loaded(listOf(StubLevel.stubLevel(settings = StubLevel.stubSettings(model = PRO)))),
+            actual = result,
+        )
+    }
+
+    @Test
     fun `GIVEN the server cannot be reached WHEN loading the levels THEN loading fails`() = runTest {
         val env = Environment(answer = { throw IOException("Connection refused") })
 
@@ -86,6 +98,24 @@ internal class RemoteLevelRepositoryTest {
     }
 
     @Test
+    fun `GIVEN an entry with a model WHEN saving THEN the server gets the model`() = runTest {
+        val env = Environment(answer = answer(content = "[$LEVEL_JSON]"))
+
+        env.repository.save(listOf(StubLevel.stubEntry(settings = StubLevel.stubSettings(model = PRO))))
+
+        assertEquals(
+            expected = Json.parseToJsonElement("""[{"code": "B1", "settings": ${SETTINGS_JSON.replace(NO_MODEL_JSON, PRO_MODEL_JSON)}}]"""),
+            actual = Json.parseToJsonElement(
+                env.engine.requestHistory
+                    .single()
+                    .body
+                    .toByteArray()
+                    .decodeToString(),
+            ),
+        )
+    }
+
+    @Test
     fun `GIVEN the server rejects the table WHEN saving THEN the save is invalid`() = runTest {
         val env = Environment(answer = answer(content = "", status = HttpStatusCode.BadRequest))
 
@@ -117,6 +147,10 @@ internal class RemoteLevelRepositoryTest {
     }
 
     private companion object {
+
+        const val NO_MODEL_JSON = "\"model\": null"
+        const val PRO = "deepseek-v4-pro"
+        const val PRO_MODEL_JSON = "\"model\": \"$PRO\""
 
         const val SETTINGS_JSON = """
             {
