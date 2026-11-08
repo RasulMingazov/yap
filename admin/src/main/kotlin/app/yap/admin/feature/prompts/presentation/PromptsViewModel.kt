@@ -34,7 +34,9 @@ internal class PromptsViewModel(
     }
 
     private fun onPromptClicked(promptKey: PromptKey) {
-        val isLoaded = promptKey in dataState.value.prompts
+        val state = dataState.value
+        if (state.load == Load.LOADING) return
+        val isLoaded = promptKey in state.prompts
         dataState.update { state ->
             state.copy(
                 chosen = promptKey,

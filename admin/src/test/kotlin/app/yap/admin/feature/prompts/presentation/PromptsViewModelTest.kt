@@ -57,6 +57,19 @@ internal class PromptsViewModelTest {
     }
 
     @Test
+    fun `GIVEN a prompt is loading WHEN another prompt is clicked THEN the click is ignored`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+        env.getPromptUseCase.invokeCall.returns(LoadResult.Loaded(StubPrompt.stubPrompt(PromptKey.TOPIC_CHECK)))
+
+        env.viewModel.onEvent(Event.PromptClicked(PromptKey.TOPIC_CHECK))
+        env.viewModel.onEvent(Event.PromptClicked(PromptKey.TOPIC_HINTS))
+        advanceUntilIdle()
+
+        assertEquals(expected = "Проверка шага", actual = env.content().title)
+    }
+
+    @Test
     fun `GIVEN the chosen prompt does not load WHEN Prompts opens THEN it shows the load error`() =
         runTest(dispatcher) {
             val env = Environment()
