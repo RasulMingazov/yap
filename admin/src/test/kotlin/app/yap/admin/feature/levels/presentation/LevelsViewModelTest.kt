@@ -10,12 +10,15 @@ import app.yap.admin.feature.levels.domain.usecase.StubSaveLevelsUseCase
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.Event
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.News
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
+import app.yap.admin.feature.models.domain.StubModels
+import app.yap.admin.feature.models.domain.usecase.StubGetModelsUseCase
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -237,14 +240,190 @@ internal class LevelsViewModelTest {
             assertEquals(expected = LevelCode.entries, actual = env.content().rows.map { row -> row.code })
         }
 
+    @Test
+    fun `GIVEN the models WHEN Levels opens THEN Model offers Default and every model`() = runTest(dispatcher) {
+        val env = Environment()
+
+        advanceUntilIdle()
+
+        assertEquals(
+            expected = listOf(null, StubModels.MODEL, PRO),
+            actual = env.content().models.map { option -> option.model },
+        )
+    }
+
+    @Test
+    fun `GIVEN the models do not load WHEN Levels opens THEN the table shows with the models error`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Failed)
+
+            advanceUntilIdle()
+
+            val content = env.content()
+            assertEquals(
+                expected = listOf(LevelCode.entries, false, "Не удалось загрузить модели"),
+                actual = listOf(content.rows.map { row -> row.code }, content.isModelChoiceEnabled, content.modelError),
+            )
+        }
+
+    @Test
+    fun `GIVEN the models did not load WHEN models Retry is clicked THEN each level shows its model`() =
+        runTest(dispatcher) {
+            val levels = StubLevel.stubLevels(settings = StubLevel.stubSettings(model = PRO))
+            val env = Environment()
+            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(levels))
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Failed)
+            advanceUntilIdle()
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels()))
+
+            env.viewModel.onEvent(Event.ModelsRetryClicked)
+            advanceUntilIdle()
+
+            assertEquals(
+                expected = List(LevelCode.entries.size) { PRO },
+                actual = env.content().rows.map { row -> row.model.model },
+            )
+            env.getLevelsUseCase.invokeCall.called(times = 1)
+        }
+
+    @Test
+    fun `GIVEN the models WHEN models Retry is clicked THEN the models are not loaded again`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.ModelsRetryClicked)
+        advanceUntilIdle()
+
+        env.getModelsUseCase.invokeCall.called(times = 1)
+    }
+
+    @Test
+    fun `GIVEN a failed models load WHEN a second load answers with the models THEN the error hides`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Failed)
+            launch { env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels())) }
+
+            env.viewModel.onEvent(Event.Opened)
+            advanceUntilIdle()
+
+            assertEquals(expected = null, actual = env.content().modelError)
+        }
+
+    @Test
+    fun `GIVEN the levels do not load WHEN Levels opens THEN it shows the load error`() = runTest(dispatcher) {
+        val env = Environment()
+        env.getLevelsUseCase.invokeCall.returns(LoadResult.Failed)
+
+        advanceUntilIdle()
+
+        assertEquals(
+            expected = UiState.Error(message = "Не удалось загрузить уровни"),
+            actual = env.viewModel.uiState.value,
+        )
+    }
+
+    @Test
+    fun `GIVEN the levels WHEN B1 gets a model THEN only the row of B1 shows it`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = StubLevel.stubInput(model = PRO)))
+        advanceUntilIdle()
+
+        assertEquals(
+            expected = listOf(null, null, PRO, null, null, null, null),
+            actual = env.content().rows.map { row -> row.model.model },
+        )
+    }
+
+    @Test
+    fun `GIVEN B1 got a model WHEN saving THEN B1 is sent with the model`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+        val form = StubLevel.stubInput(model = PRO)
+        val forms = StubLevel
+            .stubLevels()
+            .toInputs()
+
+        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = form))
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.saveLevelsUseCase.invokeCall.calledWith(forms + (LevelCode.B1 to form))
+    }
+
+    @Test
+    fun `GIVEN B1 has a model WHEN Default is saved for B1 THEN B1 is sent without a model`() = runTest(dispatcher) {
+        val levels = StubLevel.stubLevels(settings = StubLevel.stubSettings(model = PRO))
+        val env = Environment()
+        env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(levels))
+        advanceUntilIdle()
+        val form = StubLevel.stubInput(model = null)
+
+        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = form))
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.saveLevelsUseCase.invokeCall.calledWith(levels.toInputs() + (LevelCode.B1 to form))
+    }
+
+    @Test
+    fun `GIVEN the models did not load WHEN saving THEN each level is sent with its stored model`() =
+        runTest(dispatcher) {
+            val levels = StubLevel.stubLevels(settings = StubLevel.stubSettings(model = PRO))
+            val env = Environment()
+            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(levels))
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Failed)
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.saveLevelsUseCase.invokeCall.calledWith(levels.toInputs())
+        }
+
+    @Test
+    fun `GIVEN a level model is no longer available WHEN Refresh is clicked THEN it loads both and hides Refresh`() =
+        runTest(dispatcher) {
+            val env = Environment(saveResult = SaveLevelsResult.ModelUnavailable)
+            advanceUntilIdle()
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.RefreshClicked)
+            advanceUntilIdle()
+
+            env.getLevelsUseCase.invokeCall.called(times = 2)
+            env.getModelsUseCase.invokeCall.called(times = 2)
+            assertEquals(expected = false, actual = env.content().isRefreshShown)
+        }
+
+    @Test
+    fun `GIVEN a Refresh in progress WHEN Save is clicked twice THEN the levels are saved once`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.RefreshClicked)
+            launch { env.viewModel.onEvent(Event.SaveClicked) }
+            env.viewModel.onEvent(Event.SaveClicked)
+            advanceUntilIdle()
+
+            env.saveLevelsUseCase.invokeCall.called(times = 1)
+        }
+
     private class Environment(
         saveResult: SaveLevelsResult = SaveLevelsResult.Saved(StubLevel.stubLevels()),
     ) {
 
         val getLevelsUseCase = StubGetLevelsUseCase()
+        val getModelsUseCase = StubGetModelsUseCase()
         val saveLevelsUseCase = StubSaveLevelsUseCase(result = saveResult)
         val viewModel = LevelsViewModel(
             getLevelsUseCase = getLevelsUseCase,
+            getModelsUseCase = getModelsUseCase,
             saveLevelsUseCase = saveLevelsUseCase,
         )
 
@@ -253,5 +432,10 @@ internal class LevelsViewModelTest {
         }
 
         fun content(): UiState.Content = viewModel.uiState.value as UiState.Content
+    }
+
+    private companion object {
+
+        const val PRO = "deepseek-v4-pro"
     }
 }

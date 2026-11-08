@@ -14,6 +14,7 @@ import app.yap.admin.feature.levels.domain.hasEveryLevel
 import app.yap.admin.feature.levels.domain.usecase.GetLevelsUseCase
 import app.yap.admin.feature.levels.domain.usecase.SaveLevelsUseCase
 import app.yap.admin.feature.models.domain.Models
+import app.yap.admin.feature.models.domain.usecase.GetModelsUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ import kotlinx.coroutines.launch
 
 internal class LevelsViewModel(
     private val getLevelsUseCase: GetLevelsUseCase,
+    private val getModelsUseCase: GetModelsUseCase,
     private val saveLevelsUseCase: SaveLevelsUseCase,
 ) : ViewModel() {
 
@@ -36,7 +38,9 @@ internal class LevelsViewModel(
     fun onEvent(event: Event) = when (event) {
         is Event.FormChanged -> onFormChanged(event)
         is Event.LevelClicked -> dataState.update { state -> state.copy(chosen = event.code) }
+        is Event.ModelsRetryClicked -> onModelsRetryClicked()
         is Event.Opened -> onOpened()
+        is Event.RefreshClicked -> onRefreshClicked()
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
     }
@@ -56,23 +60,51 @@ internal class LevelsViewModel(
         }
     }
 
+    private fun onModelsRetryClicked() {
+        if (!dataState.value.isModelsLoadFailed) return
+        loadModels()
+    }
+
     private fun onOpened() {
         if (dataState.value.isSaving) return
+        load()
+    }
+
+    private fun onRefreshClicked() {
+        dataState.update { state -> state.copy(saveResult = null) }
         load()
     }
 
     private fun onRetryClicked() {
         val state = dataState.value
         if (!state.isLoadFailed && state.levels?.hasEveryLevel() != false) return
-        load()
+        loadLevels()
     }
 
     private fun load() {
+        loadLevels()
+        loadModels()
+    }
+
+    private fun loadLevels() {
         dataState.update { state -> state.copy(isLoadFailed = false) }
         viewModelScope.launch {
-            when (val result = getLevelsUseCase()) {
-                is LoadResult.Failed -> dataState.update { state -> state.copy(isLoadFailed = true) }
-                is LoadResult.Loaded -> dataState.update { state -> state.loaded(result.value) }
+            val result = getLevelsUseCase()
+            dataState.update { state -> state.answered(result) }
+        }
+    }
+
+    private fun loadModels() {
+        dataState.update { state -> state.copy(isModelsLoadFailed = false) }
+        viewModelScope.launch {
+            when (val result = getModelsUseCase()) {
+                is LoadResult.Failed -> dataState.update { state -> state.copy(isModelsLoadFailed = true) }
+                is LoadResult.Loaded -> dataState.update { state ->
+                    state.copy(
+                        isModelsLoadFailed = false,
+                        models = result.value,
+                    )
+                }
             }
         }
     }
@@ -106,14 +138,30 @@ internal class LevelsViewModel(
 
     private fun onSaved(result: SaveLevelsResult.Saved) {
         if (!result.levels.hasEveryLevel()) {
-            dataState.update { state -> state.copy(saveResult = result) }
-            load()
+            reloadSaved(result)
             return
         }
         dataState.update { state ->
             state
                 .loaded(result.levels)
-                .copy(saveResult = result)
+                .copy(
+                    isSaving = false,
+                    saveResult = result,
+                )
+        }
+    }
+
+    private fun reloadSaved(result: SaveLevelsResult.Saved) {
+        viewModelScope.launch {
+            val loadResult = getLevelsUseCase()
+            dataState.update { state ->
+                state
+                    .answered(loadResult)
+                    .copy(
+                        isSaving = false,
+                        saveResult = result,
+                    )
+            }
         }
     }
 
@@ -126,9 +174,14 @@ internal class LevelsViewModel(
         }
     }
 
+    private fun DataState.answered(result: LoadResult<List<Level>>): DataState = when (result) {
+        is LoadResult.Failed -> copy(isLoadFailed = true)
+        is LoadResult.Loaded -> loaded(result.value)
+    }
+
     private fun DataState.loaded(levels: List<Level>): DataState = copy(
         forms = levels.toInputs(),
-        isSaving = false,
+        isLoadFailed = false,
         levels = levels,
     )
 
@@ -208,7 +261,11 @@ internal class LevelsViewModel(
 
         data class LevelClicked(val code: LevelCode) : Event
 
+        data object ModelsRetryClicked : Event
+
         data object Opened : Event
+
+        data object RefreshClicked : Event
 
         data object RetryClicked : Event
 

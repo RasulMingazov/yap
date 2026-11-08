@@ -36,6 +36,7 @@ internal class RemoteLevelRepository(
     private suspend fun HttpResponse.toSaveResult(): SaveLevelsResult = when (status) {
         HttpStatusCode.OK -> SaveLevelsResult.Saved(toLevels())
         HttpStatusCode.BadRequest -> SaveLevelsResult.Invalid
+        HttpStatusCode.Conflict -> SaveLevelsResult.ModelUnavailable
         else -> SaveLevelsResult.Failed
     }
 

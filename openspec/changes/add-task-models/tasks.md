@@ -154,8 +154,8 @@ Files: `al/data/repository/RemoteLevelRepository.kt` (409),
 `al/presentation/LevelsViewModel.kt` (logic), `StubGetModelsUseCase` (from part 8),
 `RemoteLevelRepositoryTest`, and `LevelsViewModelTest`.
 
-- [ ] 11.1 Map 409 in the levels repository; verify with `RemoteLevelRepositoryTest` for 409 that gives `ModelUnavailable` (part 10 maps and tests the level model)
-- [ ] 11.2 Load the levels and the models together in `LevelsViewModel`, with the models Retry, the model change of a level, the stored model in a save without the models, and Refresh after `ModelUnavailable`; verify with the view-model tests for each of these, a chosen model and Default in the save, and the levels load error
+- [x] 11.1 Map 409 in the levels repository; verify with `RemoteLevelRepositoryTest` for 409 that gives `ModelUnavailable` (part 10 maps and tests the level model)
+- [x] 11.2 Load the levels and the models together in `LevelsViewModel`, with the models Retry, the model change of a level, the stored model in a save without the models, and Refresh after `ModelUnavailable`; verify with the view-model tests for each of these, a chosen model and Default in the save, and the levels load error
 
 ## 12. [12/15] Admin Levels Model column (about 200 lines)
 
