@@ -6,6 +6,8 @@ internal sealed interface SaveLevelsResult {
 
     data object Invalid : SaveLevelsResult
 
+    data object ModelUnavailable : SaveLevelsResult
+
     data class NoIdioms(val code: LevelCode) : SaveLevelsResult
 
     data class NoWordCount(val code: LevelCode) : SaveLevelsResult

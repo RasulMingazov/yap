@@ -13,6 +13,7 @@ private fun LevelSettings.toInput(): LevelInput = LevelInput(
     block = block,
     idioms = idioms,
     maxWords = maxWords.toString(),
+    model = model,
     ratingFrom = ratingFromText(),
     vocabulary = vocabulary,
 )
@@ -25,6 +26,7 @@ private val EMPTY_INPUT = LevelInput(
     block = "",
     idioms = null,
     maxWords = "",
+    model = null,
     ratingFrom = "",
     vocabulary = "",
 )

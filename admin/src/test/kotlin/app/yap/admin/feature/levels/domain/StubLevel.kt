@@ -41,12 +41,14 @@ internal object StubLevel {
         block: String = BLOCK,
         idioms: Idioms? = Idioms.RARELY,
         maxWords: String = MAX_WORDS.toString(),
+        model: String? = null,
         ratingFrom: String = RANGE_FROM.toString(),
         vocabulary: String = VOCABULARY,
     ): LevelInput = LevelInput(
         block = block,
         idioms = idioms,
         maxWords = maxWords,
+        model = model,
         ratingFrom = ratingFrom,
         vocabulary = vocabulary,
     )
@@ -63,12 +65,14 @@ internal object StubLevel {
         block: String = BLOCK,
         idioms: Idioms = Idioms.RARELY,
         maxWords: Int = MAX_WORDS,
+        model: String? = null,
         ratingFrom: Int? = RANGE_FROM,
         vocabulary: String = VOCABULARY,
     ): LevelSettings = LevelSettings(
         block = block,
         idioms = idioms,
         maxWords = maxWords,
+        model = model,
         ratingFrom = ratingFrom,
         vocabulary = vocabulary,
     )

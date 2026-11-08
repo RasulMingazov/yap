@@ -137,13 +137,15 @@ This part holds the state of M2, M3, M4 and M6, before the screen. Split of the 
 part holds the state types nested in `LevelsViewModel` and the mapper with its tests; part 11 holds
 the logic.
 
-Files: `al/domain/LevelSettings.kt` (`model`), `al/domain/SaveLevelsResult.kt` (`ModelUnavailable`),
-`al/presentation/LevelsViewModel.kt` (the nested state types only: the model of the form, the model
-choices, the state of the models load, the status `ModelUnavailable`),
-`al/presentation/LevelsUiStateMapper.kt`, `admin/src/test/.../feature/levels/domain/StubLevel.kt`,
-and `LevelsUiStateMapperTest`.
+Files: `al/domain/LevelSettings.kt` and `al/domain/LevelInput.kt` (`model`), `al/domain/SaveLevelsResult.kt`
+(`ModelUnavailable`), `al/presentation/LevelInputMapper.kt`, `al/domain/usecase/SaveLevelsUseCase.kt` and
+`al/data/mapper/LevelMapper.kt` (they pass `model` on), `al/presentation/LevelsViewModel.kt` (the nested
+state types: the facts `models` and `isModelsLoadFailed`, the model choices, the row model and the
+No rating note; and the `ModelUnavailable` branch of the save), `al/presentation/LevelsUiStateMapper.kt`,
+`admin/src/test/.../feature/levels/domain/StubLevel.kt`, `DefaultSaveLevelsUseCaseTest` (the model in
+the save) and `LevelsUiStateMapperTest`. Part 11 keeps the tests of `LevelMapper` and the 409.
 
-- [ ] 10.1 Add the level model to the Levels UI state; verify with the mapper tests for Default before a save, the choices in the server's order with the one name Default (M2), the No rating line on the calibration model (M3), Default disabled and the models error with Retry while the table shows (M4), and the status that a level model is no longer available with Refresh (M6)
+- [x] 10.1 Add the level model to the Levels UI state; verify with the mapper tests for Default before a save, the choices in the server's order with the one name Default (M2), the No rating line on the calibration model (M3), Default disabled and the models error with Retry while the table shows (M4), and the status that a level model is no longer available with Refresh (M6)
 
 ## 11. [11/15] Admin Levels data and view model (about 300 lines)
 
