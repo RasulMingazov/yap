@@ -23,6 +23,7 @@ import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelCode
 import app.yap.admin.feature.levels.domain.LevelInput
+import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.StubLevel
 import app.yap.admin.feature.levels.presentation.LevelsUiStateMapper
 import app.yap.admin.feature.levels.presentation.LevelsViewModel
@@ -227,18 +228,18 @@ internal class ScreenCaptureTest {
             "loading" to LevelsViewModel.DataState(),
             "error" to LevelsViewModel.DataState(isLoadFailed = true),
             "new" to new,
-            "saved" to saved.copy(saveStatus = LevelsViewModel.SaveStatus.Saved),
+            "saved" to saved.copy(saveResult = SaveLevelsResult.Saved(LEVELS)),
             "chosen-b2" to saved.copy(chosen = LevelCode.B2),
             "saving" to saved.copy(isSaving = true),
-            "invalid" to new.copy(saveStatus = LevelsViewModel.SaveStatus.Invalid),
-            "no-idioms" to new.copy(saveStatus = LevelsViewModel.SaveStatus.NoIdioms(LevelCode.A1)),
+            "invalid" to new.copy(saveResult = SaveLevelsResult.Invalid),
+            "no-idioms" to new.copy(saveResult = SaveLevelsResult.NoIdioms(LevelCode.A1)),
             "unread-rating-from" to saved.unread(
                 code = LevelCode.B2,
-                field = LevelsViewModel.NumberField.RATING_FROM,
+                field = SaveLevelsResult.NumberField.RATING_FROM,
             ) { form -> form.copy(ratingFrom = "12OO") },
             "unread-max-words" to saved.unread(
                 code = LevelCode.C1,
-                field = LevelsViewModel.NumberField.MAX_WORDS,
+                field = SaveLevelsResult.NumberField.MAX_WORDS,
             ) { form -> form.copy(maxWords = "twenty") },
         )
 
@@ -362,11 +363,11 @@ internal class ScreenCaptureTest {
 
     private fun LevelsViewModel.DataState.unread(
         code: LevelCode,
-        field: LevelsViewModel.NumberField,
+        field: SaveLevelsResult.NumberField,
         change: (LevelInput) -> LevelInput,
     ): LevelsViewModel.DataState = copy(
         forms = forms + (code to change(forms.getValue(code))),
-        saveStatus = LevelsViewModel.SaveStatus.UnreadNumber(
+        saveResult = SaveLevelsResult.UnreadNumber(
             code = code,
             field = field,
         ),

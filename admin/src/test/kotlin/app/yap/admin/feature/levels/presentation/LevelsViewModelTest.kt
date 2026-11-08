@@ -64,35 +64,28 @@ internal class LevelsViewModelTest {
     }
 
     @Test
-    fun `GIVEN No rating without a rating from WHEN saving THEN every level is sent`() = runTest(dispatcher) {
+    fun `GIVEN an edited level WHEN saving THEN the forms of every level are sent`() = runTest(dispatcher) {
         val env = Environment()
         advanceUntilIdle()
-        val rated = LevelCode.entries.dropLast(1).map { code -> StubLevel.stubEntry(code = code) }
-        val noRating = StubLevel.stubEntry(LevelCode.NO_RATING, StubLevel.stubSettings(ratingFrom = null))
+        val form = StubLevel.stubInput(maxWords = "16a")
 
+        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.C1, form = form))
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
-        env.saveLevelsUseCase.invokeCall.calledWith(rated + noRating)
+        env.saveLevelsUseCase.invokeCall.calledWith(StubLevel.stubLevels().toInputs() + (LevelCode.C1 to form))
     }
 
     @Test
-    fun `GIVEN A1 without a rating from WHEN saving THEN A1 is sent without it`() = runTest(dispatcher) {
-        val env = Environment()
+    fun `GIVEN a word count that is not a number WHEN saving THEN it names the level`() = runTest(dispatcher) {
+        val result = SaveLevelsResult.UnreadNumber(LevelCode.C1, SaveLevelsResult.NumberField.MAX_WORDS)
+        val env = Environment(saveResult = result)
         advanceUntilIdle()
-        val withoutRatingFrom = StubLevel.stubSettings(ratingFrom = null)
-        val rated = listOf(LevelCode.A2, LevelCode.B1, LevelCode.B2, LevelCode.C1, LevelCode.C2)
-            .map { code -> StubLevel.stubEntry(code = code) }
 
-        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.A1, form = StubLevel.stubInput(ratingFrom = "")))
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
-        env.saveLevelsUseCase.invokeCall.calledWith(
-            listOf(StubLevel.stubEntry(LevelCode.A1, withoutRatingFrom)) +
-                rated +
-                StubLevel.stubEntry(LevelCode.NO_RATING, withoutRatingFrom),
-        )
+        assertEquals(expected = "Проверьте число в «Слов в фразе»: C1", actual = env.content().saveStatus?.text)
     }
 
     @Test
@@ -127,70 +120,13 @@ internal class LevelsViewModelTest {
         }
 
     @Test
-    fun `GIVEN a word count that is not a number WHEN saving THEN it names the level and sends nothing`() =
-        runTest(dispatcher) {
-            val env = Environment()
-            advanceUntilIdle()
-            val form = StubLevel.stubInput()
-
-            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.NO_RATING, form = form.copy(maxWords = "16a")))
-            env.viewModel.onEvent(Event.SaveClicked)
-            advanceUntilIdle()
-
-            env.saveLevelsUseCase.invokeCall.notCalled()
-            assertEquals(expected = "Проверьте число в «Слов в фразе»: Без рейтинга", actual = env.content().saveStatus?.text)
-        }
-
-    @Test
-    fun `GIVEN a rating from that is not a number WHEN saving THEN it names the level and sends nothing`() =
-        runTest(dispatcher) {
-            val env = Environment()
-            advanceUntilIdle()
-            val form = StubLevel.stubInput()
-
-            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.A2, form = form.copy(ratingFrom = "10a")))
-            env.viewModel.onEvent(Event.SaveClicked)
-            advanceUntilIdle()
-
-            env.saveLevelsUseCase.invokeCall.notCalled()
-            assertEquals(expected = "Проверьте число в «Рейтинг»: A2", actual = env.content().saveStatus?.text)
-        }
-
-    @Test
-    fun `GIVEN an empty word count WHEN saving THEN it names the level and sends nothing`() = runTest(dispatcher) {
-        val env = Environment()
-        advanceUntilIdle()
-
-        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = StubLevel.stubInput(maxWords = "")))
-        env.viewModel.onEvent(Event.SaveClicked)
-        advanceUntilIdle()
-
-        env.saveLevelsUseCase.invokeCall.notCalled()
-        assertEquals(expected = "Проверьте число в «Слов в фразе»: B1", actual = env.content().saveStatus?.text)
-    }
-
-    @Test
-    fun `GIVEN a level without idioms WHEN saving THEN it asks to choose them and sends nothing`() =
-        runTest(dispatcher) {
-            val env = Environment()
-            advanceUntilIdle()
-
-            env.viewModel.onEvent(Event.FormChanged(code = LevelCode.C1, form = StubLevel.stubInput(idioms = null)))
-            env.viewModel.onEvent(Event.SaveClicked)
-            advanceUntilIdle()
-
-            env.saveLevelsUseCase.invokeCall.notCalled()
-            assertEquals(expected = "Выберите идиомы: C1", actual = env.content().saveStatus?.text)
-        }
-
-    @Test
     fun `GIVEN a save in progress WHEN a field changes THEN the edit is ignored`() = runTest(dispatcher) {
         val env = Environment(saveResult = SaveLevelsResult.Invalid)
         advanceUntilIdle()
-        val form = StubLevel.stubInput()
+        val form = StubLevel.stubInput(block = "New block")
 
         env.viewModel.onEvent(Event.SaveClicked)
-        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = form.copy(block = "New block")))
+        env.viewModel.onEvent(Event.FormChanged(code = LevelCode.B1, form = form))
         advanceUntilIdle()
 
         assertEquals(expected = StubLevel.BLOCK, actual = env.content().block.form.block)

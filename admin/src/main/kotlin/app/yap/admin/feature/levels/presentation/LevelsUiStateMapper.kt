@@ -4,10 +4,10 @@ import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelCode
+import app.yap.admin.feature.levels.domain.SaveLevelsResult
+import app.yap.admin.feature.levels.domain.SaveLevelsResult.NumberField
 import app.yap.admin.feature.levels.domain.hasEveryLevel
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.DataState
-import app.yap.admin.feature.levels.presentation.LevelsViewModel.NumberField
-import app.yap.admin.feature.levels.presentation.LevelsViewModel.SaveStatus
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
 
 internal object LevelsUiStateMapper : (DataState) -> UiState {
@@ -81,16 +81,17 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
     }
 
     private fun DataState.saveStatus(): Status? =
-        if (isSaving) Status(text = "Сохранение…", tone = Status.Tone.MUTED) else saveStatus?.status()
+        if (isSaving) Status(text = "Сохранение…", tone = Status.Tone.MUTED) else saveResult?.status()
 
-    private fun SaveStatus.status(): Status = when (this) {
-        is SaveStatus.Invalid -> Status(
+    private fun SaveLevelsResult.status(): Status? = when (this) {
+        is SaveLevelsResult.Failed -> null
+        is SaveLevelsResult.Invalid -> Status(
             text = "Заполните все уровни, рейтинг должен расти от A1 к C2",
             tone = Status.Tone.ERROR,
         )
-        is SaveStatus.NoIdioms -> Status(text = "Выберите идиомы: ${code.label()}", tone = Status.Tone.ERROR)
-        is SaveStatus.Saved -> Status(text = "Сохранено", tone = Status.Tone.SUCCESS)
-        is SaveStatus.UnreadNumber -> Status(
+        is SaveLevelsResult.NoIdioms -> Status(text = "Выберите идиомы: ${code.label()}", tone = Status.Tone.ERROR)
+        is SaveLevelsResult.Saved -> Status(text = "Сохранено", tone = Status.Tone.SUCCESS)
+        is SaveLevelsResult.UnreadNumber -> Status(
             text = "Проверьте число в «${field.label()}»: ${code.label()}",
             tone = Status.Tone.ERROR,
         )
