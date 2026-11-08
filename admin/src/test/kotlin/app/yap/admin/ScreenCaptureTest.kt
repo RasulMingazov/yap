@@ -388,7 +388,7 @@ internal class ScreenCaptureTest {
         const val VERSION_GAP_DAYS = 3L
         val CHARACTER_ID = CharacterId(StubCharacter.CHARACTER_ID)
         val CAST = listOf(
-            StubCharacterSummary.stubCharacterSummary(),
+            StubCharacterSummary.stubCharacterSummary(topicCount = 1),
             StubCharacterSummary.stubCharacterSummary(
                 characterId = "7d1e0c2a-4b3f-4e6a-9c8d-2f1a0b3c4d5e",
                 profile = StubCharacter.stubProfile(
@@ -396,6 +396,7 @@ internal class ScreenCaptureTest {
                     personality = "Calm and precise. Corrects mistakes gently, explains why, and gives one short " +
                         "example from daily life before she moves on to the next question.",
                 ),
+                topicCount = 121,
             ),
             StubCharacterSummary.stubCharacterSummary(
                 characterId = "9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
@@ -403,6 +404,17 @@ internal class ScreenCaptureTest {
                     name = "Oliver Montgomery-Smith",
                     personality = "Grumpy but kind.",
                 ),
+                topicCount = 4,
+            ),
+            StubCharacterSummary.stubCharacterSummary(
+                characterId = "3e5f7a9b-1c2d-4e6f-8a0b-9c8d7e6f5a4b",
+                profile = StubCharacter.stubProfile(name = "Emma", personality = "Cheerful and patient."),
+                topicCount = 12,
+            ),
+            StubCharacterSummary.stubCharacterSummary(
+                characterId = "5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d",
+                profile = StubCharacter.stubProfile(name = "Jack", personality = "Direct and funny."),
+                topicCount = 21,
             ),
         )
         val CONNECTED_LABEL = ServerUiStateMapper(
