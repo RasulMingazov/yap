@@ -84,11 +84,11 @@ ModelTask = TOPIC_REPLY | TOPIC_CHECK | TOPIC_HINTS | TOPIC_REVIEW | CALIBRATION
             (enum, the order of the table; dependsOnLevel = TOPIC_REPLY, TOPIC_HINTS)
 TaskModel(task, choice: ModelChoice)
 ModelsOverview(tasks: List<TaskModel>, providers: List<ProviderState(id, name, models, connected)>)
-SaveTaskModelsOutcome = Invalid | Saved(ModelsOverview)
+SaveTaskModelsOutcome = Invalid | CatalogChanged | Saved(ModelsOverview)
 ```
 
-- One rule in `model/`, `TaskModelTableValidity`, checks a full save: each task once, and each
-  choice in the catalog.
+- One rule in `model/`, `TaskModelTableValidity`, checks a full save: each task once (`Invalid`),
+  and each choice in the catalog (`CatalogChanged`).
 - A second rule in `model/`, `TaskModelChoice`, gives the choice of a task from its stored row: the
   row when it is in the catalog, else `ModelCatalog.DEFAULT`. Two use cases need it, so it lives in
   `model/`, as `docs/server/001-structure.md` says. `TaskModelChoiceTest` covers no row, a row in
@@ -143,20 +143,42 @@ alter table levels add column model text;
 
 - `GET /admin/models` returns `ModelsDto(tasks: List<TaskModelDto>, providers: List<ProviderDto>)`.
 - `TaskModelDto(task, provider, model)`: strings; the codes are the enum names.
-- `ProviderDto(code, name, models: List<String>, connected: Boolean)`. No key field.
+- `ProviderDto(code, name, models: List<String>, connected: Boolean, keySetting: String)`.
+  `keySetting` is the name of the setting, `DEEPSEEK_API_KEY`, for the next step of Not connected.
+  No key field. The name comes from `core-llm`, so the admin app holds no provider facts.
 - `PUT /admin/models` takes a JSON array of `TaskModelDto` and returns `ModelsDto`. 400 for an
-  unknown task or provider code (`entries.find`, as in levels), and for `Invalid`.
+  unknown task code (`entries.find`, as in levels) and for a task missing or twice. 409 for a
+  provider or a model outside the catalog: the mapper keeps an unknown provider code as no
+  provider, and the use case answers `CatalogChanged`. So the admin app can tell a changed catalog
+  from a broken form.
 - `LevelSettingsDto` gets `model: String? = null`. The default keeps old clients valid.
+- `PUT /admin/levels` answers 409 for a level model outside the catalog
+  (`SaveLevelsOutcome.ModelUnavailable`), and 400 as before for the other rules.
 
 ### The admin app
 
 - `feature/models` has the Ktorfit API, the remote repository, `GetModelsUseCase`,
-  `SaveModelsUseCase` and `ModelsViewModel`. The titles and the when-lines of the tasks are Russian
-  copy in `ModelTaskTitles.kt`, as `PromptTitles.kt` does for the prompts.
+  `SaveModelsUseCase` and `ModelsViewModel`. `ModelTaskTitles.kt` takes the title and the usage
+  line of the four topic tasks from `PromptKey.title()` and `PromptKey.usage()` of
+  `feature/prompts`, so the two screens have one source. Calibration takes
+  `PromptGroup.CALIBRATION.title()` and its own line.
 - The form keeps the choice of each task. A change of provider sets the first model of that
   provider from the server's list. Save sends the five tasks. A 400 gives the error beside Save.
 - `LevelsViewModel` also calls `GetModelsUseCase` of `feature/models` for the Model choices. The two
-  loads run together; either failure is the load error. The level form gets `model: String?`.
+  loads run together and have their own states. A failed levels load is the screen error. A failed
+  models load keeps the table, shows Default disabled in Model, and shows its own error with Retry,
+  which reloads only the models. The level form gets `model: String?`; without the models, Save
+  sends the stored model, so a failed load never clears a level model.
+- The UX review of the design (`ux-review`, decisions M1 to M6, m7 and m8 of the orchestrator)
+  sets these states:
+  - Models: Not connected in the warning tone with the step to add the key setting, and a mark on
+    each task row with a Not connected provider (M1). A 409 on Save gives the status that the
+    model list on the server changed, with Refresh, which reloads (M5). The loader while loading
+    (m7). The task lines from the prompts (m8).
+  - Levels: one name Default on both screens, and the table note on Character reply, Hints and
+    Default (M2). The No rating row names the calibration model on Models (M3). The models error
+    without a blocked screen (M4). A 409 on Save gives the status that a level model is no longer
+    available, with Refresh (M6).
 - `Screen.Models` goes into the group Settings after Server. #10 adds Prompts to the group Rules at
   the same time in `Sidebar.kt` and `NavigationViewModel.kt`.
 - The toolbar uses `ToolbarSaveAction`. The selects use `AdminSelect`.
@@ -169,6 +191,7 @@ alter table levels add column model text;
 - The note under the Who does what table names Character reply and Hints. The canvas says the level model
   works wherever it is set.
 - The Levels Model choices show the model name, as the canvas does; Default for no model.
+- The UX states M1 to M6 and m7 are not in the canvas. The canvas update is for the owner (m9).
 
 ## Risks / Trade-offs
 

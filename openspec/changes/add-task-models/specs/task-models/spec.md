@@ -32,12 +32,14 @@ to one provider only.
 ### Requirement: A provider is connected when the server has its key
 
 A provider SHALL be Connected when the server has a key for it that is not blank. The admin API
-SHALL NOT return a key.
+SHALL return the name of the setting that holds the key of each provider, such as
+`DEEPSEEK_API_KEY`, and SHALL NOT return a key.
 
 #### Scenario: The server has the key
 
 - **WHEN** the server runs with a DeepSeek key and the admin app reads the models
-- **THEN** DeepSeek is Connected and the answer holds no key
+- **THEN** DeepSeek is Connected, the answer names the setting `DEEPSEEK_API_KEY`, and it holds no
+  key
 
 #### Scenario: The server has no key
 
@@ -125,17 +127,24 @@ The server SHALL keep the choices of the tasks in its database.
 
 Behind the admin key, the server SHALL return the five tasks with their choices and the providers
 with their models and their Connected state at `GET /admin/models`. It SHALL replace the choices at
-`PUT /admin/models` and answer with the same content as `GET`.
+`PUT /admin/models` and answer with the same content as `GET`. A save with a provider or a model
+that is not in the catalog SHALL get 409. A save with a task missing, twice or unknown SHALL get
+400.
 
 #### Scenario: No admin key
 
 - **WHEN** a call to the models API has no admin key or a wrong one
 - **THEN** the server answers 401 and changes nothing
 
-#### Scenario: A rejected save
+#### Scenario: A model that is not in the catalog
 
 - **WHEN** the admin app saves the tasks with a model that is not in the catalog
-- **THEN** the server answers 400
+- **THEN** the server answers 409 and changes nothing
+
+#### Scenario: A save without a task
+
+- **WHEN** the admin app saves the tasks without Hints
+- **THEN** the server answers 400 and changes nothing
 
 #### Scenario: An unknown task
 
@@ -163,6 +172,17 @@ in Levels.
 
 - **WHEN** the owner opens Models before any save
 - **THEN** the table shows the five tasks with DeepSeek and `deepseek-flash`
+
+#### Scenario: Models loads
+
+- **WHEN** the owner opens Models and the server has not answered yet
+- **THEN** Models shows the loader and no table
+
+#### Scenario: The task lines
+
+- **WHEN** the owner opens Models
+- **THEN** Character reply, Step check, Hints and Review show the same title and usage line as
+  their prompts on Prompts, and Calibration shows its own line on the check and Sam's replies
 
 #### Scenario: Models opens again
 
@@ -193,7 +213,9 @@ provider.
 ### Requirement: The Providers section
 
 The section Providers SHALL list each provider with its name, its models and Connected or Not
-connected. A note SHALL say that the keys are on the server and the admin app does not show them.
+connected. Not connected SHALL show in the warning tone with the next step: add the key setting
+that the server names to the server settings. A note SHALL say that the keys are on the server and
+the admin app does not show them.
 
 #### Scenario: A connected provider
 
@@ -203,7 +225,13 @@ connected. A note SHALL say that the keys are on the server and the admin app do
 #### Scenario: A provider without a key
 
 - **WHEN** the server has no DeepSeek key and the owner opens Models
-- **THEN** Providers shows DeepSeek and Not connected
+- **THEN** Providers shows DeepSeek and Not connected in the warning tone, with the step to add
+  `DEEPSEEK_API_KEY` to the server settings
+
+#### Scenario: A task with a provider without a key
+
+- **WHEN** the server has no DeepSeek key and a task has DeepSeek
+- **THEN** the row of that task shows a short Not connected mark
 
 ### Requirement: Saving the models
 
@@ -228,9 +256,20 @@ and a Saved status.
 
 #### Scenario: The server rejects the save
 
-- **WHEN** the server rejects the tasks
+- **WHEN** the server rejects the tasks with 400
 - **THEN** the admin app shows an error beside Save that asks to choose a model of the provider for
   every task, and keeps the form as it is
+
+#### Scenario: The catalog changed before the save
+
+- **WHEN** the server rejects the tasks with 409
+- **THEN** the admin app shows a status beside Save that the model list on the server changed,
+  with Refresh
+
+#### Scenario: Refresh after a changed catalog
+
+- **WHEN** the owner clicks Refresh beside Save
+- **THEN** the admin app loads the models again and shows the choices from the server
 
 #### Scenario: The server does not answer
 

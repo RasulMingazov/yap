@@ -101,18 +101,35 @@ the block into the reply and hints prompts as `{level.rules}`.
 - **WHEN** the server returns the levels without one of the seven
 - **THEN** Levels shows an error that the levels did not load, and Retry
 
-#### Scenario: The models do not load
+### Requirement: The admin API serves the levels
 
-- **WHEN** the admin app loads the levels but cannot load the models
-- **THEN** Levels shows an error that the levels did not load, and Retry
+Behind the admin key, the server SHALL return the seven levels with their ranges at
+`GET /admin/levels` and replace them at `PUT /admin/levels`. A save with a model that is not in the
+provider catalog SHALL get 409, so the admin app can tell it from a form error.
+
+#### Scenario: No admin key
+
+- **WHEN** a call to the levels API has no admin key or a wrong one
+- **THEN** the server answers 401 and changes nothing
+
+#### Scenario: A rejected save
+
+- **WHEN** the admin app saves the levels with an empty value
+- **THEN** the server answers 400
+
+#### Scenario: A model that is not in the catalog
+
+- **WHEN** the admin app saves B1 with a model that the provider catalog does not have
+- **THEN** the server answers 409 and changes nothing
 
 ## ADDED Requirements
 
 ### Requirement: The Model column of a level
 
 Model SHALL offer Default and every model of the provider catalog, in the order of the server.
-Default SHALL mean no model for the level. A level without a model, or without saved values, SHALL
-show Default. Save SHALL send the chosen model of each level with its other values.
+Default SHALL mean no model for the level, and SHALL have the same name on Levels and Models. A
+level without a model, or without saved values, SHALL show Default. Save SHALL send the chosen
+model of each level with its other values.
 
 #### Scenario: A level before a save
 
@@ -133,3 +150,58 @@ show Default. Save SHALL send the chosen model of each level with its other valu
 
 - **WHEN** the owner chooses Default for B1 and clicks Save
 - **THEN** the admin app sends B1 with no model
+
+### Requirement: The notes on the level model
+
+The note below the table SHALL say that the model of a level works for Character reply and Hints,
+and that Default is the model of the task on Models. The Rating of No rating SHALL also say that
+the calibration model is set on Models: the level model does not apply to the calibration.
+
+#### Scenario: The table note
+
+- **WHEN** the owner opens Levels
+- **THEN** the note below the table names Character reply, Hints and Default as the model of the
+  task on Models
+
+#### Scenario: No rating and the calibration
+
+- **WHEN** the owner opens Levels
+- **THEN** the row of No rating says that the calibration model is set on Models
+
+### Requirement: Levels without the models
+
+When the admin app loads the levels but not the models, Levels SHALL show the table. The Model of
+each level SHALL show Default with the choice disabled, and an error that the models did not load
+SHALL show with Retry. Save SHALL send the stored model of each level as it was.
+
+#### Scenario: The models do not load
+
+- **WHEN** the admin app loads the levels but cannot load the models
+- **THEN** Levels shows the table, every Model shows Default and is disabled, and an error that
+  the models did not load shows with Retry
+
+#### Scenario: Retry the models
+
+- **WHEN** the owner clicks Retry after the models did not load, and the models load
+- **THEN** the Model choices become enabled and show the model of each level
+
+#### Scenario: A save without the models
+
+- **WHEN** the models did not load, B1 has the stored model `deepseek-v4-pro`, and the owner saves
+- **THEN** the admin app sends B1 with the model `deepseek-v4-pro`
+
+### Requirement: A level model that is no longer available
+
+When the server answers 409 on Save, the admin app SHALL show a status beside Save that a level
+model is no longer available, with Refresh. Refresh SHALL load the levels and the models again.
+
+#### Scenario: The catalog changed before the save
+
+- **WHEN** the owner saves a level model that the server no longer has
+- **THEN** the admin app shows the status that the level model is no longer available, with
+  Refresh, and not the error that asks to fill every level
+
+#### Scenario: Refresh
+
+- **WHEN** the owner clicks Refresh beside Save
+- **THEN** the admin app loads the levels and the models again

@@ -25,6 +25,9 @@ own model for the replies and the hints.
 - The admin app gets the Models screen in the sidebar group Settings: the section Who does what
   with Task, Provider and Model, and the section Providers with the Connected state.
 - The Levels screen gets the Model column: Default or a model of the catalog.
+- The states of the UX review of the design: Not connected with the next step and a mark on its
+  task rows, a status with Refresh when the catalog changed before a save (409), the loader, task
+  lines shared with Prompts, and Levels that still shows its table when the models do not load.
 
 Out of scope:
 
