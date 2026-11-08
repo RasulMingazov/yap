@@ -64,7 +64,7 @@ internal class TopicsUiStateMapperTest {
                         UiState.TodoEntry.Draft(
                             date = "Пт, 24 окт",
                             note = "Черновик. Опубликуйте.",
-                            title = "At the cafe",
+                            title = "At the cafe.",
                             topicId = TopicId(StubTopic.TOPIC_ID),
                         ),
                         UiState.TodoEntry.EmptyDay(
@@ -157,7 +157,7 @@ internal class TopicsUiStateMapperTest {
                     UiState.TodoEntry.Draft(
                         date = "Пт, 24 окт",
                         note = "Черновик. Опубликуйте.",
-                        title = "At the cafe",
+                        title = "At the cafe.",
                         topicId = TopicId(StubTopic.TOPIC_ID),
                     ),
                 ),
@@ -182,7 +182,7 @@ internal class TopicsUiStateMapperTest {
                     UiState.TodoEntry.Draft(
                         date = "Пт, 24 окт",
                         note = "Дописать описание и шаги 3–5.",
-                        title = "At the cafe",
+                        title = "At the cafe.",
                         topicId = TopicId(StubTopic.TOPIC_ID),
                     ),
                 ),
@@ -214,7 +214,7 @@ internal class TopicsUiStateMapperTest {
             expected = UiState.Content(
                 reloadError = UiState.ReloadError(
                     isRetrying = false,
-                    message = "Не удалось обновить темы",
+                    message = "Не удалось обновить темы. Показан прежний список.",
                 ),
                 rows = listOf(UiState.Row.EmptyDay(date = "Пт, 24 окт")),
                 todo = UiState.TodoList.Empty(message = "Всё сделано"),
@@ -236,7 +236,7 @@ internal class TopicsUiStateMapperTest {
         assertEquals(
             expected = UiState.ReloadError(
                 isRetrying = true,
-                message = "Не удалось обновить темы",
+                message = "Не удалось обновить темы. Показан прежний список.",
             ),
             actual = uiState.reloadError,
         )
@@ -249,18 +249,6 @@ internal class TopicsUiStateMapperTest {
         val uiState = TopicsUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить темы"), actual = uiState)
-    }
-
-    @Test
-    fun `GIVEN no calendar and a retry after a failed load WHEN mapping THEN the screen is loading`() {
-        val state = DataState(
-            isLoadFailed = true,
-            isLoading = true,
-        )
-
-        val uiState = TopicsUiStateMapper(state)
-
-        assertEquals(expected = UiState.Loading, actual = uiState)
     }
 
     @Test

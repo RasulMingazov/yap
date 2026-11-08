@@ -32,7 +32,7 @@ internal object TopicsUiStateMapper : (DataState) -> UiState {
         if (!isLoadFailed) return null
         return UiState.ReloadError(
             isRetrying = isLoading,
-            message = "Не удалось обновить темы",
+            message = "Не удалось обновить темы. Показан прежний список.",
         )
     }
 
@@ -86,7 +86,7 @@ internal object TopicsUiStateMapper : (DataState) -> UiState {
         is Todo.Draft -> UiState.TodoEntry.Draft(
             date = ReleaseDateFormat.short(date),
             note = note(),
-            title = title,
+            title = "$title.",
             topicId = topicId,
         )
         is Todo.EmptyDay -> UiState.TodoEntry.EmptyDay(

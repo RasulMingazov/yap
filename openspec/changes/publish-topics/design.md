@@ -168,6 +168,8 @@ The admin app maps each field and status to its Russian copy and tone. It derive
 - A rejection error has three parts: what happened, that the changes are not saved, the next step.
   Save draft builds its 400 text from the gaps too.
 - A failed reload of the calendar shows a banner with Retry above the kept calendar.
+  `TopicsViewModel` keeps `isLoadFailed` until a load succeeds, so the banner stays during the
+  retry. This is an exception to «clear stale errors on retry» in `docs/admin/001-view-models.md`.
 - The copy agrees with the feminine «тема»: «Опубликована», «Вышла», «· опубликована». A Today
   note says that users see edits at once.
 - Publish is the primary button and hides for a published topic. Save draft keeps the secondary

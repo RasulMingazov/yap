@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -219,7 +220,10 @@ private fun TodoRow(
                     append(title)
                 }
                 append(" ")
-                withStyle(AdminTheme.Type.sub.toSpanStyle().copy(color = AdminTheme.Colors.muted)) {
+                val noteStyle = AdminTheme.Type.sub
+                    .toSpanStyle()
+                    .copy(color = AdminTheme.Colors.muted)
+                withStyle(noteStyle) {
                     append(note)
                 }
             },
@@ -366,6 +370,8 @@ private fun CellText(
             text = text,
             color = color,
             style = AdminTheme.Type.tableCell,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
