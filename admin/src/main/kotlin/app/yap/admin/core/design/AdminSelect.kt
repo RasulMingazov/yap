@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Dp
 
 @Composable
 internal fun <T> AdminSelect(
@@ -18,11 +19,12 @@ internal fun <T> AdminSelect(
     options: List<T>,
     placeholder: String,
     value: T?,
+    height: Dp = AdminTheme.Sizes.cellFieldHeight,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     Box {
         PopupButton(
-            height = AdminTheme.Sizes.cellFieldHeight,
+            height = height,
             enabled = enabled,
             onClick = { isExpanded = true },
             placeholder = placeholder,

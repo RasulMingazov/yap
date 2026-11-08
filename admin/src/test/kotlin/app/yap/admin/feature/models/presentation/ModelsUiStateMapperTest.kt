@@ -286,6 +286,14 @@ internal class ModelsUiStateMapperTest {
         )
     }
 
+    @Test
+    fun `GIVEN a Retry after an answer without tasks WHEN mapping THEN Models shows the loader`() {
+        val state = loaded(StubModels.stubModels(tasks = emptyList()))
+            .copy(isLoading = true)
+
+        assertEquals(expected = UiState.Loading, actual = ModelsUiStateMapper(state))
+    }
+
     private fun reviewWith(
         choice: ModelChoice,
         models: Models,

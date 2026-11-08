@@ -76,6 +76,12 @@ internal fun Sidebar(
                 onScreenClick = onScreenClick,
                 screen = Screen.Server,
             )
+            SidebarItem(
+                current = current,
+                label = "Модели",
+                onScreenClick = onScreenClick,
+                screen = Screen.Models,
+            )
         }
         Spacer(modifier = Modifier.weight(1f))
         Text(

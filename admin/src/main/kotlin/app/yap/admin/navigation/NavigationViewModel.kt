@@ -55,6 +55,8 @@ internal class NavigationViewModel(
 
         data object Levels : Screen
 
+        data object Models : Screen
+
         data object Prompts : Screen
 
         data object Server : Screen

@@ -19,6 +19,7 @@ internal object NavigationUiStateMapper : (DataState) -> UiState {
         is Screen.Topic -> Screen.Topics
         is Screen.Characters,
         is Screen.Levels,
+        is Screen.Models,
         is Screen.Prompts,
         is Screen.Server,
         is Screen.Topics,
