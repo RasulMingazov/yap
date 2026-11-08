@@ -49,13 +49,11 @@ internal fun CastRadioRow(
             color = if (enabled) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
             style = AdminTheme.Type.body,
         )
-        choice.meta?.let { meta ->
-            Text(
-                text = meta,
-                color = AdminTheme.Colors.muted,
-                style = AdminTheme.Type.sub,
-            )
-        }
+        Text(
+            text = choice.meta,
+            color = AdminTheme.Colors.muted,
+            style = AdminTheme.Type.sub,
+        )
     }
 }
 

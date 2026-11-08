@@ -4,6 +4,7 @@ import app.yap.admin.core.common.LoadResult
 import app.yap.admin.feature.characters.domain.Character
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.CharacterProfile
+import app.yap.admin.feature.characters.domain.CharacterSummary
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 
 internal interface CharacterRepository {
@@ -12,7 +13,7 @@ internal interface CharacterRepository {
 
     suspend fun find(characterId: CharacterId): LoadResult<Character>
 
-    suspend fun list(): LoadResult<List<Character>>
+    suspend fun list(): LoadResult<List<CharacterSummary>>
 
     suspend fun update(character: Character): SaveCharacterResult
 }

@@ -1,8 +1,9 @@
 package app.yap.admin.feature.characters.presentation
 
 import app.yap.admin.core.common.LoadResult
-import app.yap.admin.feature.characters.domain.Character
+import app.yap.admin.feature.characters.domain.CharacterSummary
 import app.yap.admin.feature.characters.domain.StubCharacter
+import app.yap.admin.feature.characters.domain.StubCharacterSummary
 import app.yap.admin.feature.characters.domain.usecase.StubGetCharactersUseCase
 import app.yap.admin.feature.characters.presentation.CharactersViewModel.Event
 import app.yap.admin.feature.characters.presentation.CharactersViewModel.UiState
@@ -36,7 +37,7 @@ internal class CharactersViewModelTest {
 
     @Test
     fun `GIVEN the server has characters WHEN the screen opens THEN it shows them`() = runTest(dispatcher) {
-        val env = Environment(characters = LoadResult.Loaded(listOf(StubCharacter.stubCharacter())))
+        val env = Environment(characters = LoadResult.Loaded(listOf(StubCharacterSummary.stubCharacterSummary())))
 
         env.viewModel.onEvent(Event.Opened)
         advanceUntilIdle()
@@ -47,7 +48,7 @@ internal class CharactersViewModelTest {
     @Test
     fun `GIVEN a shown list WHEN the screen opens again THEN the list stays until the new list replaces it`() =
         runTest(dispatcher) {
-            val env = Environment(characters = LoadResult.Loaded(listOf(StubCharacter.stubCharacter())))
+            val env = Environment(characters = LoadResult.Loaded(listOf(StubCharacterSummary.stubCharacterSummary())))
             env.viewModel.onEvent(Event.Opened)
             advanceUntilIdle()
             val rowCounts = mutableListOf<Int?>()
@@ -64,7 +65,7 @@ internal class CharactersViewModelTest {
 
     @Test
     fun `GIVEN a shown list WHEN the list does not update THEN the list stays`() = runTest(dispatcher) {
-        val env = Environment(characters = LoadResult.Loaded(listOf(StubCharacter.stubCharacter())))
+        val env = Environment(characters = LoadResult.Loaded(listOf(StubCharacterSummary.stubCharacterSummary())))
         env.viewModel.onEvent(Event.Opened)
         advanceUntilIdle()
         env.getCharactersUseCase.invokeCall.returns(LoadResult.Failed)
@@ -126,7 +127,7 @@ internal class CharactersViewModelTest {
     }
 
     private class Environment(
-        characters: LoadResult<List<Character>>,
+        characters: LoadResult<List<CharacterSummary>>,
     ) {
 
         val getCharactersUseCase = StubGetCharactersUseCase(characters = characters)
@@ -136,8 +137,8 @@ internal class CharactersViewModelTest {
     private companion object {
 
         val CAST = listOf(
-            StubCharacter.stubCharacter(),
-            StubCharacter.stubCharacter(
+            StubCharacterSummary.stubCharacterSummary(),
+            StubCharacterSummary.stubCharacterSummary(
                 characterId = "7d1e0c2a-4b3f-4e6a-9c8d-2f1a0b3c4d5e",
                 profile = StubCharacter.stubProfile(name = "Mia"),
             ),

@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.presentation.mapState
-import app.yap.admin.feature.characters.domain.Character
 import app.yap.admin.feature.characters.domain.CharacterId
+import app.yap.admin.feature.characters.domain.CharacterSummary
 import app.yap.admin.feature.characters.domain.usecase.GetCharactersUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -61,7 +61,7 @@ internal class CharactersViewModel(
     }
 
     data class DataState(
-        val characters: List<Character>? = null,
+        val characters: List<CharacterSummary>? = null,
         val isLoadFailed: Boolean = false,
         val isLoading: Boolean = false,
     )
@@ -74,6 +74,7 @@ internal class CharactersViewModel(
                 val characterId: CharacterId,
                 val name: String,
                 val personality: String,
+                val topicCountText: String,
             )
         }
 

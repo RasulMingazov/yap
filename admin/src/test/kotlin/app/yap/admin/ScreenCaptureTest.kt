@@ -13,6 +13,7 @@ import app.yap.admin.core.design.ToolbarBack
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.StubCharacter
+import app.yap.admin.feature.characters.domain.StubCharacterSummary
 import app.yap.admin.feature.characters.presentation.CharacterUiStateMapper
 import app.yap.admin.feature.characters.presentation.CharacterViewModel
 import app.yap.admin.feature.characters.presentation.CharactersUiStateMapper
@@ -387,8 +388,8 @@ internal class ScreenCaptureTest {
         const val VERSION_GAP_DAYS = 3L
         val CHARACTER_ID = CharacterId(StubCharacter.CHARACTER_ID)
         val CAST = listOf(
-            StubCharacter.stubCharacter(),
-            StubCharacter.stubCharacter(
+            StubCharacterSummary.stubCharacterSummary(),
+            StubCharacterSummary.stubCharacterSummary(
                 characterId = "7d1e0c2a-4b3f-4e6a-9c8d-2f1a0b3c4d5e",
                 profile = StubCharacter.stubProfile(
                     name = "Mia",
@@ -396,7 +397,7 @@ internal class ScreenCaptureTest {
                         "example from daily life before she moves on to the next question.",
                 ),
             ),
-            StubCharacter.stubCharacter(
+            StubCharacterSummary.stubCharacterSummary(
                 characterId = "9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
                 profile = StubCharacter.stubProfile(
                     name = "Oliver Montgomery-Smith",

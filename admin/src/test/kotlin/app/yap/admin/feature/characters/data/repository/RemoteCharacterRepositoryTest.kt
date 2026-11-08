@@ -8,6 +8,7 @@ import app.yap.admin.core.network.settings.StubServerSettingsRepository
 import app.yap.admin.feature.characters.data.api.createCharacterApi
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.StubCharacter
+import app.yap.admin.feature.characters.domain.StubCharacterSummary
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
@@ -26,12 +27,15 @@ import kotlinx.serialization.json.Json
 internal class RemoteCharacterRepositoryTest {
 
     @Test
-    fun `GIVEN the server lists characters WHEN loading them THEN they are loaded`() = runTest {
+    fun `GIVEN the server lists characters WHEN loading them THEN they are loaded with their topic counts`() = runTest {
         val env = Environment(answer = answer(content = "[$SUMMARY_JSON]"))
 
         val result = env.repository.list()
 
-        assertEquals(expected = LoadResult.Loaded(listOf(StubCharacter.stubCharacter())), actual = result)
+        assertEquals(
+            expected = LoadResult.Loaded(listOf(StubCharacterSummary.stubCharacterSummary(topicCount = 2))),
+            actual = result,
+        )
     }
 
     @Test
