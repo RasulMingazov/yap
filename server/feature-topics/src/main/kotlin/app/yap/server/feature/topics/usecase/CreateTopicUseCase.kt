@@ -1,10 +1,10 @@
 package app.yap.server.feature.topics.usecase
 
 import app.yap.server.feature.topics.model.CreateTopicOutcome
-import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.TopicContent
 import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicDraftRule
+import app.yap.server.feature.topics.model.moscowToday
 import app.yap.server.feature.topics.persistence.TopicRepository
 import java.time.Clock
 
@@ -16,12 +16,13 @@ class CreateTopicUseCase(
 ) {
 
     suspend operator fun invoke(content: TopicContent): CreateTopicOutcome {
-        val gaps = topicDraftRule.gaps(content)
+        val normalized = content.normalized()
+        val gaps = topicDraftRule.gaps(normalized)
         return if (gaps.isEmpty()) {
-            val topic = topicRepository.create(content)
+            val topic = topicRepository.create(normalized)
             val details = topicDetailsRule.details(
                 isDateTaken = topicRepository.hasPublishedOn(topic.date, topic.topicId),
-                today = ReleaseState.today(clock),
+                today = moscowToday(clock),
                 topic = topic,
             )
             CreateTopicOutcome.Created(details)

@@ -1,8 +1,6 @@
 package app.yap.server.feature.topics.model
 
-import java.time.Clock
 import java.time.LocalDate
-import java.time.ZoneId
 
 enum class ReleaseState {
     DRAFT,
@@ -12,10 +10,6 @@ enum class ReleaseState {
     ;
 
     companion object {
-
-        private val MOSCOW: ZoneId = ZoneId.of("Europe/Moscow")
-
-        fun today(clock: Clock): LocalDate = LocalDate.now(clock.withZone(MOSCOW))
 
         fun of(
             status: TopicStatus,

@@ -1,6 +1,5 @@
 package app.yap.server.feature.topics.usecase
 
-import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
 import app.yap.server.feature.topics.model.TopicDetails
@@ -11,6 +10,7 @@ import app.yap.server.feature.topics.model.TopicId
 import app.yap.server.feature.topics.model.TopicPublishRule
 import app.yap.server.feature.topics.model.TopicStatus
 import app.yap.server.feature.topics.model.UpdateTopicOutcome
+import app.yap.server.feature.topics.model.moscowToday
 import app.yap.server.feature.topics.persistence.TopicRepository
 import app.yap.server.feature.topics.persistence.TopicWrite
 import java.time.Clock
@@ -28,7 +28,7 @@ class UpdateTopicUseCase(
         topicId: TopicId,
     ): UpdateTopicOutcome {
         val stored = topicRepository.find(topicId)
-        return if (stored == null) UpdateTopicOutcome.NotFound else update(content, stored)
+        return if (stored == null) UpdateTopicOutcome.NotFound else update(content.normalized(), stored)
     }
 
     private suspend fun update(content: TopicContent, stored: Topic): UpdateTopicOutcome {
@@ -46,7 +46,7 @@ class UpdateTopicUseCase(
         TopicStatus.PUBLISHED -> topicPublishRule.gaps(
             content = content,
             publishedDate = stored.publishedDate,
-            today = ReleaseState.today(clock),
+            today = moscowToday(clock),
         )
     }
 
@@ -59,7 +59,7 @@ class UpdateTopicUseCase(
 
     private suspend fun details(topic: Topic): TopicDetails = topicDetailsRule.details(
         isDateTaken = topicRepository.hasPublishedOn(topic.date, topic.topicId),
-        today = ReleaseState.today(clock),
+        today = moscowToday(clock),
         topic = topic,
     )
 }

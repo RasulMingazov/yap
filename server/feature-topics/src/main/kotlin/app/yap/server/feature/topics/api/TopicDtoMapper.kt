@@ -50,22 +50,20 @@ private fun Step.toDto(): StepDto = StepDto(
 )
 
 internal fun TopicContentDto.toModel(): TopicContent = TopicContent(
-    description = description.trim(),
+    description = description,
     durationMinutes = durationMinutes,
     interlocutor = interlocutor?.toModel(),
     openingLine = openingLine.toModel(),
     releaseDate = releaseDate?.toReleaseDate(),
-    role = role.trim(),
-    setting = setting.trim(),
-    steps = steps
-        .map { step -> step.toModel() }
-        .filterNot { step -> step.isEmpty },
-    title = title.trim(),
+    role = role,
+    setting = setting,
+    steps = steps.map { step -> step.toModel() },
+    title = title,
 )
 
 private fun InterlocutorDto.toModel(): Interlocutor = when (this) {
     is InterlocutorDto.CastDto -> Interlocutor.Cast(characterId = characterId.toCharacterId())
-    is InterlocutorDto.GuestDto -> Interlocutor.Guest(description = description.trim())
+    is InterlocutorDto.GuestDto -> Interlocutor.Guest(description = description)
 }
 
 private fun String.toCharacterId(): CharacterId = Uuid.parseOrNull(this)
@@ -73,8 +71,8 @@ private fun String.toCharacterId(): CharacterId = Uuid.parseOrNull(this)
     ?: throw BadRequestException("The character is not an identifier")
 
 private fun OpeningLineDto.toModel(): OpeningLine = OpeningLine(
-    english = english.trim(),
-    translation = translation.trim(),
+    english = english,
+    translation = translation,
 )
 
 private fun String.toReleaseDate(): LocalDate = try {
@@ -84,7 +82,7 @@ private fun String.toReleaseDate(): LocalDate = try {
 }
 
 private fun StepDto.toModel(): Step = Step(
-    outcome = outcome.trim(),
-    passWhen = passWhen.trim(),
-    task = task.trim(),
+    outcome = outcome,
+    passWhen = passWhen,
+    task = task,
 )

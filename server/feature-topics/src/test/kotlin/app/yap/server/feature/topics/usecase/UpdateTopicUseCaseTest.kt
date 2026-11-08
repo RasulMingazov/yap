@@ -60,6 +60,15 @@ internal class UpdateTopicUseCaseTest {
     }
 
     @Test
+    fun `GIVEN a padded title and an empty step WHEN updating THEN the content is stored normalized`() = runTest {
+        val env = Environment()
+
+        env.useCase(content = StubTopic.stubPaddedContent(), topicId = StubTopic.TOPIC_ID)
+
+        env.topicRepository.updateCall.calledWith(StubTopic.stubTopic())
+    }
+
+    @Test
     fun `GIVEN a draft with an empty setting WHEN updating THEN the draft is stored as a draft`() = runTest {
         val env = Environment()
         val content = StubTopic.stubContent(setting = "")

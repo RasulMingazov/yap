@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.runTest
 
 internal class TopicDetailsRuleTest {
 
-    private val today = ReleaseState.today(StubTopic.CLOCK)
+    private val today = moscowToday(StubTopic.CLOCK)
     private val rule = TopicDetailsRule(
         topicPublishRule = TopicPublishRule(
             topicDraftRule = TopicDraftRule(

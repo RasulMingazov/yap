@@ -34,6 +34,15 @@ internal class CreateTopicUseCaseTest {
     }
 
     @Test
+    fun `GIVEN a padded title and an empty step WHEN creating THEN the content is stored normalized`() = runTest {
+        val env = Environment()
+
+        env.useCase(StubTopic.stubPaddedContent())
+
+        env.topicRepository.createCall.calledWith(StubTopic.stubContent())
+    }
+
+    @Test
     fun `GIVEN a draft on a date with a published topic WHEN creating THEN the details name the taken date`() =
         runTest {
             val env = Environment()
