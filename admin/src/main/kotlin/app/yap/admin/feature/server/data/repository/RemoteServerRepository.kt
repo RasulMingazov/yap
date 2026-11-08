@@ -1,9 +1,9 @@
 package app.yap.admin.feature.server.data.repository
 
 import app.yap.admin.core.common.runSuspendCatching
+import app.yap.admin.core.network.settings.ServerSettings
 import app.yap.admin.feature.server.data.mapper.toDomain
 import app.yap.admin.feature.server.domain.ServerConnection
-import app.yap.admin.feature.server.domain.ServerSettings
 import app.yap.admin.feature.server.domain.repository.ServerRepository
 import app.yap.contract.admin.ServerInfoDto
 import io.ktor.client.HttpClient

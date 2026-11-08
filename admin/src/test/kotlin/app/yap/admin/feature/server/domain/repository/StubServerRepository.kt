@@ -1,7 +1,7 @@
 package app.yap.admin.feature.server.domain.repository
 
+import app.yap.admin.core.network.settings.ServerSettings
 import app.yap.admin.feature.server.domain.ServerConnection
-import app.yap.admin.feature.server.domain.ServerSettings
 import io.github.rasulmingazov.stubcall.StubCall1
 
 internal class StubServerRepository(

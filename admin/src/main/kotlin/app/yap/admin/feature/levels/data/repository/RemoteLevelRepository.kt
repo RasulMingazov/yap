@@ -2,19 +2,17 @@ package app.yap.admin.feature.levels.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.callServer
+import app.yap.admin.core.network.settings.ServerSettingsRepository
 import app.yap.admin.core.network.toLoadResult
-import app.yap.admin.core.network.url
 import app.yap.admin.feature.levels.data.mapper.toDomain
 import app.yap.admin.feature.levels.data.mapper.toDto
 import app.yap.admin.feature.levels.domain.Level
 import app.yap.admin.feature.levels.domain.LevelEntry
 import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.repository.LevelRepository
-import app.yap.admin.feature.server.domain.repository.ServerSettingsRepository
 import app.yap.contract.admin.LevelDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -31,15 +29,14 @@ internal class RemoteLevelRepository(
     override suspend fun list(): LoadResult<List<Level>> = serverSettingsRepository.callServer(
         failed = LoadResult.Failed,
         read = { response -> response.toLoadResult { toLevels() } },
-        send = { settings -> httpClient.get(settings.url(LEVELS_PATH)) { bearerAuth(settings.key) } },
+        send = { httpClient.get(LEVELS_PATH) },
     )
 
     override suspend fun save(entries: List<LevelEntry>): SaveLevelsResult = serverSettingsRepository.callServer(
         failed = SaveLevelsResult.Failed,
         read = { response -> response.toSaveResult() },
-        send = { settings ->
-            httpClient.put(settings.url(LEVELS_PATH)) {
-                bearerAuth(settings.key)
+        send = {
+            httpClient.put(LEVELS_PATH) {
                 contentType(ContentType.Application.Json)
                 setBody(entries.map { entry -> entry.toDto() })
             }

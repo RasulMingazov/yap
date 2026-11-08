@@ -1,7 +1,7 @@
 package app.yap.admin.feature.server.domain.usecase
 
-import app.yap.admin.feature.server.domain.ServerSettings
-import app.yap.admin.feature.server.domain.repository.ServerSettingsRepository
+import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.settings.ServerSettingsRepository
 
 internal interface GetServerSettingsUseCase {
 
