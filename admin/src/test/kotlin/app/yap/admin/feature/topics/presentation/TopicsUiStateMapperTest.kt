@@ -21,10 +21,8 @@ internal class TopicsUiStateMapperTest {
     fun `GIVEN two rows and two To do entries WHEN mapping THEN All topics and To do keep the server order`() {
         val saturday = StubTopic.RELEASE_DATE.plusDays(1)
         val published = StubTopicCalendar.stubCalendarTopic(
-            completeSteps = 5,
             ledBy = LedBy.Cast(name = "Сэм"),
             state = ReleaseState.PUBLISHED,
-            steps = 5,
         )
         val calendar = StubTopicCalendar.stubTopicCalendar(
             rows = listOf(
@@ -53,7 +51,7 @@ internal class TopicsUiStateMapperTest {
                             text = "Опубликована",
                             tone = Status.Tone.SUCCESS,
                         ),
-                        steps = "5",
+                        steps = "1",
                         title = "At the cafe",
                         topicId = TopicId(StubTopic.TOPIC_ID),
                     ),
