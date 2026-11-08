@@ -180,8 +180,9 @@ rating from. A level without saved values SHALL show no idioms choice.
 ### Requirement: Saving the levels
 
 The toolbar of Levels SHALL have Save with the save status. Save SHALL send every level to the
-server. When the server accepts them, the admin app SHALL show the levels that the server returns
-and a Saved status.
+server. The admin app SHALL read only the numbers and the idioms choice of the form, and SHALL leave
+every other rule to the server. When the server accepts the levels, the admin app SHALL show the
+levels that the server returns and a Saved status.
 
 #### Scenario: The save succeeds
 
@@ -206,15 +207,20 @@ and a Saved status.
 
 #### Scenario: A number that is not a number
 
-- **WHEN** the owner types a rating from or a word count that the admin app cannot read
+- **WHEN** the owner types a rating from or a word count that the admin app cannot read, or leaves
+  the word count empty
 - **THEN** the admin app shows an error beside Save that names the field and the level, and sends
   nothing
 
+#### Scenario: A level without idioms
+
+- **WHEN** a level has no idioms choice and the owner clicks Save
+- **THEN** the admin app shows an error beside Save that names the level, and sends nothing
+
 #### Scenario: An empty value
 
-- **WHEN** the owner leaves a value of a level empty and clicks Save
-- **THEN** the admin app shows the error beside Save that asks to fill every level with growing
-  ratings, and sends nothing
+- **WHEN** the owner leaves a rating from, a vocabulary or a block of a level empty and clicks Save
+- **THEN** the admin app sends the levels, and shows the error of the server beside Save
 
 #### Scenario: The server does not answer
 
