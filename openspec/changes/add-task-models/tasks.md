@@ -106,7 +106,8 @@ Split: the part came to about 400 lines. 7.1 holds the load, the task rows and t
 
 Files: `am/presentation/ModelsViewModel.kt` (events and logic), `am/FeatureModelsModule.kt`,
 `admin/src/main/kotlin/app/yap/admin/AppModules.kt`, `admin/src/test/.../feature/models/domain/usecase/`
-(`StubGetModelsUseCase`, `StubSaveModelsUseCase`), and `ModelsViewModelTest`.
+(`StubGetModelsUseCase`, `StubSaveModelsUseCase`), `admin/src/test/.../feature/models/domain/StubModels.kt`
+(`stubTask`), and `ModelsViewModelTest`.
 
 Split: the part came to about 520 lines. 8.1 holds the load, Retry, the choice changes,
 `StubGetModelsUseCase` and `featureModelsModule()` (about 300 lines); 8.2 holds Save, `News`,
