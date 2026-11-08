@@ -1,6 +1,7 @@
 package app.yap.admin.feature.prompts.presentation
 
 import app.yap.admin.core.presentation.Status
+import app.yap.admin.core.presentation.shortName
 import app.yap.admin.feature.prompts.domain.Prompt
 import app.yap.admin.feature.prompts.domain.PromptGroup
 import app.yap.admin.feature.prompts.domain.PromptKey
@@ -15,7 +16,6 @@ import java.time.format.DateTimeFormatter
 
 internal object PromptsUiStateMapper {
 
-    private val MONTHS = listOf("янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек")
     private val TIME = DateTimeFormatter.ofPattern("HH:mm")
 
     fun map(state: DataState): UiState = when (state.load) {
@@ -28,7 +28,7 @@ internal object PromptsUiStateMapper {
         val prompt = prompts.getValue(chosen)
         return UiState.Content(
             groups = groups(),
-            isSaveEnabled = !isSaving,
+            isSaveEnabled = !isSending,
             saveStatus = saveStatus?.status(),
             state = prompt.state(),
             text = text,
@@ -74,8 +74,7 @@ internal object PromptsUiStateMapper {
 
     private fun PromptVersion.time(): String {
         val time = savedAt.atZone(ZoneId.systemDefault())
-        val month = MONTHS[time.monthValue - 1]
-        return "${time.dayOfMonth} $month, ${TIME.format(time)}"
+        return "${time.dayOfMonth} ${time.month.shortName()}, ${TIME.format(time)}"
     }
 
     private fun PromptVersion.state(): String = if (isCurrent) "у пользователей" else "архив"

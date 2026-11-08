@@ -54,7 +54,7 @@ internal class PromptsViewModel(
 
     private fun onPromptClicked(promptKey: PromptKey) {
         val state = dataState.value
-        if (state.isSaving) return
+        if (state.isSending || state.load == Load.LOADING) return
         val isLoaded = promptKey in state.prompts
         dataState.update { current ->
             current.copy(
@@ -69,7 +69,7 @@ internal class PromptsViewModel(
 
     private fun onRestoreClicked(number: Int) {
         val state = dataState.value
-        if (state.isSaving) return
+        if (state.isSending) return
         startSending()
         viewModelScope.launch {
             when (val result = restorePromptUseCase(state.chosen, number)) {
@@ -106,13 +106,13 @@ internal class PromptsViewModel(
 
     private fun onSaveClicked() {
         val state = dataState.value
-        if (state.isSaving) return
+        if (state.isSending) return
         startSending()
         viewModelScope.launch {
             when (val result = savePromptUseCase(state.chosen, state.text)) {
                 is SavePromptResult.EmptyText -> dataState.update { current ->
                     current.copy(
-                        isSaving = false,
+                        isSending = false,
                         saveStatus = SaveStatus.EMPTY_TEXT,
                     )
                 }
@@ -129,19 +129,19 @@ internal class PromptsViewModel(
     private fun startSending() {
         dataState.update { state ->
             state.copy(
-                isSaving = true,
+                isSending = true,
                 saveStatus = null,
             )
         }
     }
 
     private suspend fun onSendFailed(message: String) {
-        dataState.update { state -> state.copy(isSaving = false) }
+        dataState.update { state -> state.copy(isSending = false) }
         newsChannel.send(News.ShowSnackbar(message))
     }
 
     private fun onTextChanged(text: String) {
-        if (dataState.value.isSaving) return
+        if (dataState.value.isSending) return
         dataState.update { state ->
             state.copy(
                 saveStatus = null,
@@ -152,7 +152,7 @@ internal class PromptsViewModel(
 
     data class DataState(
         val chosen: PromptKey = PromptKey.TOPIC_REPLY,
-        val isSaving: Boolean = false,
+        val isSending: Boolean = false,
         val load: Load = Load.LOADING,
         val prompts: Map<PromptKey, Prompt> = emptyMap(),
         val saveStatus: SaveStatus? = null,
@@ -169,7 +169,7 @@ internal class PromptsViewModel(
         )
 
         fun sent(prompt: Prompt): DataState = loaded(prompt).copy(
-            isSaving = false,
+            isSending = false,
             texts = texts - prompt.promptKey,
         )
     }
