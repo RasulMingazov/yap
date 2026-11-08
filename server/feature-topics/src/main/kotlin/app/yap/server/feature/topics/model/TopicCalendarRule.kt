@@ -18,25 +18,22 @@ class TopicCalendarRule(
             compareBy<Topic> { topic -> topic.date }
                 .thenBy(String.CASE_INSENSITIVE_ORDER) { topic -> topic.content.title },
         )
-        val emptyDays = emptyDays(ordered, today)
+        val emptyDays = emptyDays(today, ordered)
         return TopicCalendar(
-            rows = rows(emptyDays, names, ordered, today),
-            todos = todos(emptyDays, ordered, today),
+            rows = rows(emptyDays, names, today, ordered),
+            todos = todos(emptyDays, today, ordered),
         )
     }
 
-    private fun emptyDays(topics: List<Topic>, today: LocalDate): List<LocalDate> {
-        val busyDays = topics.map { topic -> topic.date }.toSet()
-        return (0 until DAYS)
-            .map { offset -> today.plusDays(offset.toLong()) }
-            .filterNot { day -> day in busyDays }
-    }
+    private fun emptyDays(today: LocalDate, topics: List<Topic>): List<LocalDate> = (0 until DAYS)
+        .map { offset -> today.plusDays(offset.toLong()) }
+        .filterNot { day -> topics.any { topic -> topic.date == day } }
 
     private fun rows(
         emptyDays: List<LocalDate>,
         names: Map<CharacterId, String>,
-        topics: List<Topic>,
         today: LocalDate,
+        topics: List<Topic>,
     ): List<CalendarRow> {
         val topicRows = topics.map { topic ->
             CalendarRow(
@@ -54,14 +51,14 @@ class TopicCalendarRule(
         topic: Topic,
     ): CalendarTopic = CalendarTopic(
         completeSteps = topic.content.steps.count { step -> step.isComplete },
-        ledBy = ledBy(names, topic.content.interlocutor),
+        ledBy = ledBy(topic.content.interlocutor, names),
         state = ReleaseState.of(topic.status, topic.date, today),
         steps = topic.content.steps.size,
         title = topic.content.title,
         topicId = topic.topicId,
     )
 
-    private fun ledBy(names: Map<CharacterId, String>, interlocutor: Interlocutor?): LedBy? = when (interlocutor) {
+    private fun ledBy(interlocutor: Interlocutor?, names: Map<CharacterId, String>): LedBy? = when (interlocutor) {
         null -> null
         is Interlocutor.Cast -> names[interlocutor.characterId]?.let(LedBy::Cast)
         is Interlocutor.Guest -> LedBy.Guest
@@ -69,15 +66,15 @@ class TopicCalendarRule(
 
     private suspend fun todos(
         emptyDays: List<LocalDate>,
-        topics: List<Topic>,
         today: LocalDate,
+        topics: List<Topic>,
     ): List<Todo> {
         val publishedDays = topics
             .filter { topic -> topic.status == TopicStatus.PUBLISHED }
             .map { topic -> topic.date }
             .toSet()
         val drafts = topics
-            .filter { topic -> isToDo(publishedDays, today, topic) }
+            .filter { topic -> !topic.date.isBefore(today) && topic.date !in publishedDays }
             .map { topic ->
                 Todo.Draft(
                     date = topic.date,
@@ -89,9 +86,6 @@ class TopicCalendarRule(
         val days = emptyDays.map(Todo::EmptyDay)
         return (drafts + days).sortedBy { todo -> todo.date }
     }
-
-    private fun isToDo(publishedDays: Set<LocalDate>, today: LocalDate, topic: Topic): Boolean =
-        topic.status == TopicStatus.DRAFT && !topic.date.isBefore(today) && topic.date !in publishedDays
 
     private val Topic.date: LocalDate
         get() = requireNotNull(content.releaseDate) { "A stored topic has a release date" }

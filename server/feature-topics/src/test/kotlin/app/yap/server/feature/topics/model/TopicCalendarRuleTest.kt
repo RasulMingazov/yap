@@ -85,7 +85,7 @@ internal class TopicCalendarRuleTest {
 
         val calendar = env.rule.calendarOf(topicOn(today, content = StubTopic.stubContent(steps = fiveSteps)))
 
-        val topic = calendar.rows.mapNotNull { row -> row.topic }.single()
+        val topic = calendar.rows.firstNotNullOf { row -> row.topic }
         assertEquals(expected = 5, actual = topic.steps)
         assertEquals(expected = 2, actual = topic.completeSteps)
     }
@@ -103,7 +103,10 @@ internal class TopicCalendarRuleTest {
                 TopicGap.Missing(TopicField.DESCRIPTION),
                 TopicGap.IncompleteSteps(listOf(3, 4, 5)),
             ),
-            actual = calendar.todos.filterIsInstance<Todo.Draft>().single().gaps,
+            actual = calendar.todos
+                .filterIsInstance<Todo.Draft>()
+                .single()
+                .gaps,
         )
     }
 

@@ -29,14 +29,13 @@ internal class GetTopicCalendarUseCaseTest {
             assertEquals(expected = LocalDate.of(2026, 10, 23), actual = calendar.rows.first().date)
             assertEquals(
                 expected = LedBy.Cast(StubCharacter.NAME),
-                actual = calendar.rows.mapNotNull { row -> row.topic }.single().ledBy,
+                actual = calendar.rows.firstNotNullOf { row -> row.topic?.ledBy },
             )
         }
 
     private class Environment {
 
         val characterRepository = StubCharacterRepository()
-        val topicRepository = StubTopicRepository()
         val useCase = GetTopicCalendarUseCase(
             clock = Clock.fixed(Instant.parse("2026-10-22T22:30:00Z"), ZoneOffset.UTC),
             getCharactersUseCase = GetCharactersUseCase(characterRepository = characterRepository),
@@ -47,7 +46,7 @@ internal class GetTopicCalendarUseCaseTest {
                     ),
                 ),
             ),
-            topicRepository = topicRepository,
+            topicRepository = StubTopicRepository(),
         )
     }
 }
