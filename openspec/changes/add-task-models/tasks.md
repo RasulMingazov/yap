@@ -25,9 +25,9 @@ Files: `llm/ModelProviderId.kt`, `llm/ModelChoice.kt`, `llm/ModelCatalog.kt`, `s
 `DatabaseTaskModelRepository`), `server/feature-models/src/main/resources/db/migration/V6__task_models.sql`
 (hot, Flyway), `server/feature-models/src/testFixtures/` (`StubTaskModel`), and their tests.
 
-- [ ] 2.1 Add the catalog in `core-llm`: DeepSeek with the exact API ids `deepseek-flash` and `deepseek-v4-pro`, as the `model` row of the DeepSeek pricing page lists them (see `design.md`), the key setting name `DEEPSEEK_API_KEY`, and the default; verify with `ModelCatalogTest`: the order, the default, the key setting name, and each model name in one provider only
-- [ ] 2.2 Add `server/feature-models` with `ModelTask` and the save rule; verify with the model tests for the five tasks in order, a missing task, a task twice, an unknown model and a model of another provider
-- [ ] 2.3 Add `V6__task_models.sql` and the Exposed repository that saves with an upsert by `task`; verify with the PostgreSQL tests for an empty read, a save, a second save and the clean bootstrap (CI runs them)
+- [x] 2.1 Add the catalog in `core-llm`: DeepSeek with the exact API ids `deepseek-flash` and `deepseek-v4-pro`, as the `model` row of the DeepSeek pricing page lists them (see `design.md`), the key setting name `DEEPSEEK_API_KEY`, and the default; verify with `ModelCatalogTest`: the order, the default, the key setting name, and each model name in one provider only
+- [x] 2.2 Add `server/feature-models` with `ModelTask` and the save rule; verify with the model tests for the five tasks in order, a missing task, a task twice, an unknown model and a model of another provider
+- [x] 2.3 Add `V6__task_models.sql` and the Exposed repository that saves with an upsert by `task`; verify with the PostgreSQL tests for an empty read, a save, a second save and the clean bootstrap (CI runs them)
 
 ## 3. [3/15] Server Connected and the model use cases (about 310 lines)
 
