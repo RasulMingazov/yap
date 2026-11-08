@@ -274,7 +274,12 @@ internal class ScreenCaptureTest {
             "loading" to PromptsViewModel.DataState(),
             "error" to PromptsViewModel.DataState(load = PromptsViewModel.Load.FAILED),
             "content" to content,
-            "no-version" to listed.copy(chosen = PromptKey.TOPIC_HINTS).loaded(NEW_PROMPT),
+            "long-text" to content.copy(
+                texts = mapOf(PromptKey.TOPIC_REPLY to "${REPLY_PROMPT.text}\n\n${REPLY_PROMPT.text}"),
+            ),
+            "no-version" to listed
+                .copy(chosen = PromptKey.TOPIC_HINTS)
+                .loaded(NEW_PROMPT),
             "prompt-loading" to content.copy(
                 chosen = PromptKey.TOPIC_HINTS,
                 promptLoad = PromptsViewModel.Load.LOADING,
@@ -366,6 +371,7 @@ internal class ScreenCaptureTest {
         const val RESTORED_NUMBER = 5
         const val SETTLED_FRAMES = 5
         const val SETTLED_NANOS = 1_000_000_000L
+        const val VERSION_GAP_DAYS = 3L
         val CHARACTER_ID = CharacterId(StubCharacter.CHARACTER_ID)
         val CAST = listOf(
             StubCharacter.stubCharacter(),
@@ -469,7 +475,7 @@ internal class ScreenCaptureTest {
             variables = listOf("{step.task}", "{topic.setting}", "{level.rules}", "{hint.level}"),
             versions = emptyList(),
         )
-        val PROMPTS_HEIGHT = 1100.dp
+        val PROMPTS_HEIGHT = 1400.dp
         val REPLY_PROMPT = StubPrompt.stubPrompt(
             text = listOf(
                 "You are {interlocutor}.",
@@ -534,7 +540,9 @@ internal class ScreenCaptureTest {
             StubPrompt.stubPromptVersion(
                 isCurrent = number == current,
                 number = number,
-                savedAt = Instant.parse(StubPrompt.SAVED_AT).minus(Duration.ofDays((REPLY_VERSIONS - number) * 3L)),
+                savedAt = Instant
+                    .parse(StubPrompt.SAVED_AT)
+                    .minus(Duration.ofDays((REPLY_VERSIONS - number) * VERSION_GAP_DAYS)),
             )
         }
 
