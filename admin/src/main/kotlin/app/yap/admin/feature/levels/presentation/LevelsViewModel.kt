@@ -13,6 +13,7 @@ import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.hasEveryLevel
 import app.yap.admin.feature.levels.domain.usecase.GetLevelsUseCase
 import app.yap.admin.feature.levels.domain.usecase.SaveLevelsUseCase
+import app.yap.admin.feature.models.domain.Models
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,6 +90,7 @@ internal class LevelsViewModel(
             when (val result = saveLevelsUseCase(state.forms)) {
                 is SaveLevelsResult.Failed -> onSaveFailed(result)
                 is SaveLevelsResult.Invalid,
+                is SaveLevelsResult.ModelUnavailable,
                 is SaveLevelsResult.NoIdioms,
                 is SaveLevelsResult.NoWordCount,
                 is SaveLevelsResult.UnreadNumber -> endSave(result)
@@ -134,8 +136,10 @@ internal class LevelsViewModel(
         val chosen: LevelCode = LevelCode.B1,
         val forms: Map<LevelCode, LevelInput> = emptyMap(),
         val isLoadFailed: Boolean = false,
+        val isModelsLoadFailed: Boolean = false,
         val isSaving: Boolean = false,
         val levels: List<Level>? = null,
+        val models: Models? = null,
         val saveResult: SaveLevelsResult? = null,
     )
 
@@ -144,7 +148,11 @@ internal class LevelsViewModel(
         data class Content(
             val block: Block,
             val idioms: List<IdiomsOption>,
+            val isModelChoiceEnabled: Boolean,
+            val isRefreshShown: Boolean,
             val isSaveEnabled: Boolean,
+            val modelError: String?,
+            val models: List<ModelOption>,
             val rows: List<Row>,
             val saveStatus: Status?,
         ) : UiState
@@ -165,6 +173,11 @@ internal class LevelsViewModel(
             val label: String,
         )
 
+        data class ModelOption(
+            val label: String,
+            val model: String?,
+        )
+
         data class Row(
             val code: LevelCode,
             val form: LevelInput,
@@ -173,8 +186,10 @@ internal class LevelsViewModel(
             val isRatingFromShown: Boolean,
             val label: String,
             val maxWordsLabel: String,
+            val model: ModelOption,
             val range: String?,
             val ratingFromLabel: String,
+            val ratingNote: String?,
             val vocabularyLabel: String,
         )
     }

@@ -8,6 +8,7 @@ import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.StubLevel
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.DataState
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
+import app.yap.admin.feature.models.domain.StubModels
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -28,8 +29,10 @@ internal class LevelsUiStateMapperTest {
                 isRatingFromShown = true,
                 label = "B1",
                 maxWordsLabel = "Слов в фразе B1",
+                model = DEFAULT_MODEL,
                 range = null,
                 ratingFromLabel = "Рейтинг от B1",
+                ratingNote = null,
                 vocabularyLabel = "Лексика B1",
             ),
             actual = uiState.rows[LevelCode.B1.ordinal],
@@ -155,8 +158,123 @@ internal class LevelsUiStateMapperTest {
         val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
-            expected = Status(text = "Введите число в «Слов в фразе»: B1", tone = Status.Tone.ERROR),
-            actual = uiState.saveStatus,
+            expected = Status(text = "Введите число в «Слов в фразе»: B1", tone = Status.Tone.ERROR) to false,
+            actual = uiState.saveStatus to uiState.isRefreshShown,
+        )
+    }
+
+    @Test
+    fun `GIVEN levels before a save WHEN mapping THEN every Model shows Default`() {
+        val state = loaded(StubLevel.stubLevels(settings = null))
+            .copy(models = StubModels.stubModels())
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = List(LevelCode.entries.size) { DEFAULT_MODEL },
+            actual = uiState.rows.map { row -> row.model },
+        )
+    }
+
+    @Test
+    fun `GIVEN saved levels with a model WHEN mapping THEN every row shows the model`() {
+        val state = loaded(StubLevel.stubLevels(settings = StubLevel.stubSettings(model = PRO)))
+            .copy(models = StubModels.stubModels())
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = List(LevelCode.entries.size) { PRO },
+            actual = uiState.rows.map { row -> row.model.model },
+        )
+    }
+
+    @Test
+    fun `GIVEN the models still load WHEN mapping THEN the choice is disabled with no models error`() {
+        val state = loaded(StubLevel.stubLevels())
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = false to null,
+            actual = uiState.isModelChoiceEnabled to uiState.modelError,
+        )
+    }
+
+    @Test
+    fun `GIVEN the catalog WHEN mapping THEN Model offers Default once and the models in the server order`() {
+        val other = StubModels.stubProvider(
+            code = "OTHER",
+            models = listOf("alpha-model"),
+        )
+        val state = loaded(StubLevel.stubLevels())
+            .copy(models = StubModels.stubModels(providers = listOf(StubModels.stubProvider(), other)))
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Triple(listOf("по умолчанию", "deepseek-flash", "deepseek-v4-pro", "alpha-model"), true, null),
+            actual = Triple(uiState.models.map { option -> option.label }, uiState.isModelChoiceEnabled, uiState.modelError),
+        )
+    }
+
+    @Test
+    fun `GIVEN B1 with a model WHEN mapping THEN only its row shows the model`() {
+        val levels = StubLevel.stubLevels()
+        val state = loaded(levels)
+            .copy(
+                forms = levels.toInputs() + (LevelCode.B1 to StubLevel.stubInput(model = PRO)),
+                models = StubModels.stubModels(),
+            )
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = listOf(null, null, PRO, null, null, null, null),
+            actual = uiState.rows.map { row -> row.model.model },
+        )
+    }
+
+    @Test
+    fun `GIVEN the levels WHEN mapping THEN only No rating says where the calibration model is set`() {
+        val state = loaded(StubLevel.stubLevels())
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = List(LevelCode.entries.size - 1) { null } + "Модель калибровки задаётся в «Моделях»",
+            actual = uiState.rows.map { row -> row.ratingNote },
+        )
+    }
+
+    @Test
+    fun `GIVEN the models did not load WHEN mapping THEN the table shows Default disabled and the models error`() {
+        val levels = StubLevel.stubLevels()
+        val state = loaded(levels)
+            .copy(
+                forms = levels.toInputs() + (LevelCode.B1 to StubLevel.stubInput(model = PRO)),
+                isModelsLoadFailed = true,
+                models = StubModels.stubModels(),
+            )
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Triple(List(LevelCode.entries.size) { DEFAULT_MODEL }, false, "Не удалось загрузить модели"),
+            actual = Triple(uiState.rows.map { row -> row.model }, uiState.isModelChoiceEnabled, uiState.modelError),
+        )
+    }
+
+    @Test
+    fun `GIVEN a level model is no longer available WHEN mapping THEN its status shows with Refresh`() {
+        val state = loaded(StubLevel.stubLevels())
+            .copy(saveResult = SaveLevelsResult.ModelUnavailable)
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(text = "Модель уровня больше недоступна — обновите экран", tone = Status.Tone.ERROR) to true,
+            actual = uiState.saveStatus to uiState.isRefreshShown,
         )
     }
 
@@ -164,4 +282,14 @@ internal class LevelsUiStateMapperTest {
         forms = levels.toInputs(),
         levels = levels,
     )
+
+    private companion object {
+
+        const val PRO = "deepseek-v4-pro"
+
+        val DEFAULT_MODEL = UiState.ModelOption(
+            label = "по умолчанию",
+            model = null,
+        )
+    }
 }

@@ -77,6 +77,15 @@ internal class DefaultSaveLevelsUseCaseTest {
     }
 
     @Test
+    fun `GIVEN B1 with a model WHEN saving THEN the model is sent`() = runTest {
+        val env = Environment()
+
+        env.useCase(mapOf(LevelCode.B1 to StubLevel.stubInput(model = "deepseek-v4-pro")))
+
+        env.levelRepository.saveCall.calledWith(listOf(StubLevel.stubEntry(settings = StubLevel.stubSettings(model = "deepseek-v4-pro"))))
+    }
+
+    @Test
     fun `GIVEN a level without idioms WHEN saving THEN it names the level and sends nothing`() = runTest {
         val env = Environment()
 
