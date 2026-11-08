@@ -74,7 +74,7 @@ internal class RemotePromptRepository(
 
     private suspend fun HttpResponse.toSaveResult(): SavePromptResult = when (status) {
         HttpStatusCode.Created -> SavePromptResult.Saved(toPrompt())
-        HttpStatusCode.BadRequest -> SavePromptResult.EmptyText
+        HttpStatusCode.BadRequest -> SavePromptResult.Rejected
         else -> SavePromptResult.Failed
     }
 

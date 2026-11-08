@@ -32,6 +32,7 @@ import io.ktor.server.testing.testApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 
 internal class TopicRoutesTest {
 
@@ -148,6 +149,39 @@ internal class TopicRoutesTest {
     }
 
     @Test
+    fun `GIVEN a draft with every kind of gap WHEN reading it THEN the server names each gap by its type`() =
+        testApplication {
+            val env = Environment()
+            env.topicRepository.findCall.returns(
+                StubTopic.stubTopic(
+                    content = StubTopic.stubContent(
+                        releaseDate = StubTopic.RELEASE_DATE.minusDays(7),
+                        setting = "",
+                        steps = listOf(StubTopic.stubStep(outcome = "")),
+                    ),
+                ),
+            )
+            env.topicRepository.hasPublishedOnCall.returns(true)
+            application { env.install(this) }
+
+            val response = client.get("/admin/topics/${StubTopicDto.TOPIC_ID}")
+
+            assertEquals(
+                expected = Json.parseToJsonElement(
+                    """
+                    [
+                      {"type": "missing", "field": "SETTING"},
+                      {"type": "pastDate"},
+                      {"type": "incompleteSteps", "numbers": [1]},
+                      {"type": "dateTaken"}
+                    ]
+                    """,
+                ),
+                actual = Json.parseToJsonElement(response.bodyAsText()).jsonObject["gaps"],
+            )
+        }
+
+    @Test
     fun `GIVEN an unknown topic WHEN reading it THEN the server answers 404`() = testApplication {
         val env = Environment()
         env.topicRepository.findCall.returns(null)
@@ -237,7 +271,11 @@ internal class TopicRoutesTest {
                         topicDetailsRule = topicDetailsRule,
                         topicRepository = topicRepository,
                     ),
-                    getTopicsUseCase = GetTopicsUseCase(topicRepository = topicRepository),
+                    getTopicsUseCase = GetTopicsUseCase(
+                        clock = StubTopic.CLOCK,
+                        topicDetailsRule = topicDetailsRule,
+                        topicRepository = topicRepository,
+                    ),
                     updateTopicUseCase = UpdateTopicUseCase(
                         clock = StubTopic.CLOCK,
                         topicDetailsRule = topicDetailsRule,
@@ -270,8 +308,14 @@ internal class TopicRoutesTest {
             }
         """
 
-        fun topicJson(interlocutor: String = CAST_JSON): String =
-            """{"content": ${contentJson(interlocutor)}, "topicId": "${StubTopicDto.TOPIC_ID}"}"""
+        fun topicJson(interlocutor: String = CAST_JSON): String = """
+            {
+              "content": ${contentJson(interlocutor)},
+              "gaps": [],
+              "status": "DRAFT",
+              "topicId": "${StubTopicDto.TOPIC_ID}"
+            }
+        """
     }
 }
 

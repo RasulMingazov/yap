@@ -36,14 +36,14 @@ fun Route.topicRoutes(
 
 private fun Route.getTopicsRoute(getTopicsUseCase: GetTopicsUseCase) {
     get {
-        call.respond(getTopicsUseCase().map { topic -> topic.toDto() })
+        call.respond(getTopicsUseCase().map { details -> details.toDto() })
     }
 }
 
 private fun Route.createTopicRoute(createTopicUseCase: CreateTopicUseCase) {
     post {
         when (val outcome = createTopicUseCase(call.receive<TopicContentDto>().toModel())) {
-            is CreateTopicOutcome.Created -> call.respond(HttpStatusCode.Created, outcome.details.topic.toDto())
+            is CreateTopicOutcome.Created -> call.respond(HttpStatusCode.Created, outcome.details.toDto())
             is CreateTopicOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
         }
     }
@@ -55,7 +55,7 @@ private fun Route.getTopicRoute(getTopicUseCase: GetTopicUseCase) {
         if (details == null) {
             call.respond(HttpStatusCode.NotFound)
         } else {
-            call.respond(details.topic.toDto())
+            call.respond(details.toDto())
         }
     }
 }
@@ -71,7 +71,7 @@ private fun Route.updateTopicRoute(updateTopicUseCase: UpdateTopicUseCase) {
             is UpdateTopicOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
             is UpdateTopicOutcome.NotFound -> call.respond(HttpStatusCode.NotFound)
             is UpdateTopicOutcome.DateTaken -> call.respond(HttpStatusCode.Conflict)
-            is UpdateTopicOutcome.Updated -> call.respond(outcome.details.topic.toDto())
+            is UpdateTopicOutcome.Updated -> call.respond(outcome.details.toDto())
         }
     }
 }

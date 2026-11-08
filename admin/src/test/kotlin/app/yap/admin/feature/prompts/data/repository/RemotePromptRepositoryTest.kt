@@ -79,12 +79,12 @@ internal class RemotePromptRepositoryTest {
     }
 
     @Test
-    fun `GIVEN the server rejects the text WHEN saving a prompt THEN the text is empty`() = runTest {
+    fun `GIVEN the server rejects the text WHEN saving a prompt THEN the save is rejected`() = runTest {
         val env = Environment(answer = answer(content = "", status = HttpStatusCode.BadRequest))
 
         val result = env.repository.save(promptKey = PromptKey.TOPIC_REPLY, text = " ")
 
-        assertEquals(expected = SavePromptResult.EmptyText, actual = result)
+        assertEquals(expected = SavePromptResult.Rejected, actual = result)
     }
 
     @Test

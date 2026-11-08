@@ -5,6 +5,8 @@ import app.yap.contract.admin.OpeningLineDto
 import app.yap.contract.admin.StepDto
 import app.yap.contract.admin.TopicContentDto
 import app.yap.contract.admin.TopicDto
+import app.yap.contract.admin.TopicGapDto
+import app.yap.contract.admin.TopicStatusDto
 import app.yap.server.feature.topics.model.StubTopic
 
 internal object StubTopicDto {
@@ -15,9 +17,13 @@ internal object StubTopicDto {
 
     fun stubTopicDto(
         content: TopicContentDto = stubContentDto(),
+        gaps: List<TopicGapDto> = emptyList(),
+        status: TopicStatusDto = TopicStatusDto.DRAFT,
         topicId: String = TOPIC_ID,
     ): TopicDto = TopicDto(
         content = content,
+        gaps = gaps,
+        status = status,
         topicId = topicId,
     )
 

@@ -1,9 +1,15 @@
 package app.yap.server.feature.topics.api
 
 import app.yap.contract.admin.InterlocutorDto
+import app.yap.contract.admin.TopicFieldDto
+import app.yap.contract.admin.TopicGapDto
+import app.yap.contract.admin.TopicStatusDto
 import app.yap.server.feature.characters.model.StubCharacter
 import app.yap.server.feature.topics.model.Interlocutor
+import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.StubTopic
+import app.yap.server.feature.topics.model.TopicField
+import app.yap.server.feature.topics.model.TopicGap
 import io.ktor.server.plugins.BadRequestException
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -101,21 +107,23 @@ internal class TopicDtoMapperTest {
     }
 
     @Test
-    fun `GIVEN a topic with a character WHEN mapping it to the DTO THEN the DTO holds every field`() {
-        val topic = StubTopic.stubTopic()
+    fun `GIVEN a draft with a character WHEN mapping its details to the DTO THEN the DTO holds every field`() {
+        val details = StubTopic.stubDetails()
 
-        val dto = topic.toDto()
+        val dto = details.toDto()
 
         assertEquals(expected = StubTopicDto.stubTopicDto(), actual = dto)
     }
 
     @Test
-    fun `GIVEN a guest WHEN mapping the topic to the DTO THEN the interlocutor is a guest`() {
-        val topic = StubTopic.stubTopic(
-            content = StubTopic.stubContent(interlocutor = Interlocutor.Guest(description = "A tourist.")),
+    fun `GIVEN a guest WHEN mapping the details to the DTO THEN the interlocutor is a guest`() {
+        val details = StubTopic.stubDetails(
+            topic = StubTopic.stubTopic(
+                content = StubTopic.stubContent(interlocutor = Interlocutor.Guest(description = "A tourist.")),
+            ),
         )
 
-        val dto = topic.toDto()
+        val dto = details.toDto()
 
         assertEquals(
             expected = InterlocutorDto.GuestDto(description = "A tourist."),
@@ -124,13 +132,73 @@ internal class TopicDtoMapperTest {
     }
 
     @Test
-    fun `GIVEN no interlocutor WHEN mapping the topic to the DTO THEN the DTO has no interlocutor`() {
-        val topic = StubTopic.stubTopic(
-            content = StubTopic.stubContent(interlocutor = null),
+    fun `GIVEN no interlocutor WHEN mapping the details to the DTO THEN the DTO has no interlocutor`() {
+        val details = StubTopic.stubDetails(
+            topic = StubTopic.stubTopic(content = StubTopic.stubContent(interlocutor = null)),
         )
 
-        val dto = topic.toDto()
+        val dto = details.toDto()
 
         assertNull(dto.content.interlocutor)
+    }
+
+    @Test
+    fun `GIVEN an upcoming published topic WHEN mapping its details to the DTO THEN the status is published`() {
+        val details = StubTopic.stubDetails(state = ReleaseState.PUBLISHED)
+
+        val dto = details.toDto()
+
+        assertEquals(expected = TopicStatusDto.PUBLISHED, actual = dto.status)
+    }
+
+    @Test
+    fun `GIVEN a topic of today WHEN mapping its details to the DTO THEN the status is today`() {
+        val details = StubTopic.stubDetails(state = ReleaseState.TODAY)
+
+        val dto = details.toDto()
+
+        assertEquals(expected = TopicStatusDto.TODAY, actual = dto.status)
+    }
+
+    @Test
+    fun `GIVEN a published topic that is out WHEN mapping its details to the DTO THEN the status is out`() {
+        val details = StubTopic.stubDetails(state = ReleaseState.OUT)
+
+        val dto = details.toDto()
+
+        assertEquals(expected = TopicStatusDto.OUT, actual = dto.status)
+    }
+
+    @Test
+    fun `GIVEN a missing gap for each field WHEN mapping the details to the DTO THEN each field keeps its name`() {
+        val gaps = TopicField.entries
+            .map { field -> TopicGap.Missing(field) }
+            .toSet()
+        val details = StubTopic.stubDetails(gaps = gaps)
+
+        val dto = details.toDto()
+
+        assertEquals(
+            expected = TopicFieldDto.entries.map { field -> TopicGapDto.MissingDto(field) },
+            actual = dto.gaps,
+        )
+    }
+
+    @Test
+    fun `GIVEN the other gaps WHEN mapping the details to the DTO THEN each gap keeps its data`() {
+        val details = StubTopic.stubDetails(
+            gaps = setOf(TopicGap.IncompleteSteps(listOf(3, 5)), TopicGap.PastDate, TopicGap.DateTaken),
+        )
+
+        val dto = details.toDto()
+
+        assertEquals(
+            expected = listOf(
+                TopicGapDto.IncompleteStepsDto(numbers = listOf(3, 5)),
+                TopicGapDto.PastDateDto,
+                TopicGapDto.DateTakenDto,
+            ),
+            actual = dto.gaps,
+        )
     }
 }
