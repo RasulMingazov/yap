@@ -235,7 +235,7 @@ internal class ScreenCaptureTest {
             capture(name = "levels-$state", current = Screen.Levels, height = LEVELS_HEIGHT) {
                 LevelsContent(
                     onEvent = {},
-                    uiState = LevelsUiStateMapper.map(dataState),
+                    uiState = LevelsUiStateMapper(dataState),
                 )
             }
         }
@@ -248,7 +248,7 @@ internal class ScreenCaptureTest {
         val image = capture(name = "levels-idioms-open", current = Screen.Levels, click = IDIOMS_SELECT) {
             LevelsContent(
                 onEvent = {},
-                uiState = LevelsUiStateMapper.map(LevelsViewModel.DataState().loaded(LEVELS)),
+                uiState = LevelsUiStateMapper(LevelsViewModel.DataState().loaded(LEVELS)),
             )
         }
 
