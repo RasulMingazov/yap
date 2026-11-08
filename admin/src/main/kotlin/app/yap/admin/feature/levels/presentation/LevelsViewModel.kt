@@ -38,7 +38,7 @@ internal class LevelsViewModel(
     fun onEvent(event: Event) = when (event) {
         is Event.FormChanged -> onFormChanged(event)
         is Event.LevelClicked -> dataState.update { state -> state.copy(chosen = event.code) }
-        is Event.ModelsRetryClicked -> loadModels()
+        is Event.ModelsRetryClicked -> onModelsRetryClicked()
         is Event.Opened -> onOpened()
         is Event.RefreshClicked -> onRefreshClicked()
         is Event.RetryClicked -> onRetryClicked()
@@ -58,6 +58,11 @@ internal class LevelsViewModel(
                 saveResult = null,
             )
         }
+    }
+
+    private fun onModelsRetryClicked() {
+        if (!dataState.value.isModelsLoadFailed) return
+        loadModels()
     }
 
     private fun onOpened() {
@@ -94,7 +99,12 @@ internal class LevelsViewModel(
         viewModelScope.launch {
             when (val result = getModelsUseCase()) {
                 is LoadResult.Failed -> dataState.update { state -> state.copy(isModelsLoadFailed = true) }
-                is LoadResult.Loaded -> dataState.update { state -> state.copy(models = result.value) }
+                is LoadResult.Loaded -> dataState.update { state ->
+                    state.copy(
+                        isModelsLoadFailed = false,
+                        models = result.value,
+                    )
+                }
             }
         }
     }
@@ -143,10 +153,10 @@ internal class LevelsViewModel(
 
     private fun reloadSaved(result: SaveLevelsResult.Saved) {
         viewModelScope.launch {
-            val levels = getLevelsUseCase()
+            val loadResult = getLevelsUseCase()
             dataState.update { state ->
                 state
-                    .answered(levels)
+                    .answered(loadResult)
                     .copy(
                         isSaving = false,
                         saveResult = result,
@@ -171,6 +181,7 @@ internal class LevelsViewModel(
 
     private fun DataState.loaded(levels: List<Level>): DataState = copy(
         forms = levels.toInputs(),
+        isLoadFailed = false,
         levels = levels,
     )
 

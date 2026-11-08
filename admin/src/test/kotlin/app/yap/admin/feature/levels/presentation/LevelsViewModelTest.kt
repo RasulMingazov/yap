@@ -30,8 +30,6 @@ internal class LevelsViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
 
-    private val proLevels = StubLevel.stubLevels(settings = StubLevel.stubSettings(model = PRO))
-
     @BeforeTest
     fun setMain() {
         Dispatchers.setMain(dispatcher)
@@ -272,8 +270,9 @@ internal class LevelsViewModelTest {
     @Test
     fun `GIVEN the models did not load WHEN models Retry is clicked THEN each level shows its model`() =
         runTest(dispatcher) {
+            val levels = StubLevel.stubLevels(settings = StubLevel.stubSettings(model = PRO))
             val env = Environment()
-            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(proLevels))
+            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(levels))
             env.getModelsUseCase.invokeCall.returns(LoadResult.Failed)
             advanceUntilIdle()
             env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels()))
@@ -286,6 +285,30 @@ internal class LevelsViewModelTest {
                 actual = env.content().rows.map { row -> row.model.model },
             )
             env.getLevelsUseCase.invokeCall.called(times = 1)
+        }
+
+    @Test
+    fun `GIVEN the models WHEN models Retry is clicked THEN the models are not loaded again`() = runTest(dispatcher) {
+        val env = Environment()
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.ModelsRetryClicked)
+        advanceUntilIdle()
+
+        env.getModelsUseCase.invokeCall.called(times = 1)
+    }
+
+    @Test
+    fun `GIVEN a failed models load WHEN a second load answers with the models THEN the error hides`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            env.getModelsUseCase.invokeCall.returns(LoadResult.Failed)
+            launch { env.getModelsUseCase.invokeCall.returns(LoadResult.Loaded(StubModels.stubModels())) }
+
+            env.viewModel.onEvent(Event.Opened)
+            advanceUntilIdle()
+
+            assertEquals(expected = null, actual = env.content().modelError)
         }
 
     @Test
@@ -333,8 +356,9 @@ internal class LevelsViewModelTest {
 
     @Test
     fun `GIVEN B1 has a model WHEN Default is saved for B1 THEN B1 is sent without a model`() = runTest(dispatcher) {
+        val levels = StubLevel.stubLevels(settings = StubLevel.stubSettings(model = PRO))
         val env = Environment()
-        env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(proLevels))
+        env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(levels))
         advanceUntilIdle()
         val form = StubLevel.stubInput(model = null)
 
@@ -342,21 +366,22 @@ internal class LevelsViewModelTest {
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
 
-        env.saveLevelsUseCase.invokeCall.calledWith(proLevels.toInputs() + (LevelCode.B1 to form))
+        env.saveLevelsUseCase.invokeCall.calledWith(levels.toInputs() + (LevelCode.B1 to form))
     }
 
     @Test
     fun `GIVEN the models did not load WHEN saving THEN each level is sent with its stored model`() =
         runTest(dispatcher) {
+            val levels = StubLevel.stubLevels(settings = StubLevel.stubSettings(model = PRO))
             val env = Environment()
-            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(proLevels))
+            env.getLevelsUseCase.invokeCall.returns(LoadResult.Loaded(levels))
             env.getModelsUseCase.invokeCall.returns(LoadResult.Failed)
             advanceUntilIdle()
 
             env.viewModel.onEvent(Event.SaveClicked)
             advanceUntilIdle()
 
-            env.saveLevelsUseCase.invokeCall.calledWith(proLevels.toInputs())
+            env.saveLevelsUseCase.invokeCall.calledWith(levels.toInputs())
         }
 
     @Test
