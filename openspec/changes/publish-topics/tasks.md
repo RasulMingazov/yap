@@ -121,7 +121,7 @@ Create opens a new topic without a date until [17/26].
 
 ## 19. [19/26] The admin publish domain · ~220 · `T/domain/` (`Topic` with the release state and the gaps, `SaveTopicResult` with the gaps and `DateTaken`, `PublishTopicResult`), `T/data/mapper/TopicMapper.kt`, `T/presentation/TopicViewModel.kt` (compile only)
 
-- [ ] 19.1 Add the domain and the mapper; verify with the mapper tests for each status and each gap
+- [x] 19.1 Add the domain and the mapper; verify with the mapper tests for each status and each gap
 
 ## 20. [20/26] The admin publish call · ~220 · `T/data/api/TopicApi.kt`, `T/data/repository/RemoteTopicRepository.kt`, `T/domain/repository/`, `T/domain/usecase/PublishTopicUseCase.kt`, `T/FeatureTopicsModule.kt`
 

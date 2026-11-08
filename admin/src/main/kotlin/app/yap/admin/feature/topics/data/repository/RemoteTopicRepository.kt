@@ -9,13 +9,13 @@ import app.yap.admin.feature.topics.data.mapper.toDomain
 import app.yap.admin.feature.topics.data.mapper.toDto
 import app.yap.admin.feature.topics.domain.LoadTopicResult
 import app.yap.admin.feature.topics.domain.SaveTopicResult
-import app.yap.admin.feature.topics.domain.Topic
 import app.yap.admin.feature.topics.domain.TopicCalendar
 import app.yap.admin.feature.topics.domain.TopicContent
 import app.yap.admin.feature.topics.domain.TopicId
 import app.yap.admin.feature.topics.domain.repository.TopicRepository
 import app.yap.contract.admin.TopicCalendarDto
 import app.yap.contract.admin.TopicDto
+import app.yap.contract.admin.TopicRejectionDto
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
@@ -48,22 +48,26 @@ internal class RemoteTopicRepository(
         send = { topicApi.find(topicId.value) },
     )
 
-    override suspend fun update(topic: Topic): SaveTopicResult = serverSettingsRepository.callServer(
-        failed = SaveTopicResult.Failed,
-        read = { response -> response.toSaveResult() },
-        send = {
-            topicApi.update(
-                topicId = topic.topicId.value,
-                content = topic.content.toDto(),
-            )
-        },
-    )
+    override suspend fun update(topicId: TopicId, content: TopicContent): SaveTopicResult =
+        serverSettingsRepository.callServer(
+            failed = SaveTopicResult.Failed,
+            read = { response -> response.toSaveResult() },
+            send = {
+                topicApi.update(
+                    topicId = topicId.value,
+                    content = content.toDto(),
+                )
+            },
+        )
 
     private suspend fun HttpResponse.toSaveResult(): SaveTopicResult = when (status) {
         HttpStatusCode.OK,
         HttpStatusCode.Created,
         -> SaveTopicResult.Saved(body<TopicDto>().toDomain())
-        HttpStatusCode.BadRequest -> SaveTopicResult.Invalid
+        HttpStatusCode.BadRequest -> SaveTopicResult.Invalid(
+            gaps = body<TopicRejectionDto>().gaps.map { gap -> gap.toDomain() },
+        )
+        HttpStatusCode.Conflict -> SaveTopicResult.DateTaken
         else -> SaveTopicResult.Failed
     }
 

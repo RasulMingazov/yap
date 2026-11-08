@@ -88,7 +88,7 @@ internal class TopicViewModelTest {
 
     @Test
     fun `GIVEN the server rejected the draft WHEN a field changes THEN the error stays`() = runTest(dispatcher) {
-        val env = Environment(topicId = null, saveResult = SaveTopicResult.Invalid)
+        val env = Environment(topicId = null, saveResult = SaveTopicResult.Invalid(gaps = emptyList()))
         advanceUntilIdle()
         env.viewModel.onEvent(Event.SaveClicked)
         advanceUntilIdle()
@@ -270,7 +270,7 @@ internal class TopicViewModelTest {
 
     @Test
     fun `GIVEN the server answers 400 WHEN saving THEN the form stays and the error shows`() = runTest(dispatcher) {
-        val env = Environment(topicId = null, saveResult = SaveTopicResult.Invalid)
+        val env = Environment(topicId = null, saveResult = SaveTopicResult.Invalid(gaps = emptyList()))
         advanceUntilIdle()
         env.viewModel.onEvent(Event.FormChanged(StubTopic.stubContent(title = "")))
 

@@ -137,7 +137,9 @@ internal class TopicViewModel(
         viewModelScope.launch {
             when (val result = saveTopicUseCase(state.saved?.topicId, state.form)) {
                 is SaveTopicResult.Failed -> onSaveFailed()
-                is SaveTopicResult.Invalid -> dataState.update { current ->
+                is SaveTopicResult.DateTaken,
+                is SaveTopicResult.Invalid,
+                -> dataState.update { current ->
                     current.copy(
                         isSaving = false,
                         saveStatus = SaveStatus.REJECTED,

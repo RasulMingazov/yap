@@ -3,7 +3,6 @@ package app.yap.admin.feature.topics.domain.repository
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.feature.topics.domain.LoadTopicResult
 import app.yap.admin.feature.topics.domain.SaveTopicResult
-import app.yap.admin.feature.topics.domain.Topic
 import app.yap.admin.feature.topics.domain.TopicCalendar
 import app.yap.admin.feature.topics.domain.TopicContent
 import app.yap.admin.feature.topics.domain.TopicId
@@ -16,5 +15,5 @@ internal interface TopicRepository {
 
     suspend fun find(topicId: TopicId): LoadTopicResult
 
-    suspend fun update(topic: Topic): SaveTopicResult
+    suspend fun update(topicId: TopicId, content: TopicContent): SaveTopicResult
 }
