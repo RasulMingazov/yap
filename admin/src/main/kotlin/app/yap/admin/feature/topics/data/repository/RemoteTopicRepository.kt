@@ -8,7 +8,6 @@ import app.yap.admin.feature.topics.data.api.TopicApi
 import app.yap.admin.feature.topics.data.mapper.toDomain
 import app.yap.admin.feature.topics.data.mapper.toDto
 import app.yap.admin.feature.topics.domain.LoadTopicResult
-import app.yap.admin.feature.topics.domain.LoadTopicsResult
 import app.yap.admin.feature.topics.domain.SaveTopicResult
 import app.yap.admin.feature.topics.domain.Topic
 import app.yap.admin.feature.topics.domain.TopicCalendar
@@ -49,12 +48,6 @@ internal class RemoteTopicRepository(
         send = { topicApi.find(topicId.value) },
     )
 
-    override suspend fun list(): LoadTopicsResult = serverSettingsRepository.callServer(
-        failed = LoadTopicsResult.Failed,
-        read = { response -> response.toLoadTopicsResult() },
-        send = { topicApi.list() },
-    )
-
     override suspend fun update(topic: Topic): SaveTopicResult = serverSettingsRepository.callServer(
         failed = SaveTopicResult.Failed,
         read = { response -> response.toSaveResult() },
@@ -77,13 +70,5 @@ internal class RemoteTopicRepository(
     private suspend fun HttpResponse.toLoadTopicResult(): LoadTopicResult = when (status) {
         HttpStatusCode.OK -> LoadTopicResult.Loaded(body<TopicDto>().toDomain())
         else -> LoadTopicResult.Failed
-    }
-
-    private suspend fun HttpResponse.toLoadTopicsResult(): LoadTopicsResult = when (status) {
-        HttpStatusCode.OK -> LoadTopicsResult.Loaded(
-            body<List<TopicDto>>()
-                .map { topic -> topic.toDomain() },
-        )
-        else -> LoadTopicsResult.Failed
     }
 }

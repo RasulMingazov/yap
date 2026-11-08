@@ -21,9 +21,6 @@ internal interface TopicApi {
     @GET("admin/topics/{topicId}")
     suspend fun find(@Path topicId: String): HttpResponse
 
-    @GET("admin/topics")
-    suspend fun list(): HttpResponse
-
     @Headers("Content-Type: application/json")
     @PUT("admin/topics/{topicId}")
     suspend fun update(

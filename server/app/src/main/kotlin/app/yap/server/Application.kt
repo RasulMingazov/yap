@@ -77,7 +77,6 @@ internal fun Application.serverModule(
                 createTopicUseCase = koin.get(),
                 getTopicCalendarUseCase = koin.get(),
                 getTopicUseCase = koin.get(),
-                getTopicsUseCase = koin.get(),
                 publishTopicUseCase = koin.get(),
                 updateTopicUseCase = koin.get(),
             )

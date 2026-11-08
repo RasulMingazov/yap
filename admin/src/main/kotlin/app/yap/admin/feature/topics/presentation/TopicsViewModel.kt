@@ -2,17 +2,18 @@ package app.yap.admin.feature.topics.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.presentation.mapState
-import app.yap.admin.feature.topics.domain.LoadTopicsResult
+import app.yap.admin.feature.topics.domain.TopicCalendar
 import app.yap.admin.feature.topics.domain.TopicId
-import app.yap.admin.feature.topics.domain.usecase.GetTopicsUseCase
+import app.yap.admin.feature.topics.domain.usecase.GetTopicCalendarUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class TopicsViewModel(
-    private val getTopicsUseCase: GetTopicsUseCase,
+    private val getTopicCalendarUseCase: GetTopicCalendarUseCase,
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
@@ -24,38 +25,45 @@ internal class TopicsViewModel(
     }
 
     private fun onOpened() {
-        val state = dataState.value
-        if (state.isLoading) return
-        if (state.topics !is LoadTopicsResult.Loaded) {
-            dataState.update { current -> current.copy(topics = null) }
-        }
+        if (dataState.value.isLoading) return
         load()
     }
 
     private fun onRetryClicked() {
-        if (dataState.value.topics !is LoadTopicsResult.Failed) return
-        dataState.update { state -> state.copy(topics = null) }
+        if (!dataState.value.isLoadFailed) return
         load()
     }
 
     private fun load() {
-        dataState.update { state -> state.copy(isLoading = true) }
+        dataState.update { state ->
+            state.copy(
+                isLoadFailed = false,
+                isLoading = true,
+            )
+        }
         viewModelScope.launch {
-            val topics = getTopicsUseCase()
-            dataState.update { state -> state.loaded(topics) }
+            when (val result = getTopicCalendarUseCase()) {
+                is LoadResult.Failed -> dataState.update { state ->
+                    state.copy(
+                        isLoadFailed = true,
+                        isLoading = false,
+                    )
+                }
+                is LoadResult.Loaded -> dataState.update { state ->
+                    state.copy(
+                        calendar = result.value,
+                        isLoading = false,
+                    )
+                }
+            }
         }
     }
 
     data class DataState(
+        val calendar: TopicCalendar? = null,
+        val isLoadFailed: Boolean = false,
         val isLoading: Boolean = false,
-        val topics: LoadTopicsResult? = null,
-    ) {
-
-        fun loaded(result: LoadTopicsResult): DataState = copy(
-            isLoading = false,
-            topics = if (result is LoadTopicsResult.Failed && topics is LoadTopicsResult.Loaded) topics else result,
-        )
-    }
+    )
 
     sealed interface UiState {
 
