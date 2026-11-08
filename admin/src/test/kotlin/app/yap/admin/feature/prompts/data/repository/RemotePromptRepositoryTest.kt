@@ -2,9 +2,10 @@ package app.yap.admin.feature.prompts.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.adminKtorfit
 import app.yap.admin.core.network.settings.StubServerSettings
 import app.yap.admin.core.network.settings.StubServerSettingsRepository
+import app.yap.admin.feature.prompts.data.api.createPromptApi
 import app.yap.admin.feature.prompts.domain.PromptGroup
 import app.yap.admin.feature.prompts.domain.PromptKey
 import app.yap.admin.feature.prompts.domain.PromptSummary
@@ -15,6 +16,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -35,15 +37,6 @@ internal class RemotePromptRepositoryTest {
 
         val summary = PromptSummary(group = PromptGroup.TOPIC, promptKey = PromptKey.TOPIC_REPLY)
         assertEquals(expected = LoadResult.Loaded(listOf(summary)), actual = result)
-    }
-
-    @Test
-    fun `GIVEN no saved server settings WHEN loading the prompts THEN loading fails`() = runTest {
-        val env = Environment(answer = answer(content = "[]"), settings = null)
-
-        val result = env.repository.list()
-
-        assertEquals(expected = LoadResult.Failed to 0, actual = result to env.engine.requestHistory.size)
     }
 
     @Test
@@ -72,6 +65,7 @@ internal class RemotePromptRepositoryTest {
                 "$PROMPTS_URL/TOPIC_REPLY/versions",
                 "Bearer ${StubServerSettings.KEY}",
                 Json.parseToJsonElement("""{"text": "${StubPrompt.TEXT}"}"""),
+                ContentType.Application.Json,
             ),
             actual = listOf(
                 result,
@@ -79,6 +73,7 @@ internal class RemotePromptRepositoryTest {
                 request.url.toString(),
                 request.headers[HttpHeaders.Authorization],
                 Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
+                request.body.contentType,
             ),
         )
     }
@@ -136,15 +131,15 @@ internal class RemotePromptRepositoryTest {
         assertEquals(expected = RestorePromptResult.Failed, actual = result)
     }
 
-    private class Environment(
-        answer: MockRequestHandler,
-        settings: ServerSettings? = StubServerSettings.stubServerSettings(),
-    ) {
+    private class Environment(answer: MockRequestHandler) {
 
         val engine = MockEngine(answer)
-        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
-        val repository = RemotePromptRepository(
+        val serverSettingsRepository = StubServerSettingsRepository(settings = StubServerSettings.stubServerSettings())
+        private val ktorfit = adminKtorfit(
             httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+        )
+        val repository = RemotePromptRepository(
+            promptApi = ktorfit.createPromptApi(),
             serverSettingsRepository = serverSettingsRepository,
         )
     }

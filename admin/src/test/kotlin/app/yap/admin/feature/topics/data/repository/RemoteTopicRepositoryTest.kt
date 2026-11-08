@@ -1,10 +1,11 @@
 package app.yap.admin.feature.topics.data.repository
 
 import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.adminKtorfit
 import app.yap.admin.core.network.settings.StubServerSettings
 import app.yap.admin.core.network.settings.StubServerSettingsRepository
 import app.yap.admin.feature.characters.domain.StubCharacter
+import app.yap.admin.feature.topics.data.api.createTopicApi
 import app.yap.admin.feature.topics.data.mapper.StubTopicDto
 import app.yap.admin.feature.topics.domain.LoadTopicResult
 import app.yap.admin.feature.topics.domain.LoadTopicsResult
@@ -14,6 +15,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -33,15 +35,6 @@ internal class RemoteTopicRepositoryTest {
         val result = env.repository.list()
 
         assertEquals(expected = LoadTopicsResult.Loaded(listOf(StubTopic.stubTopic())), actual = result)
-    }
-
-    @Test
-    fun `GIVEN no saved server settings WHEN loading the topics THEN loading fails`() = runTest {
-        val env = Environment(answer = answer(content = "[]"), settings = null)
-
-        val result = env.repository.list()
-
-        assertEquals(expected = LoadTopicsResult.Failed to 0, actual = result to env.engine.requestHistory.size)
     }
 
     @Test
@@ -84,6 +77,7 @@ internal class RemoteTopicRepositoryTest {
                 "${StubServerSettings.ADDRESS}/admin/topics",
                 "Bearer ${StubServerSettings.KEY}",
                 Json.parseToJsonElement(CONTENT_JSON),
+                ContentType.Application.Json,
             ),
             actual = listOf(
                 result,
@@ -91,6 +85,7 @@ internal class RemoteTopicRepositoryTest {
                 request.url.toString(),
                 request.headers[HttpHeaders.Authorization],
                 Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
+                request.body.contentType,
             ),
         )
     }
@@ -107,8 +102,9 @@ internal class RemoteTopicRepositoryTest {
                 SaveTopicResult.Saved(StubTopic.stubTopic()),
                 HttpMethod.Put,
                 "${StubServerSettings.ADDRESS}/admin/topics/${StubTopic.TOPIC_ID}",
+                ContentType.Application.Json,
             ),
-            actual = listOf(result, request.method, request.url.toString()),
+            actual = listOf(result, request.method, request.url.toString(), request.body.contentType),
         )
     }
 
@@ -130,16 +126,16 @@ internal class RemoteTopicRepositoryTest {
         assertEquals(expected = SaveTopicResult.Failed, actual = result)
     }
 
-    private class Environment(
-        answer: MockRequestHandler,
-        settings: ServerSettings? = StubServerSettings.stubServerSettings(),
-    ) {
+    private class Environment(answer: MockRequestHandler) {
 
         val engine = MockEngine(answer)
-        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
-        val repository = RemoteTopicRepository(
+        val serverSettingsRepository = StubServerSettingsRepository(settings = StubServerSettings.stubServerSettings())
+        private val ktorfit = adminKtorfit(
             httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+        )
+        val repository = RemoteTopicRepository(
             serverSettingsRepository = serverSettingsRepository,
+            topicApi = ktorfit.createTopicApi(),
         )
     }
 

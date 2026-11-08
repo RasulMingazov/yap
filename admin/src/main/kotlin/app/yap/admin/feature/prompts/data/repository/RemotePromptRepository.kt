@@ -4,6 +4,7 @@ import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.callServer
 import app.yap.admin.core.network.settings.ServerSettingsRepository
 import app.yap.admin.core.network.toLoadResult
+import app.yap.admin.feature.prompts.data.api.PromptApi
 import app.yap.admin.feature.prompts.data.mapper.toDomain
 import app.yap.admin.feature.prompts.domain.Prompt
 import app.yap.admin.feature.prompts.domain.PromptKey
@@ -14,25 +15,19 @@ import app.yap.admin.feature.prompts.domain.repository.PromptRepository
 import app.yap.contract.admin.PromptDto
 import app.yap.contract.admin.PromptSummaryDto
 import app.yap.contract.admin.PromptTextDto
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 
 internal class RemotePromptRepository(
-    private val httpClient: HttpClient,
+    private val promptApi: PromptApi,
     private val serverSettingsRepository: ServerSettingsRepository,
 ) : PromptRepository {
 
     override suspend fun find(promptKey: PromptKey): LoadResult<Prompt> = serverSettingsRepository.callServer(
         failed = LoadResult.Failed,
         read = { response -> response.toLoadResult { toPrompt() } },
-        send = { httpClient.get(promptPath(promptKey)) },
+        send = { promptApi.find(promptKey.name) },
     )
 
     override suspend fun list(): LoadResult<List<PromptSummary>> = serverSettingsRepository.callServer(
@@ -43,7 +38,7 @@ internal class RemotePromptRepository(
                     .map { prompt -> prompt.toDomain() }
             }
         },
-        send = { httpClient.get(PROMPTS_PATH) },
+        send = { promptApi.list() },
     )
 
     override suspend fun restore(
@@ -52,7 +47,12 @@ internal class RemotePromptRepository(
     ): RestorePromptResult = serverSettingsRepository.callServer(
         failed = RestorePromptResult.Failed,
         read = { response -> response.toRestoreResult() },
-        send = { httpClient.post("${promptPath(promptKey)}/versions/$number/restore") },
+        send = {
+            promptApi.restore(
+                promptKey = promptKey.name,
+                number = number,
+            )
+        },
     )
 
     override suspend fun save(
@@ -62,10 +62,10 @@ internal class RemotePromptRepository(
         failed = SavePromptResult.Failed,
         read = { response -> response.toSaveResult() },
         send = {
-            httpClient.post("${promptPath(promptKey)}/versions") {
-                contentType(ContentType.Application.Json)
-                setBody(PromptTextDto(text = text))
-            }
+            promptApi.save(
+                promptKey = promptKey.name,
+                text = PromptTextDto(text = text),
+            )
         },
     )
 
@@ -79,11 +79,4 @@ internal class RemotePromptRepository(
     }
 
     private suspend fun HttpResponse.toPrompt(): Prompt = body<PromptDto>().toDomain()
-
-    private fun promptPath(promptKey: PromptKey): String = "$PROMPTS_PATH/${promptKey.name}"
-
-    private companion object {
-
-        const val PROMPTS_PATH = "/admin/prompts"
-    }
 }

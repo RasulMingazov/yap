@@ -11,8 +11,10 @@ koin = "4.2.2"
 kotlin = "2.4.0"
 kotlinCoroutines = "1.11.0"
 kotlinSerialization = "1.11.0"
+ksp = "2.3.11"
 lifecycle = "2.11.0"
 ktor = "3.5.0"
+ktorfit = "2.7.5"
 logback = "1.5.18"
 postgresql = "42.7.7"
 slf4j = "2.0.16"
@@ -48,6 +50,7 @@ ktor-server-di = { group = "io.ktor", name = "ktor-server-di", version.ref = "kt
 ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty", version.ref = "ktor" }
 ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktor" }
 ktor-server-test-host = { group = "io.ktor", name = "ktor-server-test-host", version.ref = "ktor" }
+ktorfit-lib-light = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-lib-light", version.ref = "ktorfit" }
 lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
 lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycle" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
@@ -61,12 +64,16 @@ gradle-plugin-detekt = { module = "dev.detekt:detekt-gradle-plugin", version.ref
 gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradle-plugin-kotlin-compose = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 gradle-plugin-kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+gradle-plugin-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }
+gradle-plugin-ktorfit = { module = "de.jensklingenberg.ktorfit:gradle-plugin", version.ref = "ktorfit" }
 
 [plugins]
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+ktorfit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 yap-compose-desktop = { id = "app.yap.compose.desktop" }
 yap-detekt = { id = "app.yap.detekt" }
 yap-jvm-library = { id = "app.yap.jvm.library" }

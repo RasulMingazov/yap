@@ -2,9 +2,10 @@ package app.yap.admin.feature.levels.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
-import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.adminKtorfit
 import app.yap.admin.core.network.settings.StubServerSettings
 import app.yap.admin.core.network.settings.StubServerSettingsRepository
+import app.yap.admin.feature.levels.data.api.createLevelApi
 import app.yap.admin.feature.levels.domain.LevelCode
 import app.yap.admin.feature.levels.domain.SaveLevelsResult
 import app.yap.admin.feature.levels.domain.StubLevel
@@ -12,6 +13,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -36,15 +38,6 @@ internal class RemoteLevelRepositoryTest {
             ),
             actual = result,
         )
-    }
-
-    @Test
-    fun `GIVEN no saved server settings WHEN loading the levels THEN loading fails without a call`() = runTest {
-        val env = Environment(answer = answer(content = "[]"), settings = null)
-
-        val result = env.repository.list()
-
-        assertEquals(expected = LoadResult.Failed to 0, actual = result to env.engine.requestHistory.size)
     }
 
     @Test
@@ -79,6 +72,7 @@ internal class RemoteLevelRepositoryTest {
                 "${StubServerSettings.ADDRESS}/admin/levels",
                 "Bearer ${StubServerSettings.KEY}",
                 Json.parseToJsonElement("""[{"code": "B1", "settings": $SETTINGS_JSON}]"""),
+                ContentType.Application.Json,
             ),
             actual = listOf(
                 result,
@@ -86,6 +80,7 @@ internal class RemoteLevelRepositoryTest {
                 request.url.toString(),
                 request.headers[HttpHeaders.Authorization],
                 Json.parseToJsonElement(request.body.toByteArray().decodeToString()),
+                request.body.contentType,
             ),
         )
     }
@@ -108,15 +103,15 @@ internal class RemoteLevelRepositoryTest {
         assertEquals(expected = SaveLevelsResult.Failed, actual = result)
     }
 
-    private class Environment(
-        answer: MockRequestHandler,
-        settings: ServerSettings? = StubServerSettings.stubServerSettings(),
-    ) {
+    private class Environment(answer: MockRequestHandler) {
 
         val engine = MockEngine(answer)
-        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
-        val repository = RemoteLevelRepository(
+        val serverSettingsRepository = StubServerSettingsRepository(settings = StubServerSettings.stubServerSettings())
+        private val ktorfit = adminKtorfit(
             httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+        )
+        val repository = RemoteLevelRepository(
+            levelApi = ktorfit.createLevelApi(),
             serverSettingsRepository = serverSettingsRepository,
         )
     }

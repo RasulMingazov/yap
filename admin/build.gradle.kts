@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.yap.compose.desktop)
+    id(libs.plugins.ksp.get().pluginId)
+    id(libs.plugins.ktorfit.get().pluginId)
 }
 
 dependencies {
@@ -9,6 +11,7 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.serialization.json)
+    implementation(libs.ktorfit.lib.light)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel)
 
