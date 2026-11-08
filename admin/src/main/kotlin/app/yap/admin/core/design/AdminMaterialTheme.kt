@@ -30,6 +30,7 @@ private val COLOR_SCHEME = lightColorScheme(
     outlineVariant = AdminTheme.Colors.line,
     primary = AdminTheme.Colors.ink,
     surface = AdminTheme.Colors.background,
+    surfaceContainer = AdminTheme.Colors.background,
     surfaceContainerHigh = AdminTheme.Colors.background,
 )
 

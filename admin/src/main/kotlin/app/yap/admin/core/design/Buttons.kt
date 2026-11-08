@@ -33,6 +33,7 @@ internal fun PrimaryButton(
         background = if (enabled) AdminTheme.Colors.ink else AdminTheme.Colors.fill,
         border = if (enabled) AdminTheme.Colors.ink else AdminTheme.Colors.lineStrong,
         enabled = enabled,
+        height = AdminTheme.Sizes.buttonHeight,
         horizontalPadding = AdminTheme.Sizes.buttonPadding,
         onClick = onClick,
     ) {
@@ -53,6 +54,7 @@ internal fun SecondaryButton(
         background = if (enabled) AdminTheme.Colors.background else AdminTheme.Colors.fill,
         border = AdminTheme.Colors.lineStrong,
         enabled = enabled,
+        height = AdminTheme.Sizes.buttonHeight,
         horizontalPadding = AdminTheme.Sizes.secondaryButtonPadding,
         onClick = onClick,
     ) {
@@ -69,11 +71,13 @@ internal fun PopupButton(
     onClick: () -> Unit,
     placeholder: String,
     text: String?,
+    height: Dp = AdminTheme.Sizes.buttonHeight,
 ) {
     ButtonBox(
         background = if (enabled) AdminTheme.Colors.background else AdminTheme.Colors.fill,
         border = AdminTheme.Colors.lineStrong,
         enabled = enabled,
+        height = height,
         horizontalPadding = AdminTheme.Sizes.popupPadding,
         onClick = onClick,
     ) {
@@ -116,6 +120,7 @@ private fun ButtonBox(
     background: Color,
     border: Color,
     enabled: Boolean,
+    height: Dp,
     horizontalPadding: Dp,
     onClick: () -> Unit,
     content: @Composable () -> Unit,
@@ -123,7 +128,7 @@ private fun ButtonBox(
     val shape = RoundedCornerShape(AdminTheme.Sizes.cornerRadius)
     Box(
         modifier = Modifier
-            .height(AdminTheme.Sizes.buttonHeight)
+            .height(height)
             .clip(shape)
             .background(background)
             .border(
