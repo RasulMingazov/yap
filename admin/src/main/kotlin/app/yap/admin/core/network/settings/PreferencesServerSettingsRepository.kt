@@ -1,7 +1,5 @@
-package app.yap.admin.feature.server.data.repository
+package app.yap.admin.core.network.settings
 
-import app.yap.admin.feature.server.domain.ServerSettings
-import app.yap.admin.feature.server.domain.repository.ServerSettingsRepository
 import java.util.prefs.Preferences
 
 internal class PreferencesServerSettingsRepository(

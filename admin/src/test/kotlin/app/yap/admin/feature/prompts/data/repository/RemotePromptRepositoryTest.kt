@@ -2,15 +2,15 @@ package app.yap.admin.feature.prompts.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.adminHttpClient
+import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.settings.StubServerSettings
+import app.yap.admin.core.network.settings.StubServerSettingsRepository
 import app.yap.admin.feature.prompts.domain.PromptGroup
 import app.yap.admin.feature.prompts.domain.PromptKey
 import app.yap.admin.feature.prompts.domain.PromptSummary
 import app.yap.admin.feature.prompts.domain.RestorePromptResult
 import app.yap.admin.feature.prompts.domain.SavePromptResult
 import app.yap.admin.feature.prompts.domain.StubPrompt
-import app.yap.admin.feature.server.domain.ServerSettings
-import app.yap.admin.feature.server.domain.StubServerSettings
-import app.yap.admin.feature.server.domain.repository.StubServerSettingsRepository
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
@@ -142,9 +142,10 @@ internal class RemotePromptRepositoryTest {
     ) {
 
         val engine = MockEngine(answer)
+        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
         val repository = RemotePromptRepository(
-            httpClient = adminHttpClient(engine),
-            serverSettingsRepository = StubServerSettingsRepository(settings = settings),
+            httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+            serverSettingsRepository = serverSettingsRepository,
         )
     }
 

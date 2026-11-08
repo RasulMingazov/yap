@@ -1,8 +1,7 @@
 package app.yap.admin.feature.topics.data.repository
 
-import app.yap.admin.core.common.runSuspendCatching
-import app.yap.admin.feature.server.domain.ServerSettings
-import app.yap.admin.feature.server.domain.repository.ServerSettingsRepository
+import app.yap.admin.core.network.callServer
+import app.yap.admin.core.network.settings.ServerSettingsRepository
 import app.yap.admin.feature.topics.data.mapper.toDomain
 import app.yap.admin.feature.topics.data.mapper.toDto
 import app.yap.admin.feature.topics.domain.LoadTopicResult
@@ -15,7 +14,6 @@ import app.yap.admin.feature.topics.domain.repository.TopicRepository
 import app.yap.contract.admin.TopicDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -30,53 +28,39 @@ internal class RemoteTopicRepository(
     private val serverSettingsRepository: ServerSettingsRepository,
 ) : TopicRepository {
 
-    override suspend fun create(content: TopicContent): SaveTopicResult = request(
+    override suspend fun create(content: TopicContent): SaveTopicResult = serverSettingsRepository.callServer(
         failed = SaveTopicResult.Failed,
         read = { response -> response.toSaveResult() },
-        send = { settings ->
-            httpClient.post(settings.url(TOPICS_PATH)) {
-                bearerAuth(settings.key)
+        send = {
+            httpClient.post(TOPICS_PATH) {
                 contentType(ContentType.Application.Json)
                 setBody(content.toDto())
             }
         },
     )
 
-    override suspend fun find(topicId: TopicId): LoadTopicResult = request(
+    override suspend fun find(topicId: TopicId): LoadTopicResult = serverSettingsRepository.callServer(
         failed = LoadTopicResult.Failed,
         read = { response -> response.toLoadTopicResult() },
-        send = { settings ->
-            httpClient.get(settings.url("$TOPICS_PATH/${topicId.value}")) { bearerAuth(settings.key) }
-        },
+        send = { httpClient.get("$TOPICS_PATH/${topicId.value}") },
     )
 
-    override suspend fun list(): LoadTopicsResult = request(
+    override suspend fun list(): LoadTopicsResult = serverSettingsRepository.callServer(
         failed = LoadTopicsResult.Failed,
         read = { response -> response.toLoadTopicsResult() },
-        send = { settings -> httpClient.get(settings.url(TOPICS_PATH)) { bearerAuth(settings.key) } },
+        send = { httpClient.get(TOPICS_PATH) },
     )
 
-    override suspend fun update(topic: Topic): SaveTopicResult = request(
+    override suspend fun update(topic: Topic): SaveTopicResult = serverSettingsRepository.callServer(
         failed = SaveTopicResult.Failed,
         read = { response -> response.toSaveResult() },
-        send = { settings ->
-            httpClient.put(settings.url("$TOPICS_PATH/${topic.topicId.value}")) {
-                bearerAuth(settings.key)
+        send = {
+            httpClient.put("$TOPICS_PATH/${topic.topicId.value}") {
                 contentType(ContentType.Application.Json)
                 setBody(topic.content.toDto())
             }
         },
     )
-
-    private suspend fun <T> request(
-        failed: T,
-        read: suspend (HttpResponse) -> T,
-        send: suspend (ServerSettings) -> HttpResponse,
-    ): T {
-        val settings = serverSettingsRepository.get() ?: return failed
-        return runSuspendCatching { read(send(settings)) }
-            .getOrElse { failed }
-    }
 
     private suspend fun HttpResponse.toSaveResult(): SaveTopicResult = when (status) {
         HttpStatusCode.OK,
@@ -98,8 +82,6 @@ internal class RemoteTopicRepository(
         )
         else -> LoadTopicsResult.Failed
     }
-
-    private fun ServerSettings.url(path: String): String = "${address.trimEnd('/')}$path"
 
     private companion object {
 

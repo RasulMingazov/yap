@@ -1,7 +1,7 @@
 package app.yap.admin.navigation
 
-import app.yap.admin.feature.server.domain.ServerSettings
-import app.yap.admin.feature.server.domain.StubServerSettings
+import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.settings.StubServerSettings
 import app.yap.admin.feature.server.domain.usecase.StubGetServerSettingsUseCase
 import app.yap.admin.navigation.NavigationViewModel.Event
 import app.yap.admin.navigation.NavigationViewModel.Screen

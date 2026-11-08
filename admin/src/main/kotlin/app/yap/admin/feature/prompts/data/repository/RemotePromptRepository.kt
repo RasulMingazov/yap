@@ -2,8 +2,8 @@ package app.yap.admin.feature.prompts.data.repository
 
 import app.yap.admin.core.common.LoadResult
 import app.yap.admin.core.network.callServer
+import app.yap.admin.core.network.settings.ServerSettingsRepository
 import app.yap.admin.core.network.toLoadResult
-import app.yap.admin.core.network.url
 import app.yap.admin.feature.prompts.data.mapper.toDomain
 import app.yap.admin.feature.prompts.domain.Prompt
 import app.yap.admin.feature.prompts.domain.PromptKey
@@ -11,13 +11,11 @@ import app.yap.admin.feature.prompts.domain.PromptSummary
 import app.yap.admin.feature.prompts.domain.RestorePromptResult
 import app.yap.admin.feature.prompts.domain.SavePromptResult
 import app.yap.admin.feature.prompts.domain.repository.PromptRepository
-import app.yap.admin.feature.server.domain.repository.ServerSettingsRepository
 import app.yap.contract.admin.PromptDto
 import app.yap.contract.admin.PromptSummaryDto
 import app.yap.contract.admin.PromptTextDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -34,7 +32,7 @@ internal class RemotePromptRepository(
     override suspend fun find(promptKey: PromptKey): LoadResult<Prompt> = serverSettingsRepository.callServer(
         failed = LoadResult.Failed,
         read = { response -> response.toLoadResult { toPrompt() } },
-        send = { settings -> httpClient.get(settings.url(promptPath(promptKey))) { bearerAuth(settings.key) } },
+        send = { httpClient.get(promptPath(promptKey)) },
     )
 
     override suspend fun list(): LoadResult<List<PromptSummary>> = serverSettingsRepository.callServer(
@@ -45,7 +43,7 @@ internal class RemotePromptRepository(
                     .map { prompt -> prompt.toDomain() }
             }
         },
-        send = { settings -> httpClient.get(settings.url(PROMPTS_PATH)) { bearerAuth(settings.key) } },
+        send = { httpClient.get(PROMPTS_PATH) },
     )
 
     override suspend fun restore(
@@ -54,11 +52,7 @@ internal class RemotePromptRepository(
     ): RestorePromptResult = serverSettingsRepository.callServer(
         failed = RestorePromptResult.Failed,
         read = { response -> response.toRestoreResult() },
-        send = { settings ->
-            httpClient.post(settings.url("${promptPath(promptKey)}/versions/$number/restore")) {
-                bearerAuth(settings.key)
-            }
-        },
+        send = { httpClient.post("${promptPath(promptKey)}/versions/$number/restore") },
     )
 
     override suspend fun save(
@@ -67,9 +61,8 @@ internal class RemotePromptRepository(
     ): SavePromptResult = serverSettingsRepository.callServer(
         failed = SavePromptResult.Failed,
         read = { response -> response.toSaveResult() },
-        send = { settings ->
-            httpClient.post(settings.url("${promptPath(promptKey)}/versions")) {
-                bearerAuth(settings.key)
+        send = {
+            httpClient.post("${promptPath(promptKey)}/versions") {
                 contentType(ContentType.Application.Json)
                 setBody(PromptTextDto(text = text))
             }

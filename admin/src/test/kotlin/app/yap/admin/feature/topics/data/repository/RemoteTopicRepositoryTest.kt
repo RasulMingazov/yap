@@ -1,10 +1,10 @@
 package app.yap.admin.feature.topics.data.repository
 
 import app.yap.admin.core.network.adminHttpClient
+import app.yap.admin.core.network.settings.ServerSettings
+import app.yap.admin.core.network.settings.StubServerSettings
+import app.yap.admin.core.network.settings.StubServerSettingsRepository
 import app.yap.admin.feature.characters.domain.StubCharacter
-import app.yap.admin.feature.server.domain.ServerSettings
-import app.yap.admin.feature.server.domain.StubServerSettings
-import app.yap.admin.feature.server.domain.repository.StubServerSettingsRepository
 import app.yap.admin.feature.topics.data.mapper.StubTopicDto
 import app.yap.admin.feature.topics.domain.LoadTopicResult
 import app.yap.admin.feature.topics.domain.LoadTopicsResult
@@ -136,9 +136,10 @@ internal class RemoteTopicRepositoryTest {
     ) {
 
         val engine = MockEngine(answer)
+        val serverSettingsRepository = StubServerSettingsRepository(settings = settings)
         val repository = RemoteTopicRepository(
-            httpClient = adminHttpClient(engine),
-            serverSettingsRepository = StubServerSettingsRepository(settings = settings),
+            httpClient = adminHttpClient(serverSettingsRepository = serverSettingsRepository, engine = engine),
+            serverSettingsRepository = serverSettingsRepository,
         )
     }
 

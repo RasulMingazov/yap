@@ -1,6 +1,5 @@
-package app.yap.admin.feature.server.domain.repository
+package app.yap.admin.core.network.settings
 
-import app.yap.admin.feature.server.domain.ServerSettings
 import io.github.rasulmingazov.stubcall.StubCall0
 import io.github.rasulmingazov.stubcall.StubCall1
 
