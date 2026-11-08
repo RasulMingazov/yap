@@ -16,6 +16,10 @@ Core modules never depend on features. Features never depend on `app`. A feature
 feature only through that feature's use cases and the model types in their signatures, and the
 dependency has no cycle.
 
+When a feature needs data that a later feature holds, it owns a port: an interface in its
+`usecase/`, such as `CharacterTopicCounts`. The feature that holds the data implements the port in
+its `persistence/` and binds it in its own Koin module. The Gradle dependency keeps its direction.
+
 A module that needs settings owns their type, such as `DatabaseConfig` in `core-database`. `app`
 reads the values, builds it at start, and passes it to the Koin module function of that module.
 

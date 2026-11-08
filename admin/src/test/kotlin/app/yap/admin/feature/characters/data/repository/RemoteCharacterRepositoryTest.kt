@@ -27,7 +27,7 @@ internal class RemoteCharacterRepositoryTest {
 
     @Test
     fun `GIVEN the server lists characters WHEN loading them THEN they are loaded`() = runTest {
-        val env = Environment(answer = answer(content = "[$CHARACTER_JSON]"))
+        val env = Environment(answer = answer(content = "[$SUMMARY_JSON]"))
 
         val result = env.repository.list()
 
@@ -120,6 +120,9 @@ internal class RemoteCharacterRepositoryTest {
             }
         """
         const val CHARACTER_JSON = """{"characterId": "${StubCharacter.CHARACTER_ID}", "profile": $PROFILE_JSON}"""
+        const val SUMMARY_JSON = """
+            {"characterId": "${StubCharacter.CHARACTER_ID}", "profile": $PROFILE_JSON, "topicCount": 2}
+        """
 
         fun answer(content: String, status: HttpStatusCode = HttpStatusCode.OK): MockRequestHandler = {
             respond(

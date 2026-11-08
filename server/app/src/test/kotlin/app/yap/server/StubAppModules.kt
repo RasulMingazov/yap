@@ -5,6 +5,8 @@ import app.yap.server.core.llm.coreLlmModule
 import app.yap.server.feature.characters.featureCharactersModule
 import app.yap.server.feature.characters.persistence.CharacterRepository
 import app.yap.server.feature.characters.persistence.StubCharacterRepository
+import app.yap.server.feature.characters.usecase.CharacterTopicCounts
+import app.yap.server.feature.characters.usecase.StubCharacterTopicCounts
 import app.yap.server.feature.levels.featureLevelsModule
 import app.yap.server.feature.levels.persistence.LevelRepository
 import app.yap.server.feature.levels.persistence.StubLevelRepository
@@ -30,6 +32,7 @@ internal object StubAppModules {
         featurePromptsModule(),
         featureTopicsModule(),
         module { single<CharacterRepository> { StubCharacterRepository() } },
+        module { single<CharacterTopicCounts> { StubCharacterTopicCounts() } },
         module { single<LevelRepository> { StubLevelRepository() } },
         module { single<PromptRepository> { StubPromptRepository() } },
         module { single<TaskModelRepository> { StubTaskModelRepository() } },

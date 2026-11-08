@@ -1,8 +1,10 @@
 package app.yap.server.feature.topics
 
+import app.yap.server.feature.characters.usecase.CharacterTopicCounts
 import app.yap.server.feature.topics.model.TopicCalendarRule
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicPublishRule
+import app.yap.server.feature.topics.persistence.DatabaseCharacterTopicCounts
 import app.yap.server.feature.topics.persistence.DatabaseTopicRepository
 import app.yap.server.feature.topics.persistence.TopicRepository
 import app.yap.server.feature.topics.usecase.CreateTopicUseCase
@@ -20,6 +22,7 @@ import org.koin.dsl.module
 
 fun featureTopicsModule(): Module = module {
     single<Clock> { Clock.systemUTC() }
+    singleOf(::DatabaseCharacterTopicCounts) { bind<CharacterTopicCounts>() }
     singleOf(::DatabaseTopicRepository) { bind<TopicRepository>() }
 
     factoryOf(::CreateTopicUseCase)

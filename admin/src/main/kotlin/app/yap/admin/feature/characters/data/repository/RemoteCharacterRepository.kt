@@ -13,6 +13,7 @@ import app.yap.admin.feature.characters.domain.CharacterProfile
 import app.yap.admin.feature.characters.domain.SaveCharacterResult
 import app.yap.admin.feature.characters.domain.repository.CharacterRepository
 import app.yap.contract.admin.CharacterDto
+import app.yap.contract.admin.CharacterSummaryDto
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
@@ -38,8 +39,8 @@ internal class RemoteCharacterRepository(
         failed = LoadResult.Failed,
         read = { response ->
             response.toLoadResult {
-                body<List<CharacterDto>>()
-                    .map { character -> character.toDomain() }
+                body<List<CharacterSummaryDto>>()
+                    .map { summary -> summary.toDomain() }
             }
         },
         send = { characterApi.list() },
