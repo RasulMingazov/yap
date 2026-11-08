@@ -1,6 +1,7 @@
 package app.yap.admin.feature.prompts.presentation
 
 import app.yap.admin.core.common.LoadResult
+import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.prompts.domain.PromptKey
 import app.yap.admin.feature.prompts.domain.RestorePromptResult
 import app.yap.admin.feature.prompts.domain.SavePromptResult
@@ -44,7 +45,7 @@ internal class PromptsViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(expected = "Реплика персонажа", actual = env.content().title)
+        assertEquals(expected = "Реплика персонажа", actual = env.editor().title)
     }
 
     @Test
@@ -59,7 +60,7 @@ internal class PromptsViewModelTest {
         env.viewModel.onEvent(Event.PromptClicked(PromptKey.TOPIC_REPLY))
         advanceUntilIdle()
 
-        assertEquals(expected = "Typed text", actual = env.content().text)
+        assertEquals(expected = "Typed text", actual = env.editor().text)
     }
 
     @Test
@@ -72,7 +73,7 @@ internal class PromptsViewModelTest {
         env.viewModel.onEvent(Event.PromptClicked(PromptKey.TOPIC_HINTS))
         advanceUntilIdle()
 
-        assertEquals(expected = "Проверка шага", actual = env.content().title)
+        assertEquals(expected = "Проверка шага", actual = env.editor().title)
     }
 
     @Test
@@ -100,7 +101,7 @@ internal class PromptsViewModelTest {
 
             assertEquals(
                 expected = "Saved" to "Сохранено",
-                actual = env.content().text to env.content().saveStatus?.text,
+                actual = env.editor().text to env.content().saveStatus.text,
             )
         }
 
@@ -114,7 +115,7 @@ internal class PromptsViewModelTest {
             env.viewModel.onEvent(Event.SaveClicked)
             advanceUntilIdle()
 
-            assertEquals(expected = "Введите текст промпта", actual = env.content().saveStatus?.text)
+            assertEquals(expected = "Введите текст промпта", actual = env.content().saveStatus.text)
         }
 
     @Test
@@ -127,7 +128,7 @@ internal class PromptsViewModelTest {
         env.viewModel.onEvent(Event.TextChanged("Typed text"))
         advanceUntilIdle()
 
-        assertEquals(expected = StubPrompt.TEXT, actual = env.content().text)
+        assertEquals(expected = StubPrompt.TEXT, actual = env.editor().text)
     }
 
     @Test
@@ -143,7 +144,7 @@ internal class PromptsViewModelTest {
 
             assertEquals(
                 expected = News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз.") to "Typed text",
-                actual = env.viewModel.news.first() to env.content().text,
+                actual = env.viewModel.news.first() to env.editor().text,
             )
         }
 
@@ -158,7 +159,7 @@ internal class PromptsViewModelTest {
         env.viewModel.onEvent(Event.RestoreClicked(2))
         advanceUntilIdle()
 
-        assertEquals(expected = "Version 2", actual = env.content().text)
+        assertEquals(expected = "Version 2", actual = env.editor().text)
     }
 
     @Test
@@ -204,7 +205,22 @@ internal class PromptsViewModelTest {
         }
 
     @Test
-    fun `GIVEN the chosen prompt does not load WHEN Prompts opens THEN it shows the load error`() =
+    fun `GIVEN version 2 WHEN the restore succeeds THEN the status says v2 is with the users again`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            advanceUntilIdle()
+
+            env.viewModel.onEvent(Event.RestoreClicked(2))
+            advanceUntilIdle()
+
+            assertEquals(
+                expected = Status(text = "v2 снова у пользователей", tone = Status.Tone.SUCCESS),
+                actual = env.content().saveStatus,
+            )
+        }
+
+    @Test
+    fun `GIVEN the chosen prompt does not load WHEN Prompts opens THEN only the editor shows the error`() =
         runTest(dispatcher) {
             val env = Environment()
             env.getPromptUseCase.invokeCall.returns(LoadResult.Failed)
@@ -212,9 +228,35 @@ internal class PromptsViewModelTest {
             advanceUntilIdle()
 
             assertEquals(
-                expected = UiState.Error(message = "Не удалось загрузить промпты"),
-                actual = env.viewModel.uiState.value,
+                expected = UiState.Editor.Error(message = "Не удалось загрузить промпт"),
+                actual = env.content().editor,
             )
+        }
+
+    @Test
+    fun `GIVEN the chosen prompt did not load WHEN Save is clicked THEN nothing is sent`() = runTest(dispatcher) {
+        val env = Environment()
+        env.getPromptUseCase.invokeCall.returns(LoadResult.Failed)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.savePromptUseCase.invokeCall.notCalled()
+    }
+
+    @Test
+    fun `GIVEN the chosen prompt did not load WHEN Retry is clicked THEN the editor shows it`() =
+        runTest(dispatcher) {
+            val env = Environment()
+            env.getPromptUseCase.invokeCall.returns(LoadResult.Failed)
+            advanceUntilIdle()
+            env.getPromptUseCase.invokeCall.returns(LoadResult.Loaded(StubPrompt.stubPrompt()))
+
+            env.viewModel.onEvent(Event.RetryClicked)
+            advanceUntilIdle()
+
+            assertEquals(expected = StubPrompt.TEXT, actual = env.editor().text)
         }
 
     @Test
@@ -227,7 +269,7 @@ internal class PromptsViewModelTest {
         env.viewModel.onEvent(Event.RetryClicked)
         advanceUntilIdle()
 
-        assertEquals(expected = StubPrompt.TEXT, actual = env.content().text)
+        assertEquals(expected = StubPrompt.TEXT, actual = env.editor().text)
     }
 
     private class Environment {
@@ -244,5 +286,7 @@ internal class PromptsViewModelTest {
         )
 
         fun content(): UiState.Content = viewModel.uiState.value as UiState.Content
+
+        fun editor(): UiState.Editor.Loaded = content().editor as UiState.Editor.Loaded
     }
 }

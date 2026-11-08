@@ -137,23 +137,45 @@ Restore.
 #### Scenario: A prompt without a version
 
 - **WHEN** the owner chooses a prompt that has no version yet
-- **THEN** the editor is empty, the state says that it is not saved yet, and Versions is empty
+- **THEN** the editor is empty, the state says that it is not saved yet, and Versions has no rows
+- **AND** Versions says that the first version comes after Save
 
 #### Scenario: Typed text stays
 
 - **WHEN** the owner types in one prompt, chooses another, and returns
 - **THEN** the editor shows the typed text
 
-#### Scenario: The prompts do not load
+#### Scenario: The list does not load
 
-- **WHEN** the admin app cannot load the list or the chosen prompt
+- **WHEN** the admin app cannot load the list of the prompts
 - **THEN** Prompts shows an error that the prompts did not load, and Retry
+
+### Requirement: Loading one prompt
+
+The admin app SHALL load a prompt when the owner chooses it for the first time. While the prompt
+loads or after it fails, the list SHALL stay, and only the editor SHALL show the loader or the error.
+
+#### Scenario: A prompt loads
+
+- **WHEN** the owner chooses a prompt that is not loaded yet
+- **THEN** the list stays, the editor shows a loader, and the list and Save are disabled
+
+#### Scenario: A prompt does not load
+
+- **WHEN** the admin app cannot load the chosen prompt
+- **THEN** the list stays, and the editor shows an error that the prompt did not load, and Retry
 
 ### Requirement: Saving and restoring a prompt
 
 The toolbar SHALL have Save with a note that a new version goes to the users at once. Save SHALL send
 the text of the chosen prompt. Restore SHALL send the number of the version. After either, the admin
-app SHALL show the prompt that the server returns, and a Saved status for Save.
+app SHALL show the prompt that the server returns, a Saved status for Save, and a status that the
+version is with the users again for Restore.
+
+#### Scenario: No request yet
+
+- **WHEN** the owner opens a prompt
+- **THEN** the note that a new version goes to the users at once shows beside Save
 
 #### Scenario: The save succeeds
 
@@ -165,13 +187,31 @@ app SHALL show the prompt that the server returns, and a Saved status for Save.
 - **WHEN** the owner clicks Save with an empty editor
 - **THEN** the admin app sends the text, the server answers 400, and the admin app shows an error
   beside Save that asks for the text
+- **AND** the editor shows the error
 
 #### Scenario: Restore
 
 - **WHEN** the owner clicks Restore at version 2
 - **THEN** the editor shows the text of version 2, and Versions shows version 2 as current
+- **AND** the status beside Save says that version 2 is with the users again
 
 #### Scenario: The server does not answer
 
 - **WHEN** the admin app cannot reach the server on Save or Restore
 - **THEN** it keeps the editor as it is and shows a snackbar that the action failed
+
+### Requirement: A request in progress
+
+While Save or Restore runs, the status beside Save SHALL say that the prompt saves or that the
+version returns. The editor SHALL be read-only, and the list, Save and Restore SHALL be disabled.
+
+#### Scenario: Save runs
+
+- **WHEN** the owner clicks Save and the server has not answered yet
+- **THEN** the status says that the prompt saves, and the editor, the list and Save are disabled
+
+#### Scenario: Restore runs
+
+- **WHEN** the owner clicks Restore and the server has not answered yet
+- **THEN** the status says that the version returns, and the editor, the list and Restore are
+  disabled
