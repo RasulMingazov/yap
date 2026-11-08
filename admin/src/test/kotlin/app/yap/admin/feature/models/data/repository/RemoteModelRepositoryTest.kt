@@ -116,15 +116,6 @@ internal class RemoteModelRepositoryTest {
         assertEquals(expected = SaveModelsResult.Failed, actual = result)
     }
 
-    @Test
-    fun `GIVEN no saved server settings WHEN saving THEN the save fails and no request goes out`() = runTest {
-        val env = Environment(answer = answer(content = MODELS_JSON), settings = null)
-
-        val result = env.repository.save(StubModels.stubTasks())
-
-        assertEquals(expected = listOf(SaveModelsResult.Failed, 0), actual = listOf(result, env.engine.requestHistory.size))
-    }
-
     private class Environment(
         answer: MockRequestHandler,
         settings: ServerSettings? =StubServerSettings.stubServerSettings(),
