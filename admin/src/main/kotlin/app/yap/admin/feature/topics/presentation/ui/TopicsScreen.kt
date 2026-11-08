@@ -341,11 +341,13 @@ private fun TopicRow(
                 style = AdminTheme.Type.tableCellMedium,
             )
         }
-        CellText(
-            color = AdminTheme.Colors.ink,
-            modifier = Modifier.width(AdminTheme.Sizes.ledByColumnWidth),
-            text = row.ledBy,
-        )
+        TableCell(modifier = Modifier.width(AdminTheme.Sizes.ledByColumnWidth)) {
+            Text(
+                text = row.ledBy,
+                color = AdminTheme.Colors.ink,
+                style = AdminTheme.Type.tableCell,
+            )
+        }
         CellText(
             color = AdminTheme.Colors.muted,
             modifier = Modifier.width(AdminTheme.Sizes.stepsColumnWidth),

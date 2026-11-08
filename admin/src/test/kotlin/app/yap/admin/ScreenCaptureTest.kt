@@ -642,7 +642,7 @@ internal class ScreenCaptureTest {
                     date = LocalDate.of(2025, 10, 25),
                     topic = StubTopicCalendar.stubCalendarTopic(
                         completeSteps = 2,
-                        ledBy = LedBy.Cast(name = "Мия"),
+                        ledBy = LedBy.Cast(name = "Александра-Мария"),
                         steps = 5,
                         title = LONG_TOPIC_TITLE,
                     ),

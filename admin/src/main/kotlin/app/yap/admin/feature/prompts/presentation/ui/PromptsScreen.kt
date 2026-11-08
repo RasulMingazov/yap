@@ -215,8 +215,7 @@ private fun PromptListItem(
         Text(
             text = item.title,
             color = if (enabled) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
-            style = AdminTheme.Type.body,
-            fontWeight = FontWeight.Medium,
+            style = AdminTheme.Type.bodyMedium,
         )
         Text(
             text = item.usage,
