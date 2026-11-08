@@ -3,7 +3,10 @@ package app.yap.server.feature.topics.usecase
 import app.yap.server.feature.characters.persistence.StubCharacterRepository
 import app.yap.server.feature.characters.usecase.GetCharacterUseCase
 import app.yap.server.feature.topics.model.PublishTopicOutcome
+import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.StubTopic
+import app.yap.server.feature.topics.model.TopicDetails
+import app.yap.server.feature.topics.model.TopicDetailsRule
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicField
 import app.yap.server.feature.topics.model.TopicGap
@@ -19,7 +22,7 @@ import kotlinx.coroutines.test.runTest
 internal class PublishTopicUseCaseTest {
 
     @Test
-    fun `GIVEN a draft with every field WHEN publishing THEN the topic is published`() = runTest {
+    fun `GIVEN a draft with every field WHEN publishing THEN the topic is published with its details`() = runTest {
         val env = Environment()
         val published = StubTopic.stubTopic(status = TopicStatus.PUBLISHED)
         env.topicRepository.publishCall.returns(TopicPublish.Published(published))
@@ -27,7 +30,12 @@ internal class PublishTopicUseCaseTest {
         val outcome = env.useCase(content = StubTopic.stubContent(), topicId = StubTopic.TOPIC_ID)
 
         env.topicRepository.publishCall.calledWith(StubTopic.stubContent(), StubTopic.TOPIC_ID)
-        assertEquals(expected = PublishTopicOutcome.Published(published), actual = outcome)
+        assertEquals(
+            expected = PublishTopicOutcome.Published(
+                TopicDetails(gaps = emptySet(), state = ReleaseState.PUBLISHED, topic = published),
+            ),
+            actual = outcome,
+        )
     }
 
     @Test
@@ -67,7 +75,12 @@ internal class PublishTopicUseCaseTest {
             val outcome = env.useCase(content = content, topicId = StubTopic.TOPIC_ID)
 
             env.topicRepository.publishCall.calledWith(content, StubTopic.TOPIC_ID)
-            assertEquals(expected = PublishTopicOutcome.Published(out), actual = outcome)
+            assertEquals(
+                expected = PublishTopicOutcome.Published(
+                    TopicDetails(gaps = emptySet(), state = ReleaseState.OUT, topic = out),
+                ),
+                actual = outcome,
+            )
         }
 
     @Test
@@ -104,13 +117,15 @@ internal class PublishTopicUseCaseTest {
     private class Environment {
 
         val topicRepository = StubTopicRepository()
+        val topicPublishRule = TopicPublishRule(
+            topicDraftRule = TopicDraftRule(
+                getCharacterUseCase = GetCharacterUseCase(characterRepository = StubCharacterRepository()),
+            ),
+        )
         val useCase = PublishTopicUseCase(
             clock = StubTopic.CLOCK,
-            topicPublishRule = TopicPublishRule(
-                topicDraftRule = TopicDraftRule(
-                    getCharacterUseCase = GetCharacterUseCase(characterRepository = StubCharacterRepository()),
-                ),
-            ),
+            topicDetailsRule = TopicDetailsRule(topicPublishRule = topicPublishRule),
+            topicPublishRule = topicPublishRule,
             topicRepository = topicRepository,
         )
     }

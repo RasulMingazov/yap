@@ -65,6 +65,30 @@ internal class LevelRoutesTest {
     }
 
     @Test
+    fun `GIVEN a level with a model WHEN saving the levels THEN the server stores the model`() = testApplication {
+        val env = Environment()
+        application { env.install(this) }
+
+        val response = putLevels(StubLevelDto.stubInputDtos(b1 = StubLevelDto.stubSettingsDto(model = StubLevel.MODEL)))
+
+        assertEquals(expected = HttpStatusCode.OK, actual = response.status)
+        env.levelRepository.saveCall.calledWith(
+            StubLevel.stubTable(b1 = StubLevel.stubSettings(model = StubLevel.MODEL)),
+        )
+    }
+
+    @Test
+    fun `GIVEN a model outside the catalog WHEN saving the levels THEN the server answers 409`() = testApplication {
+        val env = Environment()
+        application { env.install(this) }
+
+        val response = putLevels(StubLevelDto.stubInputDtos(b1 = StubLevelDto.stubSettingsDto(model = "deepseek-chat")))
+
+        assertEquals(expected = HttpStatusCode.Conflict, actual = response.status)
+        env.levelRepository.saveCall.notCalled()
+    }
+
+    @Test
     fun `GIVEN a code that is not a level WHEN saving the levels THEN the server answers 400`() = testApplication {
         val env = Environment()
         application { env.install(this) }
@@ -135,6 +159,7 @@ internal class LevelRoutesTest {
                 "block": "${StubLevel.BLOCK}",
                 "idioms": "RARELY",
                 "maxWords": ${StubLevel.MAX_WORDS},
+                "model": null,
                 "ratingFrom": $ratingFrom,
                 "vocabulary": "${StubLevel.VOCABULARY}"
               }

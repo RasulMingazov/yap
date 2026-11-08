@@ -9,4 +9,5 @@ data class LevelSettingsDto(
     val maxWords: Int,
     val ratingFrom: Int?,
     val vocabulary: String,
+    val model: String? = null,
 )

@@ -33,6 +33,7 @@ private fun Route.saveLevelsRoute(saveLevelsUseCase: SaveLevelsUseCase) {
         val entries = call.receive<List<LevelInputDto>>().map { input -> input.toModel() }
         when (val outcome = saveLevelsUseCase(entries)) {
             is SaveLevelsOutcome.Invalid -> call.respond(HttpStatusCode.BadRequest)
+            is SaveLevelsOutcome.ModelUnavailable -> call.respond(HttpStatusCode.Conflict)
             is SaveLevelsOutcome.Saved -> call.respond(outcome.levels.map { level -> level.toDto() })
         }
     }

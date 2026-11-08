@@ -4,6 +4,7 @@ object StubLevel {
 
     const val BLOCK = "Speak in short, simple sentences. Avoid phrasal verbs."
     const val MAX_WORDS = 16
+    const val MODEL = "deepseek-v4-pro"
     const val RATING_FROM = 1050
     const val VOCABULARY = "B1"
 
@@ -21,12 +22,14 @@ object StubLevel {
         block: String = BLOCK,
         idioms: Idioms = Idioms.RARELY,
         maxWords: Int = MAX_WORDS,
+        model: String? = null,
         ratingFrom: Int? = RATING_FROM,
         vocabulary: String = VOCABULARY,
     ): LevelSettings = LevelSettings(
         block = block,
         idioms = idioms,
         maxWords = maxWords,
+        model = model,
         ratingFrom = ratingFrom,
         vocabulary = vocabulary,
     )
