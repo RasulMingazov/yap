@@ -20,8 +20,8 @@ import kotlin.test.assertEquals
 internal class TopicCalendarMapperTest {
 
     @Test
-    fun `GIVEN a day with a topic, an empty day and both To do entries WHEN mapping the calendar THEN each keeps its data`() {
-        val dto = StubTopicCalendarDto.stubCalendarDto(
+    fun `GIVEN a day with a topic, an empty day and an empty To do day WHEN mapping the calendar THEN each keeps its data`() {
+        val dto = StubTopicCalendarDto.stubTopicCalendarDto(
             rows = listOf(
                 StubTopicCalendarDto.stubCalendarRowDto(
                     topic = StubTopicCalendarDto.stubCalendarTopicDto(
@@ -39,7 +39,7 @@ internal class TopicCalendarMapperTest {
         val calendar = dto.toDomain()
 
         assertEquals(
-            expected = StubTopicCalendar.stubCalendar(
+            expected = StubTopicCalendar.stubTopicCalendar(
                 rows = listOf(
                     CalendarRow(
                         date = StubTopic.RELEASE_DATE,
@@ -60,7 +60,7 @@ internal class TopicCalendarMapperTest {
 
     @Test
     fun `GIVEN a topic of each status WHEN mapping the calendar THEN each topic has its release state`() {
-        val dto = StubTopicCalendarDto.stubCalendarDto(
+        val dto = StubTopicCalendarDto.stubTopicCalendarDto(
             rows = TopicStatusDto.entries.map { status ->
                 StubTopicCalendarDto.stubCalendarRowDto(
                     topic = StubTopicCalendarDto.stubCalendarTopicDto(status = status),
@@ -78,12 +78,13 @@ internal class TopicCalendarMapperTest {
 
     @Test
     fun `GIVEN topics led by a character, by a guest and by no one WHEN mapping the calendar THEN each has its leader`() {
-        val dto = StubTopicCalendarDto.stubCalendarDto(
-            rows = listOf(LedByDto.CastDto(name = "Sam"), LedByDto.GuestDto, null).map { ledBy ->
-                StubTopicCalendarDto.stubCalendarRowDto(
-                    topic = StubTopicCalendarDto.stubCalendarTopicDto(ledBy = ledBy),
-                )
-            },
+        val dto = StubTopicCalendarDto.stubTopicCalendarDto(
+            rows = listOf(LedByDto.CastDto(name = "Sam"), LedByDto.GuestDto, null)
+                .map { ledBy ->
+                    StubTopicCalendarDto.stubCalendarRowDto(
+                        topic = StubTopicCalendarDto.stubCalendarTopicDto(ledBy = ledBy),
+                    )
+                },
         )
 
         val calendar = dto.toDomain()
@@ -96,7 +97,7 @@ internal class TopicCalendarMapperTest {
 
     @Test
     fun `GIVEN a draft with every kind of gap WHEN mapping the calendar THEN the To do entry holds the draft and each gap`() {
-        val dto = StubTopicCalendarDto.stubCalendarDto(
+        val dto = StubTopicCalendarDto.stubTopicCalendarDto(
             todos = listOf(
                 TodoDto.DraftDto(
                     date = StubTopicDto.RELEASE_DATE,
@@ -134,7 +135,7 @@ internal class TopicCalendarMapperTest {
 
     @Test
     fun `GIVEN a missing gap for each field WHEN mapping the calendar THEN each gap names its field`() {
-        val dto = StubTopicCalendarDto.stubCalendarDto(
+        val dto = StubTopicCalendarDto.stubTopicCalendarDto(
             todos = listOf(
                 TodoDto.DraftDto(
                     date = StubTopicDto.RELEASE_DATE,

@@ -2,7 +2,7 @@ package app.yap.admin.feature.topics.domain
 
 internal object StubTopicCalendar {
 
-    fun stubCalendar(
+    fun stubTopicCalendar(
         rows: List<CalendarRow> = emptyList(),
         todos: List<Todo> = emptyList(),
     ): TopicCalendar = TopicCalendar(

@@ -10,7 +10,7 @@ import app.yap.contract.admin.TopicStatusDto
 
 internal object StubTopicCalendarDto {
 
-    fun stubCalendarDto(
+    fun stubTopicCalendarDto(
         rows: List<CalendarRowDto> = emptyList(),
         todos: List<TodoDto> = emptyList(),
     ): TopicCalendarDto = TopicCalendarDto(
