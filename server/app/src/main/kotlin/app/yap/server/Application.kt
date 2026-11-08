@@ -56,7 +56,7 @@ internal fun Application.serverModule(
             characterRoutes(
                 createCharacterUseCase = koin.get(),
                 getCharacterUseCase = koin.get(),
-                getCharactersUseCase = koin.get(),
+                getCharacterSummariesUseCase = koin.get(),
                 updateCharacterUseCase = koin.get(),
             )
             levelRoutes(

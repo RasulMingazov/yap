@@ -6,8 +6,8 @@ import app.yap.server.feature.characters.model.CharacterId
 import app.yap.server.feature.characters.model.CreateCharacterOutcome
 import app.yap.server.feature.characters.model.UpdateCharacterOutcome
 import app.yap.server.feature.characters.usecase.CreateCharacterUseCase
+import app.yap.server.feature.characters.usecase.GetCharacterSummariesUseCase
 import app.yap.server.feature.characters.usecase.GetCharacterUseCase
-import app.yap.server.feature.characters.usecase.GetCharactersUseCase
 import app.yap.server.feature.characters.usecase.UpdateCharacterUseCase
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.NotFoundException
@@ -24,20 +24,20 @@ import kotlin.uuid.Uuid
 fun Route.characterRoutes(
     createCharacterUseCase: CreateCharacterUseCase,
     getCharacterUseCase: GetCharacterUseCase,
-    getCharactersUseCase: GetCharactersUseCase,
+    getCharacterSummariesUseCase: GetCharacterSummariesUseCase,
     updateCharacterUseCase: UpdateCharacterUseCase,
 ) {
     route("/admin/characters") {
-        getCharactersRoute(getCharactersUseCase)
+        getCharactersRoute(getCharacterSummariesUseCase)
         createCharacterRoute(createCharacterUseCase)
         getCharacterRoute(getCharacterUseCase)
         updateCharacterRoute(updateCharacterUseCase)
     }
 }
 
-private fun Route.getCharactersRoute(getCharactersUseCase: GetCharactersUseCase) {
+private fun Route.getCharactersRoute(getCharacterSummariesUseCase: GetCharacterSummariesUseCase) {
     get {
-        call.respond(getCharactersUseCase().map { character -> character.toDto() })
+        call.respond(getCharacterSummariesUseCase().map { summary -> summary.toDto() })
     }
 }
 
