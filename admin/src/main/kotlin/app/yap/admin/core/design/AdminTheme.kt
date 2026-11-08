@@ -39,6 +39,11 @@ internal object AdminTheme {
         val cellFieldHeight = 28.dp
         val cellFieldPadding = 10.dp
         val cellFieldWidth = 64.dp
+        val chipGap = 6.dp
+        val chipHeight = 24.dp
+        val chipLabelGap = 4.dp
+        val chipPadding = 8.dp
+        val chipRadius = 4.dp
         val contentBottomPadding = 40.dp
         val contentMaxWidth = 880.dp
         val contentPadding = 32.dp
@@ -91,6 +96,8 @@ internal object AdminTheme {
         val toolbarHeight = 64.dp
         val toolbarTitleGap = 8.dp
         val toolbarTitleMinWidth = 240.dp
+        val versionLabelWidth = 36.dp
+        val versionStateWidth = 120.dp
         val windowHeight = 800.dp
         val windowWidth = 1280.dp
     }

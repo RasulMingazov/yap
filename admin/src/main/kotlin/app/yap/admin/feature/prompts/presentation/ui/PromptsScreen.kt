@@ -5,14 +5,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -31,11 +35,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.yap.admin.core.design.AdminTextField
 import app.yap.admin.core.design.AdminTheme
+import app.yap.admin.core.design.Chip
+import app.yap.admin.core.design.EmptyMessage
+import app.yap.admin.core.design.LinkButton
 import app.yap.admin.core.design.LoadError
 import app.yap.admin.core.design.Loader
+import app.yap.admin.core.design.Note
 import app.yap.admin.core.design.PrimaryButton
 import app.yap.admin.core.design.ScreenBody
 import app.yap.admin.core.design.ScreenToolbar
+import app.yap.admin.core.design.SectionHeader
+import app.yap.admin.core.design.StatusText
 import app.yap.admin.core.design.ToolbarSaveAction
 import app.yap.admin.feature.prompts.presentation.PromptsViewModel
 import app.yap.admin.feature.prompts.presentation.PromptsViewModel.Event
@@ -243,35 +253,149 @@ private fun LoadedEditor(
     editor: UiState.Editor.Loaded,
     onEvent: (Event) -> Unit,
 ) {
-    ScreenBody(maxWidth = Dp.Unspecified) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = editor.title,
-                color = AdminTheme.Colors.ink,
-                style = AdminTheme.Type.heading,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.alignByBaseline(),
+    ScreenBody(
+        maxWidth = Dp.Unspecified,
+        spacing = AdminTheme.Sizes.sectionGap,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = editor.title,
+                    color = AdminTheme.Colors.ink,
+                    style = AdminTheme.Type.heading,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.alignByBaseline(),
+                )
+                Text(
+                    text = editor.state,
+                    color = AdminTheme.Colors.muted,
+                    style = AdminTheme.Type.sub,
+                    modifier = Modifier.alignByBaseline(),
+                )
+            }
+            AdminTextField(
+                label = "Текст промпта",
+                onValueChange = { text -> onEvent(Event.TextChanged(text)) },
+                value = editor.text,
+                enabled = editor.isEditable,
+                isError = editor.isTextError,
+                minLines = TEXT_LINES,
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = AdminTheme.Type.mono,
             )
-            Text(
-                text = editor.state,
-                color = AdminTheme.Colors.muted,
-                style = AdminTheme.Type.sub,
-                modifier = Modifier.alignByBaseline(),
-            )
+            Variables(variables = editor.variables)
         }
-        AdminTextField(
-            label = "Текст промпта",
-            onValueChange = { text -> onEvent(Event.TextChanged(text)) },
-            value = editor.text,
-            enabled = editor.isEditable,
-            minLines = TEXT_LINES,
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = AdminTheme.Type.mono,
+        Versions(
+            editor = editor,
+            onEvent = onEvent,
         )
     }
 }
 
+@Composable
+private fun Variables(variables: List<String>) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.chipGap),
+        verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.chipGap),
+        itemVerticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "Сервер подставляет:",
+            color = AdminTheme.Colors.muted,
+            style = AdminTheme.Type.sub,
+            modifier = Modifier.padding(end = AdminTheme.Sizes.chipLabelGap),
+        )
+        variables.forEach { variable ->
+            Chip(text = variable)
+        }
+    }
+}
+
+@Composable
+private fun Versions(
+    editor: UiState.Editor.Loaded,
+    onEvent: (Event) -> Unit,
+) {
+    val emptyMessage = editor.versionsEmptyMessage
+    Column(verticalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.sectionInnerGap)) {
+        SectionHeader(title = "Версии")
+        if (emptyMessage == null) {
+            VersionList(
+                editor = editor,
+                onEvent = onEvent,
+            )
+        } else {
+            EmptyMessage(text = emptyMessage)
+        }
+        Note(text = VERSIONS_NOTE)
+    }
+}
+
+@Composable
+private fun VersionList(
+    editor: UiState.Editor.Loaded,
+    onEvent: (Event) -> Unit,
+) {
+    Column {
+        HorizontalDivider(color = AdminTheme.Colors.line)
+        editor.versions.forEach { version ->
+            key(version.number) {
+                VersionRow(
+                    isRestoreEnabled = editor.isRestoreEnabled,
+                    onEvent = onEvent,
+                    version = version,
+                )
+                HorizontalDivider(color = AdminTheme.Colors.line)
+            }
+        }
+    }
+}
+
+@Composable
+private fun VersionRow(
+    isRestoreEnabled: Boolean,
+    onEvent: (Event) -> Unit,
+    version: UiState.Version,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = AdminTheme.Sizes.rowMinHeight)
+            .padding(vertical = AdminTheme.Sizes.rowPadding),
+        horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.rowGap),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = version.label,
+            color = AdminTheme.Colors.ink,
+            style = AdminTheme.Type.body,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.width(AdminTheme.Sizes.versionLabelWidth),
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = version.savedAt,
+            color = AdminTheme.Colors.muted,
+            style = AdminTheme.Type.sub,
+        )
+        StatusText(
+            status = version.state,
+            modifier = Modifier.width(AdminTheme.Sizes.versionStateWidth),
+        )
+        if (version.isRestoreShown) {
+            LinkButton(
+                enabled = isRestoreEnabled,
+                onClick = { onEvent(Event.RestoreClicked(version.number)) },
+                text = "Вернуть",
+            )
+        }
+    }
+}
+
 private const val TEXT_LINES = 16
+
+private const val VERSIONS_NOTE =
+    "«Сохранить» выпускает новую версию сразу для всех пользователей. «Вернуть» снова делает старую версию текущей."
