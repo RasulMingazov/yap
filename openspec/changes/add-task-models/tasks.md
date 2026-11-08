@@ -81,7 +81,7 @@ Files: `am/domain/` (`ModelTask`, `ModelChoice`, `TaskModel`, `Provider`, `Model
 `am/data/repository/RemoteModelRepository.kt`, `am/domain/usecase/` (`GetModelsUseCase`,
 `SaveModelsUseCase`), `admin/src/test/.../feature/models/domain/StubModels.kt`, and their tests.
 
-- [ ] 6.1 Add the admin models repository, its mapper and the two use cases; verify with mock engine tests for `GET` 200 with `keySetting`, `PUT` 200, 400, 409 that gives `CatalogChanged`, an unknown task code in the answer, a call without saved settings and a failed call. No use-case test: the use cases only delegate
+- [x] 6.1 Add the admin models repository, its mapper and the two use cases; verify with mock engine tests for `GET` 200 with `keySetting`, `PUT` 200, 400, 409 that gives `CatalogChanged`, an unknown task code in the answer, a call without saved settings and a failed call. No use-case test: the use cases only delegate
 
 ## 7. [7/15] Admin Models UI state and its mapper (about 300 lines)
 
