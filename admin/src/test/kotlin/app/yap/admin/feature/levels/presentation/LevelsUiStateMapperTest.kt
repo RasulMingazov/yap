@@ -1,5 +1,6 @@
 package app.yap.admin.feature.levels.presentation
 
+import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.levels.domain.Idioms
 import app.yap.admin.feature.levels.domain.LevelCode
 import app.yap.admin.feature.levels.domain.StubLevel
@@ -72,7 +73,12 @@ internal class LevelsUiStateMapperTest {
         val uiState = LevelsUiStateMapper.map(state) as UiState.Content
 
         assertEquals(
-            expected = UiState.Block(rating = "рейтинг 1050–1199", text = StubLevel.BLOCK, title = "Блок промпта · B1"),
+            expected = UiState.Block(
+                code = LevelCode.B1,
+                form = LevelForm.of(StubLevel.stubSettings()),
+                rating = "рейтинг 1050–1199",
+                title = "Блок промпта · B1",
+            ),
             actual = uiState.block,
         )
     }
@@ -86,6 +92,20 @@ internal class LevelsUiStateMapperTest {
         assertEquals(
             expected = listOf("нет", "редко", "иногда", "да"),
             actual = uiState.idioms.map { option -> option.label },
+        )
+    }
+
+    @Test
+    fun `GIVEN a save in progress WHEN mapping THEN the saving status shows beside a disabled Save`() {
+        val state = DataState()
+            .loaded(StubLevel.stubLevels())
+            .copy(isSaving = true)
+
+        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(text = "Сохранение…", tone = Status.Tone.MUTED) to false,
+            actual = uiState.saveStatus to uiState.isSaveEnabled,
         )
     }
 

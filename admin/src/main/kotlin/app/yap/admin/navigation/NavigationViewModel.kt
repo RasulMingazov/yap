@@ -53,6 +53,8 @@ internal class NavigationViewModel(
 
         data object Characters : Screen
 
+        data object Levels : Screen
+
         data object Server : Screen
 
         data class Topic(val topicId: TopicId?) : Screen

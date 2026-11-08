@@ -55,6 +55,14 @@ internal fun Sidebar(
                 screen = Screen.Characters,
             )
         }
+        SidebarGroup(title = "Правила") {
+            SidebarItem(
+                current = current,
+                label = "Уровни",
+                onScreenClick = onScreenClick,
+                screen = Screen.Levels,
+            )
+        }
         SidebarGroup(title = "Настройки") {
             SidebarItem(
                 current = current,

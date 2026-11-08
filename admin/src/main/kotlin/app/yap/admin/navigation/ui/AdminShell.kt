@@ -9,6 +9,8 @@ import app.yap.admin.feature.characters.presentation.CharacterViewModel
 import app.yap.admin.feature.characters.presentation.CharactersViewModel
 import app.yap.admin.feature.characters.presentation.ui.CharacterScreen
 import app.yap.admin.feature.characters.presentation.ui.CharactersScreen
+import app.yap.admin.feature.levels.presentation.LevelsViewModel
+import app.yap.admin.feature.levels.presentation.ui.LevelsScreen
 import app.yap.admin.feature.server.presentation.ServerViewModel
 import app.yap.admin.feature.server.presentation.ui.ServerScreen
 import app.yap.admin.feature.topics.domain.TopicId
@@ -25,6 +27,7 @@ import app.yap.admin.navigation.NavigationViewModel.UiState
 internal fun AdminShell(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: CharactersViewModel,
+    levelsViewModel: LevelsViewModel,
     serverViewModel: ServerViewModel,
     topicViewModel: (TopicId?) -> TopicViewModel,
     topicsViewModel: TopicsViewModel,
@@ -42,6 +45,7 @@ internal fun AdminShell(
             ScreenContent(
                 characterViewModel = characterViewModel,
                 charactersViewModel = charactersViewModel,
+                levelsViewModel = levelsViewModel,
                 onScreenClick = onScreenClick,
                 screen = state.screen,
                 serverViewModel = serverViewModel,
@@ -57,6 +61,7 @@ internal fun AdminShell(
 private fun ScreenContent(
     characterViewModel: (CharacterId?) -> CharacterViewModel,
     charactersViewModel: CharactersViewModel,
+    levelsViewModel: LevelsViewModel,
     onScreenClick: (Screen) -> Unit,
     screen: Screen,
     serverViewModel: ServerViewModel,
@@ -73,6 +78,7 @@ private fun ScreenContent(
             onNewCharacterClick = { onScreenClick(Screen.Character(characterId = null)) },
             viewModel = charactersViewModel,
         )
+        is Screen.Levels -> LevelsScreen(viewModel = levelsViewModel)
         is Screen.Server -> ServerScreen(viewModel = serverViewModel)
         is Screen.Topic -> TopicScreen(
             onBackClick = { onScreenClick(Screen.Topics) },
