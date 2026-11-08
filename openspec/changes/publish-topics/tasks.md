@@ -62,7 +62,7 @@ It merges after the PR of 7.2 (`TopicDetails`, merged), whose use cases read `Re
 - [x] 8.2 Write `TopicDraftRule` with `durationMinutes != null && durationMinutes < 1`; a zero duration stays `Missing(DURATION)`; verify with the unchanged tests `GIVEN a duration of 0 minutes WHEN checking THEN the duration is missing` and `GIVEN only a title and a date WHEN checking THEN there are no gaps` (no duration)
 - [x] 8.3 Move `today(clock)` out of the `ReleaseState` enum into `moscowToday(clock)` in `S/model/ReleaseDay.kt` with the `Europe/Moscow` constant; `ReleaseState` keeps only the values and `of`; `CreateTopicUseCase`, `GetTopicUseCase`, `UpdateTopicUseCase`, `PublishTopicUseCase`, `GetTopicCalendarUseCase` and `TopicDetailsRuleTest` call it (`TopicDetailsRule` takes `today` as a parameter and stays); verify with the 22:30 UTC on 23 October test moved to `ReleaseDayTest` and the unchanged `ReleaseState` tests
 
-### Slice 2 · The topic DTOs · ~330 · `K/` (`TopicDto`, `TopicStatusDto`, `TopicFieldDto`, `TopicGapDto`, `TopicRejectionDto`), `S/api/` (`TopicDtoMapper`, `TopicRoutes`: compile only), `S/usecase/GetTopicsUseCase.kt` (it returns `TopicDetails`, because `TopicDto` carries the state and the gaps), their tests, `T/` tests that build `TopicDto`
+### Slice 2 · The topic DTOs · ~330 · `K/` (`TopicDto`, `TopicStatusDto`, `TopicFieldDto`, `TopicGapDto`), `S/api/` (`TopicDtoMapper`, `TopicRoutes`: compile only), `S/usecase/GetTopicsUseCase.kt` (it returns `TopicDetails`, because `TopicDto` carries the state and the gaps), their tests, `T/` tests that build `TopicDto`
 
 - [x] 8.4 Add the topic DTOs and the server mapper of `TopicDetails`; the mapper maps the fields 1:1 and decides nothing; verify with the mapper tests for each status, each field, each gap and both interlocutors, and a test of `GetTopicsUseCase` with a taken date
 - [x] 8.5 Fill the new `TopicDto` fields in the admin tests; verify with `./gradlew build`
@@ -71,12 +71,12 @@ It merges after the PR of 7.2 (`TopicDetails`, merged), whose use cases read `Re
 
 - [x] 8.6 Add the calendar DTOs and the server mapper; verify with the mapper tests for both interlocutors, both To do entries and an empty day
 
-## 9. [9/26] The topic routes · ~380, at risk · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `S/api/TopicRoutes.kt` and its test
+## 9. [9/26] The topic routes · ~380, at risk · `server/app/src/main/kotlin/app/yap/server/Application.kt`, `K/TopicRejectionDto.kt`, `S/api/TopicRoutes.kt` and its test
 
 At risk: if it grows over 400, slice 1 is the calendar route and slice 2 is the publish route with
 the 400 body and 409, as two PRs.
 
-- [ ] 9.1 Add `GET /admin/topics/calendar`, `POST /admin/topics/{topicId}/publish`, the 400 body and 409; keep `GET /admin/topics` until [14/26]; verify with the route tests for the calendar with a fixed clock, publish 200, a publish of a published topic, 400 with the gaps and a past date, 401, 404 and 409, a GET of a draft with a taken date, and a PUT of a published topic with 400 and 409
+- [ ] 9.1 Add `TopicRejectionDto`, `GET /admin/topics/calendar`, `POST /admin/topics/{topicId}/publish`, the 400 body and 409; keep `GET /admin/topics` until [14/26]; verify with the route tests for the calendar with a fixed clock, publish 200, a publish of a published topic, 400 with the gaps and a past date, 401, 404 and 409, a GET of a draft with a taken date, and a PUT of a published topic with 400 and 409
 
 ## 10. [10/26] The admin topic counts · ~260 · `H/domain/` (`CharacterSummary`, the repository, `GetCharactersUseCase`), `H/data/`, `H/presentation/` (`CharactersUiStateMapper`, `TopicCountText`), `H/presentation/ui/CharactersScreen.kt` (the count on the right), `T/presentation/` (`TopicViewModel`, `TopicUiStateMapper`)
 

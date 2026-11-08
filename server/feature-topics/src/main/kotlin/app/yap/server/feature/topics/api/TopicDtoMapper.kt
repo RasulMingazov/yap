@@ -29,35 +29,6 @@ internal fun TopicDetails.toDto(): TopicDto = TopicDto(
     topicId = topic.topicId.value.toString(),
 )
 
-internal fun Set<TopicGap>.toDto(): List<TopicGapDto> = map { gap -> gap.toDto() }
-
-internal fun ReleaseState.toDto(): TopicStatusDto = when (this) {
-    ReleaseState.DRAFT -> TopicStatusDto.DRAFT
-    ReleaseState.PUBLISHED -> TopicStatusDto.PUBLISHED
-    ReleaseState.TODAY -> TopicStatusDto.TODAY
-    ReleaseState.OUT -> TopicStatusDto.OUT
-}
-
-private fun TopicGap.toDto(): TopicGapDto = when (this) {
-    is TopicGap.DateTaken -> TopicGapDto.DateTakenDto
-    is TopicGap.IncompleteSteps -> TopicGapDto.IncompleteStepsDto(numbers = numbers)
-    is TopicGap.Missing -> TopicGapDto.MissingDto(field = field.toDto())
-    is TopicGap.PastDate -> TopicGapDto.PastDateDto
-}
-
-private fun TopicField.toDto(): TopicFieldDto = when (this) {
-    TopicField.TITLE -> TopicFieldDto.TITLE
-    TopicField.RELEASE_DATE -> TopicFieldDto.RELEASE_DATE
-    TopicField.DURATION -> TopicFieldDto.DURATION
-    TopicField.DESCRIPTION -> TopicFieldDto.DESCRIPTION
-    TopicField.SETTING -> TopicFieldDto.SETTING
-    TopicField.INTERLOCUTOR -> TopicFieldDto.INTERLOCUTOR
-    TopicField.ROLE -> TopicFieldDto.ROLE
-    TopicField.OPENING_LINE -> TopicFieldDto.OPENING_LINE
-    TopicField.TRANSLATION -> TopicFieldDto.TRANSLATION
-    TopicField.STEPS -> TopicFieldDto.STEPS
-}
-
 private fun TopicContent.toDto(): TopicContentDto = TopicContentDto(
     description = description,
     durationMinutes = durationMinutes,
@@ -85,6 +56,35 @@ private fun Step.toDto(): StepDto = StepDto(
     passWhen = passWhen,
     task = task,
 )
+
+internal fun Set<TopicGap>.toDto(): List<TopicGapDto> = map { gap -> gap.toDto() }
+
+private fun TopicGap.toDto(): TopicGapDto = when (this) {
+    is TopicGap.DateTaken -> TopicGapDto.DateTakenDto
+    is TopicGap.IncompleteSteps -> TopicGapDto.IncompleteStepsDto(numbers = numbers)
+    is TopicGap.Missing -> TopicGapDto.MissingDto(field = field.toDto())
+    is TopicGap.PastDate -> TopicGapDto.PastDateDto
+}
+
+private fun TopicField.toDto(): TopicFieldDto = when (this) {
+    TopicField.TITLE -> TopicFieldDto.TITLE
+    TopicField.RELEASE_DATE -> TopicFieldDto.RELEASE_DATE
+    TopicField.DURATION -> TopicFieldDto.DURATION
+    TopicField.DESCRIPTION -> TopicFieldDto.DESCRIPTION
+    TopicField.SETTING -> TopicFieldDto.SETTING
+    TopicField.INTERLOCUTOR -> TopicFieldDto.INTERLOCUTOR
+    TopicField.ROLE -> TopicFieldDto.ROLE
+    TopicField.OPENING_LINE -> TopicFieldDto.OPENING_LINE
+    TopicField.TRANSLATION -> TopicFieldDto.TRANSLATION
+    TopicField.STEPS -> TopicFieldDto.STEPS
+}
+
+internal fun ReleaseState.toDto(): TopicStatusDto = when (this) {
+    ReleaseState.DRAFT -> TopicStatusDto.DRAFT
+    ReleaseState.PUBLISHED -> TopicStatusDto.PUBLISHED
+    ReleaseState.TODAY -> TopicStatusDto.TODAY
+    ReleaseState.OUT -> TopicStatusDto.OUT
+}
 
 internal fun TopicContentDto.toModel(): TopicContent = TopicContent(
     description = description,

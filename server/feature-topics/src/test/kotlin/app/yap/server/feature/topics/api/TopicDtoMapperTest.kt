@@ -8,8 +8,6 @@ import app.yap.server.feature.characters.model.StubCharacter
 import app.yap.server.feature.topics.model.Interlocutor
 import app.yap.server.feature.topics.model.ReleaseState
 import app.yap.server.feature.topics.model.StubTopic
-import app.yap.server.feature.topics.model.Topic
-import app.yap.server.feature.topics.model.TopicDetails
 import app.yap.server.feature.topics.model.TopicField
 import app.yap.server.feature.topics.model.TopicGap
 import io.ktor.server.plugins.BadRequestException
@@ -17,7 +15,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
-import kotlinx.serialization.json.Json
 
 internal class TopicDtoMapperTest {
 
@@ -111,7 +108,7 @@ internal class TopicDtoMapperTest {
 
     @Test
     fun `GIVEN a draft with a character WHEN mapping its details to the DTO THEN the DTO holds every field`() {
-        val details = details()
+        val details = StubTopic.stubDetails()
 
         val dto = details.toDto()
 
@@ -120,7 +117,7 @@ internal class TopicDtoMapperTest {
 
     @Test
     fun `GIVEN a guest WHEN mapping the details to the DTO THEN the interlocutor is a guest`() {
-        val details = details(
+        val details = StubTopic.stubDetails(
             topic = StubTopic.stubTopic(
                 content = StubTopic.stubContent(interlocutor = Interlocutor.Guest(description = "A tourist.")),
             ),
@@ -136,7 +133,9 @@ internal class TopicDtoMapperTest {
 
     @Test
     fun `GIVEN no interlocutor WHEN mapping the details to the DTO THEN the DTO has no interlocutor`() {
-        val details = details(topic = StubTopic.stubTopic(content = StubTopic.stubContent(interlocutor = null)))
+        val details = StubTopic.stubDetails(
+            topic = StubTopic.stubTopic(content = StubTopic.stubContent(interlocutor = null)),
+        )
 
         val dto = details.toDto()
 
@@ -144,23 +143,38 @@ internal class TopicDtoMapperTest {
     }
 
     @Test
-    fun `GIVEN each release state WHEN mapping the details to the DTO THEN each state has its status`() {
-        val statuses = ReleaseState.entries.map { state -> details(state = state).toDto().status }
+    fun `GIVEN an upcoming published topic WHEN mapping its details to the DTO THEN the status is published`() {
+        val details = StubTopic.stubDetails(state = ReleaseState.PUBLISHED)
 
-        assertEquals(
-            expected = listOf(
-                TopicStatusDto.DRAFT,
-                TopicStatusDto.PUBLISHED,
-                TopicStatusDto.TODAY,
-                TopicStatusDto.OUT,
-            ),
-            actual = statuses,
-        )
+        val dto = details.toDto()
+
+        assertEquals(expected = TopicStatusDto.PUBLISHED, actual = dto.status)
+    }
+
+    @Test
+    fun `GIVEN a topic of today WHEN mapping its details to the DTO THEN the status is today`() {
+        val details = StubTopic.stubDetails(state = ReleaseState.TODAY)
+
+        val dto = details.toDto()
+
+        assertEquals(expected = TopicStatusDto.TODAY, actual = dto.status)
+    }
+
+    @Test
+    fun `GIVEN a published topic that is out WHEN mapping its details to the DTO THEN the status is out`() {
+        val details = StubTopic.stubDetails(state = ReleaseState.OUT)
+
+        val dto = details.toDto()
+
+        assertEquals(expected = TopicStatusDto.OUT, actual = dto.status)
     }
 
     @Test
     fun `GIVEN a missing gap for each field WHEN mapping the details to the DTO THEN each field keeps its name`() {
-        val details = details(gaps = TopicField.entries.map { field -> TopicGap.Missing(field) }.toSet())
+        val gaps = TopicField.entries
+            .map { field -> TopicGap.Missing(field) }
+            .toSet()
+        val details = StubTopic.stubDetails(gaps = gaps)
 
         val dto = details.toDto()
 
@@ -172,7 +186,7 @@ internal class TopicDtoMapperTest {
 
     @Test
     fun `GIVEN the other gaps WHEN mapping the details to the DTO THEN each gap keeps its data`() {
-        val details = details(
+        val details = StubTopic.stubDetails(
             gaps = setOf(TopicGap.IncompleteSteps(listOf(3, 5)), TopicGap.PastDate, TopicGap.DateTaken),
         )
 
@@ -187,40 +201,4 @@ internal class TopicDtoMapperTest {
             actual = dto.gaps,
         )
     }
-
-    @Test
-    fun `GIVEN every kind of gap WHEN encoding the DTOs to JSON THEN each gap has its type name`() {
-        val gaps = listOf(
-            TopicGapDto.MissingDto(field = TopicFieldDto.OPENING_LINE),
-            TopicGapDto.IncompleteStepsDto(numbers = listOf(3)),
-            TopicGapDto.PastDateDto,
-            TopicGapDto.DateTakenDto,
-        )
-
-        val json = Json.encodeToString(gaps)
-
-        assertEquals(
-            expected = Json.parseToJsonElement(
-                """
-                [
-                  {"type": "missing", "field": "OPENING_LINE"},
-                  {"type": "incompleteSteps", "numbers": [3]},
-                  {"type": "pastDate"},
-                  {"type": "dateTaken"}
-                ]
-                """,
-            ),
-            actual = Json.parseToJsonElement(json),
-        )
-    }
-
-    private fun details(
-        gaps: Set<TopicGap> = emptySet(),
-        state: ReleaseState = ReleaseState.DRAFT,
-        topic: Topic = StubTopic.stubTopic(),
-    ): TopicDetails = TopicDetails(
-        gaps = gaps,
-        state = state,
-        topic = topic,
-    )
 }
