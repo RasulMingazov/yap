@@ -86,9 +86,9 @@ the 400 body and 409, as two PRs.
 
 - [x] 11.1 Capture Characters and the Topic screen with counts; verify with the images
 
-## 12. [12/26] The admin calendar domain · ~220 · `T/domain/` (`TopicCalendar`, `CalendarRow`, `CalendarTopic`, `LedBy`, `Todo`, `TopicField`, `TopicGap`, `ReleaseState`), `T/data/mapper/TopicCalendarMapper.kt`
+## 12. [12/26] The admin calendar domain · ~220 · `T/domain/` (`TopicCalendar`, `CalendarRow`, `CalendarTopic`, `LedBy`, `Todo`, `TopicField`, `TopicGap`, `ReleaseState`), `T/data/mapper/TopicCalendarMapper.kt`, `TopicCalendarMapperTest`, `StubTopicCalendar`, `StubTopicCalendarDto`
 
-- [ ] 12.1 Add the domain and the DTO mapper; verify with the mapper tests for each status, each gap, both interlocutors, both To do entries and an empty day
+- [x] 12.1 Add the domain and the DTO mapper; verify with the mapper tests for each status, each gap, both interlocutors, both To do entries and an empty day
 
 ## 13. [13/26] The admin calendar call · ~200 · `T/data/api/TopicApi.kt`, `T/data/repository/`, `T/domain/repository/`, `T/domain/usecase/GetTopicCalendarUseCase.kt`, `T/FeatureTopicsModule.kt`
 
