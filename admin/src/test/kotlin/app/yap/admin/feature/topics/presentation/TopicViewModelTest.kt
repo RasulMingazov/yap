@@ -146,6 +146,22 @@ internal class TopicViewModelTest {
     }
 
     @Test
+    fun `GIVEN Saved WHEN the same day is picked THEN the form and Saved stay`() = runTest(dispatcher) {
+        val env = Environment(topicId = null)
+        advanceUntilIdle()
+        env.viewModel.onEvent(Event.SaveClicked)
+        advanceUntilIdle()
+
+        env.viewModel.onEvent(Event.ReleaseDatePicked(StubTopic.RELEASE_DATE))
+        advanceUntilIdle()
+
+        assertEquals(
+            expected = StubTopic.stubContent() to Status.Tone.SUCCESS,
+            actual = env.content().form to env.content().saveStatus?.tone,
+        )
+    }
+
+    @Test
     fun `GIVEN Guest is chosen WHEN its description is typed THEN the guest has it`() = runTest(dispatcher) {
         val env = Environment(topicId = TopicId(StubTopic.TOPIC_ID))
         advanceUntilIdle()

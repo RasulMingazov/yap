@@ -50,7 +50,7 @@ internal class TopicViewModel(
             form.copy(interlocutor = Interlocutor.Guest(description = event.description))
         }
         is Event.InterlocutorChosen -> edit { form -> form.copy(interlocutor = event.interlocutor) }
-        is Event.ReleaseDatePicked -> edit { form -> form.copy(releaseDate = event.date) }
+        is Event.ReleaseDatePicked -> onReleaseDatePicked(event.date)
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
     }
@@ -70,6 +70,11 @@ internal class TopicViewModel(
             form = transform(state.form),
             saveStatus = state.saveStatus.takeIf { status -> status == SaveStatus.REJECTED },
         )
+    }
+
+    private fun onReleaseDatePicked(date: LocalDate) {
+        if (date == dataState.value.form.releaseDate) return
+        edit { form -> form.copy(releaseDate = date) }
     }
 
     private fun onRetryClicked() {
