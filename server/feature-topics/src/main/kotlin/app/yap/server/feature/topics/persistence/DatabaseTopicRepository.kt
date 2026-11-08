@@ -9,7 +9,6 @@ import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
 import app.yap.server.feature.topics.model.TopicId
 import app.yap.server.feature.topics.model.TopicStatus
-import app.yap.server.feature.topics.model.UpdateTopicOutcome
 import kotlin.uuid.Uuid
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
@@ -68,7 +67,7 @@ class DatabaseTopicRepository(
             .map { row -> row.toTopic(steps = stepsByTopic[row[TopicsTable.topicId]].orEmpty()) }
     }
 
-    override suspend fun update(topic: Topic): UpdateTopicOutcome = try {
+    override suspend fun update(topic: Topic): TopicWrite = try {
         database.transaction {
             maxAttempts = 1
             val updatedRows = TopicsTable.update(
@@ -80,16 +79,16 @@ class DatabaseTopicRepository(
                 updatedRows > 0 -> {
                     TopicStepsTable.deleteWhere { TopicStepsTable.topicId eq topic.topicId.value }
                     insertSteps(topic)
-                    UpdateTopicOutcome.Updated(topic)
+                    TopicWrite.Written(topic)
                 }
 
-                isStored(topic.topicId.value) -> UpdateTopicOutcome.StaleStatus
-                else -> UpdateTopicOutcome.NotFound
+                isStored(topic.topicId.value) -> TopicWrite.StaleStatus
+                else -> TopicWrite.NotFound
             }
         }
     } catch (exception: ExposedSQLException) {
         if (exception.sqlState != UNIQUE_VIOLATION) throw exception
-        UpdateTopicOutcome.DateTaken
+        TopicWrite.DateTaken
     }
 }
 

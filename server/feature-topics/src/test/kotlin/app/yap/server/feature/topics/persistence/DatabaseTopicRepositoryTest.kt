@@ -11,7 +11,6 @@ import app.yap.server.feature.topics.model.StubTopic
 import app.yap.server.feature.topics.model.TopicContent
 import app.yap.server.feature.topics.model.TopicId
 import app.yap.server.feature.topics.model.TopicStatus
-import app.yap.server.feature.topics.model.UpdateTopicOutcome
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -69,7 +68,7 @@ internal class DatabaseTopicRepositoryTest {
                 val outcome = repository.update(changed)
 
                 assertEquals(
-                    expected = UpdateTopicOutcome.Updated(changed) to changed,
+                    expected = TopicWrite.Written(changed) to changed,
                     actual = outcome to repository.find(topic.topicId),
                 )
             }
@@ -82,7 +81,7 @@ internal class DatabaseTopicRepositoryTest {
 
             val outcome = repository.update(StubTopic.stubTopic())
 
-            assertEquals(expected = UpdateTopicOutcome.NotFound to emptyList(), actual = outcome to repository.list())
+            assertEquals(expected = TopicWrite.NotFound to emptyList(), actual = outcome to repository.list())
         }
     }
 
@@ -90,9 +89,17 @@ internal class DatabaseTopicRepositoryTest {
     fun `GIVEN a created draft WHEN the database restarts THEN the topic is still a draft`() =
         withRestartableDatabase { open ->
             runTest {
-                val topic = open().use { database -> DatabaseTopicRepository(database).create(stubContent()) }
+                val topic = open()
+                    .use { database ->
+                        val repository = DatabaseTopicRepository(database)
+                        repository.create(stubContent())
+                    }
 
-                val found = open().use { database -> DatabaseTopicRepository(database).find(topic.topicId) }
+                val found = open()
+                    .use { database ->
+                        val repository = DatabaseTopicRepository(database)
+                        repository.find(topic.topicId)
+                    }
 
                 assertEquals(expected = TopicStatus.DRAFT to topic, actual = found?.status to found)
             }
@@ -125,7 +132,7 @@ internal class DatabaseTopicRepositoryTest {
             val outcome = repository.update(changed)
 
             assertEquals(
-                expected = UpdateTopicOutcome.Updated(changed) to changed,
+                expected = TopicWrite.Written(changed) to changed,
                 actual = outcome to repository.find(topic.topicId),
             )
         }
@@ -143,7 +150,7 @@ internal class DatabaseTopicRepositoryTest {
                 val outcome = repository.update(changed)
 
                 assertEquals(
-                    expected = UpdateTopicOutcome.StaleStatus to topic.copy(status = TopicStatus.PUBLISHED),
+                    expected = TopicWrite.StaleStatus to topic.copy(status = TopicStatus.PUBLISHED),
                     actual = outcome to repository.find(topic.topicId),
                 )
             }
@@ -168,7 +175,7 @@ internal class DatabaseTopicRepositoryTest {
                 val outcome = repository.update(moved)
 
                 assertEquals(
-                    expected = UpdateTopicOutcome.DateTaken to other.copy(status = TopicStatus.PUBLISHED),
+                    expected = TopicWrite.DateTaken to other.copy(status = TopicStatus.PUBLISHED),
                     actual = outcome to repository.find(other.topicId),
                 )
             }

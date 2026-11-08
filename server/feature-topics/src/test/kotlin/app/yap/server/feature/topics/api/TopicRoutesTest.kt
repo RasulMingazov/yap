@@ -6,6 +6,7 @@ import app.yap.server.feature.topics.model.Interlocutor
 import app.yap.server.feature.topics.model.StubTopic
 import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.persistence.StubTopicRepository
+import app.yap.server.feature.topics.persistence.TopicWrite
 import app.yap.server.feature.topics.usecase.CreateTopicUseCase
 import app.yap.server.feature.topics.usecase.GetTopicUseCase
 import app.yap.server.feature.topics.usecase.GetTopicsUseCase
@@ -194,6 +195,28 @@ internal class TopicRoutesTest {
         val response = putTopic(contentJson())
 
         assertEquals(expected = HttpStatusCode.NotFound, actual = response.status)
+    }
+
+    @Test
+    fun `GIVEN a date with a published topic WHEN updating a topic THEN the server answers 409`() = testApplication {
+        val env = Environment()
+        env.topicRepository.updateCall.returns(TopicWrite.DateTaken)
+        application { env.install(this) }
+
+        val response = putTopic(contentJson())
+
+        assertEquals(expected = HttpStatusCode.Conflict, actual = response.status)
+    }
+
+    @Test
+    fun `GIVEN a topic published after it was read WHEN updating it THEN the server answers 409`() = testApplication {
+        val env = Environment()
+        env.topicRepository.updateCall.returns(TopicWrite.StaleStatus)
+        application { env.install(this) }
+
+        val response = putTopic(contentJson())
+
+        assertEquals(expected = HttpStatusCode.Conflict, actual = response.status)
     }
 
     private class Environment {

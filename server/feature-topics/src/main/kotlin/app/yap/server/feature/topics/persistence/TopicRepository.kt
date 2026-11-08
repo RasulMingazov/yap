@@ -3,7 +3,6 @@ package app.yap.server.feature.topics.persistence
 import app.yap.server.feature.topics.model.Topic
 import app.yap.server.feature.topics.model.TopicContent
 import app.yap.server.feature.topics.model.TopicId
-import app.yap.server.feature.topics.model.UpdateTopicOutcome
 
 interface TopicRepository {
 
@@ -13,5 +12,5 @@ interface TopicRepository {
 
     suspend fun list(): List<Topic>
 
-    suspend fun update(topic: Topic): UpdateTopicOutcome
+    suspend fun update(topic: Topic): TopicWrite
 }

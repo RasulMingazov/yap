@@ -7,6 +7,7 @@ import app.yap.server.feature.topics.model.TopicDraftRule
 import app.yap.server.feature.topics.model.TopicStatus
 import app.yap.server.feature.topics.model.UpdateTopicOutcome
 import app.yap.server.feature.topics.persistence.StubTopicRepository
+import app.yap.server.feature.topics.persistence.TopicWrite
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
@@ -39,11 +40,31 @@ internal class UpdateTopicUseCaseTest {
     @Test
     fun `GIVEN a date with a published topic WHEN updating THEN the date is taken`() = runTest {
         val env = Environment()
-        env.topicRepository.updateCall.returns(UpdateTopicOutcome.DateTaken)
+        env.topicRepository.updateCall.returns(TopicWrite.DateTaken)
 
         val outcome = env.useCase(content = StubTopic.stubContent(), topicId = StubTopic.TOPIC_ID)
 
         assertEquals(expected = UpdateTopicOutcome.DateTaken, actual = outcome)
+    }
+
+    @Test
+    fun `GIVEN a topic published after it was read WHEN updating THEN the status is stale`() = runTest {
+        val env = Environment()
+        env.topicRepository.updateCall.returns(TopicWrite.StaleStatus)
+
+        val outcome = env.useCase(content = StubTopic.stubContent(), topicId = StubTopic.TOPIC_ID)
+
+        assertEquals(expected = UpdateTopicOutcome.StaleStatus, actual = outcome)
+    }
+
+    @Test
+    fun `GIVEN a topic that is gone before the write WHEN updating THEN it is not found`() = runTest {
+        val env = Environment()
+        env.topicRepository.updateCall.returns(TopicWrite.NotFound)
+
+        val outcome = env.useCase(content = StubTopic.stubContent(), topicId = StubTopic.TOPIC_ID)
+
+        assertEquals(expected = UpdateTopicOutcome.NotFound, actual = outcome)
     }
 
     @Test

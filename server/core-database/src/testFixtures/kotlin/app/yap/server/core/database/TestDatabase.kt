@@ -6,7 +6,8 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 
 fun <T> withTestDatabase(block: (Database) -> T): T = withRestartableDatabase { open ->
-    open().use(block)
+    open()
+        .use(block)
 }
 
 fun <T> withRestartableDatabase(block: (open: () -> Database) -> T): T = withPostgres { container ->

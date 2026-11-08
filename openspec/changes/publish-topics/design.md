@@ -20,7 +20,7 @@ Options:
 
 1. A unique index on `release_date` for every topic. The calendar has one row per day. A second
    draft for a date fails. If the database has two drafts on one date, `V5` fails at deploy.
-2. A partial unique index on `release_date` where `status = 'published'`. Drafts can share a date.
+2. A partial unique index on `release_date` where `status = 'PUBLISHED'`. Drafts can share a date.
 
 Choice: 2. It needs no change to the stored drafts, because no topic is published before `V5`. It
 keeps the owner's drafts. It matches the example in `docs/testing/003-backend-integration.md`.
