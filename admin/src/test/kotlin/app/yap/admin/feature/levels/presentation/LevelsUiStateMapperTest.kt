@@ -260,7 +260,7 @@ internal class LevelsUiStateMapperTest {
         val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
-            expected = Triple(List(LevelCode.entries.size) { DEFAULT_MODEL }, false, "Не удалось загрузить модели"),
+            expected = Triple(List(LevelCode.entries.size) { DEFAULT_MODEL }, false, MODELS_LOAD_ERROR),
             actual = Triple(uiState.rows.map { row -> row.model }, uiState.isModelChoiceEnabled, uiState.modelError),
         )
     }
@@ -273,8 +273,53 @@ internal class LevelsUiStateMapperTest {
         val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
-            expected = Status(text = "Модель уровня больше недоступна — обновите экран", tone = Status.Tone.ERROR) to true,
+            expected = Status(text = MODEL_UNAVAILABLE, tone = Status.Tone.ERROR) to true,
             actual = uiState.saveStatus to uiState.isRefreshShown,
+        )
+    }
+
+    @Test
+    fun `GIVEN a save in progress with the models WHEN mapping THEN the Model choice is disabled`() {
+        val state = loaded(StubLevel.stubLevels())
+            .copy(
+                isSaving = true,
+                models = StubModels.stubModels(),
+            )
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(expected = false, actual = uiState.isModelChoiceEnabled)
+    }
+
+    @Test
+    fun `GIVEN the levels reload WHEN mapping THEN the reload status shows and the form is disabled`() {
+        val state = loaded(StubLevel.stubLevels())
+            .copy(
+                isLoading = true,
+                models = StubModels.stubModels(),
+            )
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Triple(Status(text = "Обновление…", tone = Status.Tone.MUTED), false, false),
+            actual = Triple(uiState.saveStatus, uiState.isSaveEnabled, uiState.isModelChoiceEnabled),
+        )
+    }
+
+    @Test
+    fun `GIVEN the models load again WHEN mapping THEN Model is disabled with the loading sign`() {
+        val state = loaded(StubLevel.stubLevels())
+            .copy(
+                isModelsLoading = true,
+                models = StubModels.stubModels(),
+            )
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Triple("Загрузка моделей…", false, null),
+            actual = Triple(uiState.modelProgress, uiState.isModelChoiceEnabled, uiState.modelError),
         )
     }
 
@@ -284,6 +329,11 @@ internal class LevelsUiStateMapperTest {
     )
 
     private companion object {
+
+        const val MODEL_UNAVAILABLE =
+            "Список моделей на сервере изменился: модель уровня недоступна. «Обновить» заменит правки данными сервера"
+
+        const val MODELS_LOAD_ERROR = "Не удалось загрузить модели. Сохранение не меняет модели уровней"
 
         const val PRO = "deepseek-v4-pro"
 

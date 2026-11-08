@@ -16,7 +16,9 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
 
     private const val LOAD_ERROR = "Не удалось загрузить уровни"
 
-    private const val MODELS_LOAD_ERROR = "Не удалось загрузить модели"
+    private const val MODELS_LOAD_ERROR = "Не удалось загрузить модели. Сохранение не меняет модели уровней"
+
+    private const val MODELS_LOADING = "Загрузка моделей…"
 
     private val DEFAULT_MODEL = UiState.ModelOption(
         label = "по умолчанию",
@@ -33,17 +35,21 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
         }
     }
 
-    private fun DataState.toContent(levels: List<Level>): UiState.Content = UiState.Content(
-        block = block(levels),
-        idioms = Idioms.entries.map { idioms -> idioms.option() },
-        isModelChoiceEnabled = loadedModels() != null,
-        isRefreshShown = saveResult is SaveLevelsResult.ModelUnavailable,
-        isSaveEnabled = !isSaving,
-        modelError = modelError(),
-        models = modelOptions(),
-        rows = levels.map { level -> row(level) },
-        saveStatus = saveStatus(),
-    )
+    private fun DataState.toContent(levels: List<Level>): UiState.Content {
+        val isFormEnabled = !isSaving && !isLoading
+        return UiState.Content(
+            block = block(levels),
+            idioms = Idioms.entries.map { idioms -> idioms.option() },
+            isModelChoiceEnabled = isFormEnabled && !isModelsLoading && loadedModels() != null,
+            isRefreshShown = saveResult is SaveLevelsResult.ModelUnavailable,
+            isSaveEnabled = isFormEnabled,
+            modelError = modelError(),
+            modelProgress = if (isModelsLoading) MODELS_LOADING else null,
+            models = modelOptions(),
+            rows = levels.map { level -> row(level) },
+            saveStatus = saveStatus(),
+        )
+    }
 
     private fun DataState.block(levels: List<Level>): UiState.Block {
         val level = levels.first { level -> level.code == chosen }
@@ -119,8 +125,11 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
 
     private fun LevelCode.ratingNote(): String? = if (hasRatingFrom) null else "Модель калибровки задаётся в «Моделях»"
 
-    private fun DataState.saveStatus(): Status? =
-        if (isSaving) Status(text = "Сохранение…", tone = Status.Tone.MUTED) else saveResult?.status()
+    private fun DataState.saveStatus(): Status? = when {
+        isSaving -> Status(text = "Сохранение…", tone = Status.Tone.MUTED)
+        isLoading -> Status(text = "Обновление…", tone = Status.Tone.MUTED)
+        else -> saveResult?.status()
+    }
 
     private fun SaveLevelsResult.status(): Status? = when (this) {
         is SaveLevelsResult.Failed -> null
@@ -129,7 +138,7 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
             tone = Status.Tone.ERROR,
         )
         is SaveLevelsResult.ModelUnavailable -> Status(
-            text = "Модель уровня больше недоступна — обновите экран",
+            text = "Список моделей на сервере изменился: модель уровня недоступна. «Обновить» заменит правки данными сервера",
             tone = Status.Tone.ERROR,
         )
         is SaveLevelsResult.NoIdioms -> Status(text = "Выберите идиомы: ${code.label()}", tone = Status.Tone.ERROR)

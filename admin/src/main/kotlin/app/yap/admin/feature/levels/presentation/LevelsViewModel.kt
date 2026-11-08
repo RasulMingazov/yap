@@ -87,21 +87,37 @@ internal class LevelsViewModel(
     }
 
     private fun loadLevels() {
-        dataState.update { state -> state.copy(isLoadFailed = false) }
+        dataState.update { state ->
+            state.copy(
+                isLoadFailed = false,
+                isLoading = true,
+            )
+        }
         viewModelScope.launch {
             val result = getLevelsUseCase()
-            dataState.update { state -> state.answered(result) }
+            dataState.update { state -> state.answered(result).copy(isLoading = false) }
         }
     }
 
     private fun loadModels() {
-        dataState.update { state -> state.copy(isModelsLoadFailed = false) }
+        dataState.update { state ->
+            state.copy(
+                isModelsLoadFailed = false,
+                isModelsLoading = true,
+            )
+        }
         viewModelScope.launch {
             when (val result = getModelsUseCase()) {
-                is LoadResult.Failed -> dataState.update { state -> state.copy(isModelsLoadFailed = true) }
+                is LoadResult.Failed -> dataState.update { state ->
+                    state.copy(
+                        isModelsLoadFailed = true,
+                        isModelsLoading = false,
+                    )
+                }
                 is LoadResult.Loaded -> dataState.update { state ->
                     state.copy(
                         isModelsLoadFailed = false,
+                        isModelsLoading = false,
                         models = result.value,
                     )
                 }
@@ -189,7 +205,9 @@ internal class LevelsViewModel(
         val chosen: LevelCode = LevelCode.B1,
         val forms: Map<LevelCode, LevelInput> = emptyMap(),
         val isLoadFailed: Boolean = false,
+        val isLoading: Boolean = false,
         val isModelsLoadFailed: Boolean = false,
+        val isModelsLoading: Boolean = false,
         val isSaving: Boolean = false,
         val levels: List<Level>? = null,
         val models: Models? = null,
@@ -205,6 +223,7 @@ internal class LevelsViewModel(
             val isRefreshShown: Boolean,
             val isSaveEnabled: Boolean,
             val modelError: String?,
+            val modelProgress: String?,
             val models: List<ModelOption>,
             val rows: List<Row>,
             val saveStatus: Status?,
