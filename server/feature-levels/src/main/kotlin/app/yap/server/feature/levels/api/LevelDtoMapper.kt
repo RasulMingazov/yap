@@ -27,6 +27,7 @@ private fun LevelSettings.toDto(): LevelSettingsDto = LevelSettingsDto(
     block = block,
     idioms = idioms.name,
     maxWords = maxWords,
+    model = model,
     ratingFrom = ratingFrom,
     vocabulary = vocabulary,
 )
@@ -43,6 +44,7 @@ private fun LevelSettingsDto.toModel(): LevelSettings = LevelSettings(
     block = block.trim(),
     idioms = idioms.toIdioms(),
     maxWords = maxWords,
+    model = model,
     ratingFrom = ratingFrom,
     vocabulary = vocabulary.trim(),
 )

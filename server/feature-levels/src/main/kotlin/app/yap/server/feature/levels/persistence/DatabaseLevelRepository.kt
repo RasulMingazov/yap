@@ -1,6 +1,7 @@
 package app.yap.server.feature.levels.persistence
 
 import app.yap.server.core.database.Database
+import app.yap.server.core.llm.ModelCatalog
 import app.yap.server.feature.levels.model.LevelEntry
 import app.yap.server.feature.levels.model.LevelSettings
 import org.jetbrains.exposed.v1.core.ResultRow
@@ -33,6 +34,8 @@ private fun ResultRow.toEntry(): LevelEntry = LevelEntry(
         block = this[LevelsTable.block],
         idioms = this[LevelsTable.idioms],
         maxWords = this[LevelsTable.maxWords],
+        model = this[LevelsTable.model]
+            ?.takeIf { model -> ModelCatalog.choiceOf(model) != null },
         ratingFrom = this[LevelsTable.ratingFrom],
         vocabulary = this[LevelsTable.vocabulary],
     ),
@@ -43,6 +46,7 @@ private fun UpdateBuilder<*>.write(entry: LevelEntry) {
     this[LevelsTable.code] = entry.code
     this[LevelsTable.idioms] = entry.settings.idioms
     this[LevelsTable.maxWords] = entry.settings.maxWords
+    this[LevelsTable.model] = entry.settings.model
     this[LevelsTable.ratingFrom] = entry.settings.ratingFrom
     this[LevelsTable.vocabulary] = entry.settings.vocabulary
 }

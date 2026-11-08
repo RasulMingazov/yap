@@ -3,6 +3,7 @@ package app.yap.server.core.llm
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 internal class ModelCatalogTest {
@@ -50,5 +51,23 @@ internal class ModelCatalogTest {
         )
 
         assertFalse(ModelCatalog.contains(choice))
+    }
+
+    @Test
+    fun `GIVEN a model of DeepSeek WHEN asking the catalog for its choice THEN the choice names DeepSeek`() {
+        val choice = ModelCatalog.choiceOf("deepseek-v4-pro")
+
+        assertEquals(
+            expected = ModelChoice(
+                model = "deepseek-v4-pro",
+                provider = ModelProviderId.DEEPSEEK,
+            ),
+            actual = choice,
+        )
+    }
+
+    @Test
+    fun `GIVEN a model that no provider has WHEN asking the catalog for its choice THEN there is none`() {
+        assertNull(ModelCatalog.choiceOf("deepseek-chat"))
     }
 }

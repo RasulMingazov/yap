@@ -10,6 +10,7 @@ internal object LevelsTable : Table("levels") {
     val code = enumerationByName<LevelCode>("code", length = ENUM_NAME_LENGTH)
     val idioms = enumerationByName<Idioms>("idioms", length = ENUM_NAME_LENGTH)
     val maxWords = integer("max_words")
+    val model = text("model").nullable()
     val ratingFrom = integer("rating_from").nullable()
     val vocabulary = text("vocabulary")
 
