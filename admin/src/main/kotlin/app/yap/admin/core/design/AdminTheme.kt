@@ -76,6 +76,7 @@ internal object AdminTheme {
         val sideItemPadding = 10.dp
         val sidePadding = 12.dp
         val sideWidth = 200.dp
+        val stepNumberTopPadding = 24.dp
         val stepNumberWidth = 28.dp
         val tableCellEndPadding = 16.dp
         val tableCellPadding = 12.dp

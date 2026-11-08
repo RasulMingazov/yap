@@ -2,6 +2,7 @@ package app.yap.admin.core.design
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
@@ -16,7 +17,7 @@ internal fun SectionHeader(
     number: Int? = null,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = if (note == null) Modifier else Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.sectionHeaderGap),
     ) {
         number?.let { sectionNumber ->
@@ -29,11 +30,13 @@ internal fun SectionHeader(
         }
         Text(
             text = title,
-            modifier = Modifier.weight(1f),
             color = AdminTheme.Colors.ink,
             style = AdminTheme.Type.sub,
             fontWeight = FontWeight.SemiBold,
         )
-        note?.let { sectionNote -> Note(text = sectionNote) }
+        note?.let { sectionNote ->
+            Spacer(modifier = Modifier.weight(1f))
+            Note(text = sectionNote)
+        }
     }
 }

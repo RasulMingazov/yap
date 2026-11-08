@@ -3,10 +3,10 @@ package app.yap.admin.feature.topics.presentation.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import app.yap.admin.core.design.AdminTextField
 import app.yap.admin.core.design.AdminTheme
@@ -55,13 +55,12 @@ private fun StepRow(
     onStepChange: (Step) -> Unit,
     step: Step,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+    Row(horizontalArrangement = Arrangement.spacedBy(AdminTheme.Sizes.gap)) {
         Text(
             text = number.toString(),
-            modifier = Modifier.width(AdminTheme.Sizes.stepNumberWidth),
+            modifier = Modifier
+                .width(AdminTheme.Sizes.stepNumberWidth)
+                .padding(top = AdminTheme.Sizes.stepNumberTopPadding),
             color = AdminTheme.Colors.muted,
             style = AdminTheme.Type.body,
         )

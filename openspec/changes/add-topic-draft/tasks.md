@@ -71,8 +71,9 @@ Two slices: slice 1 (~290) builds Interlocutor with the UX points M5, M10 and m6
 `AdminTheme`, `TopicUiStateMapper`, `InterlocutorUiStateMapper` and the mapper test, the section in
 `T/presentation/ui/TopicScreen.kt`, its scenarios in `specs/topics/spec.md`, the guest and new-cast
 captures and the full-height Topic capture in `docs/testing/004-screen-capture.md`. Slice 2 (~220) builds Steps: the step events,
-`StepsSection`, the `note` of `SectionHeader`, `enabled` of `LinkButton`, and five steps in the guest
-capture.
+`StepsSection`, the `note` of `SectionHeader`, `enabled` of `LinkButton`, the step number tokens in
+`AdminTheme`, the section in `T/presentation/ui/TopicScreen.kt`, its scenarios in `specs/topics/spec.md`,
+and five steps in the guest capture.
 
 - [x] 15.1 Add the two sections and the step events of `TopicViewModel` (from [13/16]); verify with the view model tests for Add step and a step edit, `./gradlew build` and the capture of Guest and five steps
 - [ ] 15.2 Run the admin app against a server with a database; verify a create, an edit with Add step and Guest, and the topic after a restart
