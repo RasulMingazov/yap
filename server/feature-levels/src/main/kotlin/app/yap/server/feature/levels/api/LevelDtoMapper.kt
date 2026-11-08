@@ -41,12 +41,12 @@ private fun String.toLevelCode(): LevelCode = LevelCode.entries.find { levelCode
     ?: throw BadRequestException("The level code is unknown")
 
 private fun LevelSettingsDto.toModel(): LevelSettings = LevelSettings(
-    block = block.trim(),
+    block = block,
     idioms = idioms.toIdioms(),
     maxWords = maxWords,
     model = model,
     ratingFrom = ratingFrom,
-    vocabulary = vocabulary.trim(),
+    vocabulary = vocabulary,
 )
 
 private fun String.toIdioms(): Idioms = Idioms.entries.find { setting -> setting.name == this }

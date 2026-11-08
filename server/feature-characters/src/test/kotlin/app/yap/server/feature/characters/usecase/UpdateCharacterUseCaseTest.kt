@@ -30,6 +30,28 @@ internal class UpdateCharacterUseCaseTest {
     }
 
     @Test
+    fun `GIVEN a profile with spaces around the fields WHEN updating THEN the trimmed character is stored`() = runTest {
+        val env = Environment()
+
+        val outcome = env.useCase(
+            StubCharacter.stubCharacter(profile = StubCharacter.stubProfile(name = " ${StubCharacter.NAME} ")),
+        )
+
+        env.characterRepository.updateCall.calledWith(StubCharacter.stubCharacter())
+        assertEquals(expected = UpdateCharacterOutcome.Updated(StubCharacter.stubCharacter()), actual = outcome)
+    }
+
+    @Test
+    fun `GIVEN a field of spaces WHEN updating THEN nothing is stored`() = runTest {
+        val env = Environment()
+
+        val outcome = env.useCase(StubCharacter.stubCharacter(profile = StubCharacter.stubProfile(manner = "   ")))
+
+        env.characterRepository.updateCall.notCalled()
+        assertEquals(expected = UpdateCharacterOutcome.Invalid, actual = outcome)
+    }
+
+    @Test
     fun `GIVEN an unknown character WHEN updating it THEN it is not found`() = runTest {
         val env = Environment()
         env.characterRepository.updateCall.returns(false)

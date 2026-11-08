@@ -7,6 +7,13 @@ data class CharacterProfile(
     val personality: String,
 ) {
 
+    fun normalized(): CharacterProfile = CharacterProfile(
+        history = history.trim(),
+        manner = manner.trim(),
+        name = name.trim(),
+        personality = personality.trim(),
+    )
+
     internal val isFilled: Boolean
         get() = listOf(history, manner, name, personality).none(String::isEmpty)
 }

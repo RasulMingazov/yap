@@ -9,6 +9,11 @@ data class LevelSettings(
     val vocabulary: String,
 ) {
 
+    fun normalized(): LevelSettings = copy(
+        block = block.trim(),
+        vocabulary = vocabulary.trim(),
+    )
+
     internal val isFilled: Boolean
         get() = block.isNotBlank() && vocabulary.isNotBlank() && maxWords > 0
 }

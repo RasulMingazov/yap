@@ -9,7 +9,8 @@ class CreateCharacterUseCase(
 ) {
 
     suspend operator fun invoke(profile: CharacterProfile): CreateCharacterOutcome {
-        if (!profile.isFilled) return CreateCharacterOutcome.Invalid
-        return CreateCharacterOutcome.Created(characterRepository.create(profile))
+        val normalized = profile.normalized()
+        if (!normalized.isFilled) return CreateCharacterOutcome.Invalid
+        return CreateCharacterOutcome.Created(characterRepository.create(normalized))
     }
 }
