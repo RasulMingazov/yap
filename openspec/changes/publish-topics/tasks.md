@@ -84,7 +84,7 @@ the 400 body and 409, as two PRs.
 
 ## 11. [11/26] The captures of the counts · ~60 · `A/ScreenCaptureTest.kt`
 
-- [ ] 11.1 Capture Characters and the Topic screen with counts; verify with the images
+- [x] 11.1 Capture Characters and the Topic screen with counts; verify with the images
 
 ## 12. [12/26] The admin calendar domain · ~220 · `T/domain/` (`TopicCalendar`, `CalendarRow`, `CalendarTopic`, `LedBy`, `Todo`, `TopicField`, `TopicGap`, `ReleaseState`), `T/data/mapper/TopicCalendarMapper.kt`
 
