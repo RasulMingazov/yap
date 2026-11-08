@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import app.yap.admin.core.presentation.mapState
 import app.yap.admin.feature.characters.domain.CharacterId
 import app.yap.admin.feature.server.domain.usecase.GetServerSettingsUseCase
+import app.yap.admin.feature.topics.domain.TopicId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -53,6 +54,8 @@ internal class NavigationViewModel(
         data object Characters : Screen
 
         data object Server : Screen
+
+        data class Topic(val topicId: TopicId?) : Screen
 
         data object Topics : Screen
     }

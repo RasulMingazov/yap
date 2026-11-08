@@ -40,6 +40,7 @@ fun main() {
                     characterViewModel = { characterId -> koin.get { parametersOf(characterId) } },
                     charactersViewModel = charactersViewModel,
                     serverViewModel = serverViewModel,
+                    topicViewModel = { topicId -> koin.get { parametersOf(topicId) } },
                     topicsViewModel = topicsViewModel,
                     viewModel = navigationViewModel,
                 )

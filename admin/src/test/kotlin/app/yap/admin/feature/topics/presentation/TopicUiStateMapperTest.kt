@@ -23,7 +23,11 @@ internal class TopicUiStateMapperTest {
 
         assertEquals(expected = "Новая тема", actual = content.title)
         assertEquals(expected = "Ещё не сохранена", actual = content.subtitle)
-        assertEquals(expected = "", actual = content.releaseDateText)
+        assertEquals(expected = null, actual = content.releaseDateText)
+        assertEquals(
+            expected = "Для черновика нужны название и дата выхода. Остальное можно заполнить позже.",
+            actual = content.hint,
+        )
         assertEquals(
             expected = listOf(StubTopic.stubStep(outcome = "", passWhen = "", task = "")),
             actual = content.form.steps,
@@ -47,6 +51,7 @@ internal class TopicUiStateMapperTest {
         assertEquals(expected = "At the cafe", actual = content.title)
         assertEquals(expected = "Пятница, 24 октября · черновик", actual = content.subtitle)
         assertEquals(expected = "Пятница, 24 октября", actual = content.releaseDateText)
+        assertEquals(expected = null, actual = content.hint)
         assertEquals(expected = null, actual = content.guestDescription)
         assertEquals(expected = listOf(true, false), actual = content.choices.map { choice -> choice.isSelected })
         assertEquals(
@@ -91,12 +96,13 @@ internal class TopicUiStateMapperTest {
     }
 
     @Test
-    fun `GIVEN a save in progress WHEN mapping THEN Save draft is disabled`() {
+    fun `GIVEN a save in progress WHEN mapping THEN Save draft is disabled and the status says Saving`() {
         val state = DataState(isSaving = true, load = Load.LOADED)
 
         val content = contentOf(state)
 
-        assertEquals(expected = false, actual = content.isSaveEnabled)
+        val saving = Status(text = "Сохранение…", tone = Status.Tone.MUTED)
+        assertEquals(expected = false to saving, actual = content.isSaveEnabled to content.saveStatus)
     }
 
     @Test

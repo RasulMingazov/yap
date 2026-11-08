@@ -7,6 +7,7 @@ internal data class Status(
 
     enum class Tone {
         ERROR,
+        MUTED,
         SUCCESS,
     }
 }

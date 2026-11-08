@@ -16,6 +16,7 @@ internal object NavigationUiStateMapper {
 
     private fun Screen.section(): Screen = when (this) {
         is Screen.Character -> Screen.Characters
+        is Screen.Topic -> Screen.Topics
         is Screen.Characters,
         is Screen.Server,
         is Screen.Topics,

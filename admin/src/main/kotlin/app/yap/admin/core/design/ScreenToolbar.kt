@@ -85,6 +85,7 @@ internal fun ScreenToolbar(
 internal data class ToolbarBack(
     val label: String,
     val onClick: () -> Unit,
+    val enabled: Boolean = true,
 )
 
 @Composable
@@ -95,6 +96,7 @@ private fun BackButton(toolbarBack: ToolbarBack) {
             .size(AdminTheme.Sizes.backButton)
             .clip(RoundedCornerShape(AdminTheme.Sizes.cornerRadius))
             .clickable(
+                enabled = toolbarBack.enabled,
                 role = Role.Button,
                 onClick = toolbarBack.onClick,
             ),
@@ -103,7 +105,7 @@ private fun BackButton(toolbarBack: ToolbarBack) {
         Icon(
             imageVector = BACK_ARROW,
             contentDescription = "Назад: ${toolbarBack.label}",
-            tint = AdminTheme.Colors.ink,
+            tint = if (toolbarBack.enabled) AdminTheme.Colors.ink else AdminTheme.Colors.muted,
             modifier = Modifier.size(AdminTheme.Sizes.backArrow),
         )
     }

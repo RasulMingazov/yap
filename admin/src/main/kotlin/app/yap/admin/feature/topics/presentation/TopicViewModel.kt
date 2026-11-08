@@ -62,7 +62,7 @@ internal class TopicViewModel(
     private fun edit(transform: (TopicContent) -> TopicContent) = dataState.update { state ->
         state.copy(
             form = transform(state.form),
-            saveStatus = null,
+            saveStatus = state.saveStatus.takeIf { status -> status == SaveStatus.REJECTED },
         )
     }
 
@@ -167,8 +167,9 @@ internal class TopicViewModel(
             val choices: List<Choice>,
             val form: TopicContent,
             val guestDescription: String?,
+            val hint: String?,
             val isSaveEnabled: Boolean,
-            val releaseDateText: String,
+            val releaseDateText: String?,
             val saveStatus: Status?,
             val subtitle: String,
             val title: String,

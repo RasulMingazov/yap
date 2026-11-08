@@ -8,7 +8,6 @@ import app.yap.admin.feature.topics.presentation.TopicViewModel.Load
 import app.yap.admin.feature.topics.presentation.TopicViewModel.SaveStatus
 import app.yap.admin.feature.topics.presentation.TopicViewModel.UiState
 import app.yap.admin.feature.topics.presentation.TopicViewModel.UiState.Content.Choice
-import java.time.LocalDate
 
 internal object TopicUiStateMapper {
 
@@ -22,9 +21,10 @@ internal object TopicUiStateMapper {
         choices = choices(),
         form = form,
         guestDescription = guestDescription(),
+        hint = hint(),
         isSaveEnabled = !isSaving,
-        releaseDateText = form.releaseDate.longText(),
-        saveStatus = saveStatus?.status(),
+        releaseDateText = form.releaseDate?.let(ReleaseDateFormat::long),
+        saveStatus = saveStatus(),
         subtitle = subtitle(),
         title = title(),
     )
@@ -56,7 +56,11 @@ internal object TopicUiStateMapper {
 
     private fun DataState.guestDescription(): String? = (form.interlocutor as? Interlocutor.Guest)?.description
 
-    private fun LocalDate?.longText(): String = this?.let(ReleaseDateFormat::long).orEmpty()
+    private fun DataState.hint(): String? =
+        if (saved == null) "Для черновика нужны название и дата выхода. Остальное можно заполнить позже." else null
+
+    private fun DataState.saveStatus(): Status? =
+        if (isSaving) Status(text = "Сохранение…", tone = Status.Tone.MUTED) else saveStatus?.status()
 
     private fun SaveStatus.status(): Status = when (this) {
         SaveStatus.REJECTED -> Status(
