@@ -2,7 +2,6 @@ package app.yap.server.feature.prompts.api
 
 import app.yap.contract.admin.PromptDto
 import app.yap.contract.admin.PromptSummaryDto
-import app.yap.contract.admin.PromptTextDto
 import app.yap.contract.admin.PromptVersionDto
 import app.yap.server.feature.prompts.model.Prompt
 import app.yap.server.feature.prompts.model.PromptKey
@@ -26,5 +25,3 @@ private fun PromptVersion.toDto(isCurrent: Boolean): PromptVersionDto = PromptVe
     number = number,
     savedAt = savedAt.toString(),
 )
-
-internal fun PromptTextDto.toText(): String = text.trim()

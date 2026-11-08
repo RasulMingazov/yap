@@ -10,12 +10,15 @@ class SaveLevelsUseCase(
     private val levelRepository: LevelRepository,
 ) {
 
-    suspend operator fun invoke(entries: List<LevelEntry>): SaveLevelsOutcome = when {
-        !LevelTableValidity.isValid(entries) -> SaveLevelsOutcome.Invalid
-        !LevelTableValidity.isInCatalog(entries) -> SaveLevelsOutcome.ModelUnavailable
-        else -> {
-            levelRepository.save(entries)
-            SaveLevelsOutcome.Saved(RatingRanges.levelsOf(entries))
+    suspend operator fun invoke(entries: List<LevelEntry>): SaveLevelsOutcome {
+        val normalized = entries.map { entry -> entry.normalized() }
+        return when {
+            !LevelTableValidity.isValid(normalized) -> SaveLevelsOutcome.Invalid
+            !LevelTableValidity.isInCatalog(normalized) -> SaveLevelsOutcome.ModelUnavailable
+            else -> {
+                levelRepository.save(normalized)
+                SaveLevelsOutcome.Saved(RatingRanges.levelsOf(normalized))
+            }
         }
     }
 }

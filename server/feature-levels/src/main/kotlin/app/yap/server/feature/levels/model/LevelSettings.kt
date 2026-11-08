@@ -11,4 +11,9 @@ data class LevelSettings(
 
     internal val isFilled: Boolean
         get() = block.isNotBlank() && vocabulary.isNotBlank() && maxWords > 0
+
+    internal fun normalized(): LevelSettings = copy(
+        block = block.trim(),
+        vocabulary = vocabulary.trim(),
+    )
 }

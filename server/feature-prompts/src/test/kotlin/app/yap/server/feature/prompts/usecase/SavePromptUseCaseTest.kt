@@ -21,6 +21,15 @@ internal class SavePromptUseCaseTest {
     }
 
     @Test
+    fun `GIVEN spaces and lines around the text WHEN saving a prompt THEN the trimmed text is stored`() = runTest {
+        val env = Environment()
+
+        env.useCase(PromptKey.TOPIC_REPLY, " \n ${StubPrompt.TEXT}\n ")
+
+        env.promptRepository.saveCall.calledWith(PromptKey.TOPIC_REPLY, StubPrompt.TEXT)
+    }
+
+    @Test
     fun `GIVEN an empty text WHEN saving a prompt THEN nothing is stored`() = runTest {
         val env = Environment()
 

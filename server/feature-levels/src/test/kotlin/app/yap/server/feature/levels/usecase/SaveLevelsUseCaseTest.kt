@@ -27,6 +27,16 @@ internal class SaveLevelsUseCaseTest {
     }
 
     @Test
+    fun `GIVEN a block with spaces around WHEN saving THEN the trimmed table is stored`() = runTest {
+        val env = Environment()
+        val table = StubLevel.stubTable(b1 = StubLevel.stubSettings(block = " ${StubLevel.BLOCK} "))
+
+        env.useCase(table)
+
+        env.levelRepository.saveCall.calledWith(StubLevel.stubTable())
+    }
+
+    @Test
     fun `GIVEN a table without C2 WHEN saving THEN nothing is stored`() = runTest {
         val env = Environment()
         val table = StubLevel.stubTable().filter { entry -> entry.code != LevelCode.C2 }

@@ -46,7 +46,7 @@ private fun Route.getPromptRoute(getPromptUseCase: GetPromptUseCase) {
 
 private fun Route.savePromptRoute(savePromptUseCase: SavePromptUseCase) {
     post("/{promptKey}/versions") {
-        val text = call.receive<PromptTextDto>().toText()
+        val text = call.receive<PromptTextDto>().text
         when (val outcome = savePromptUseCase(call.promptKey(), text)) {
             is SavePromptOutcome.EmptyText -> call.respond(HttpStatusCode.BadRequest)
             is SavePromptOutcome.Saved -> call.respond(HttpStatusCode.Created, outcome.prompt.toDto())

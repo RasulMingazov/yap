@@ -29,6 +29,25 @@ internal class CreateCharacterUseCaseTest {
         assertEquals(expected = CreateCharacterOutcome.Invalid, actual = outcome)
     }
 
+    @Test
+    fun `GIVEN a profile with spaces around the fields WHEN creating THEN the trimmed profile is stored`() = runTest {
+        val env = Environment()
+
+        env.useCase(StubCharacter.stubProfile(name = " ${StubCharacter.NAME} "))
+
+        env.characterRepository.createCall.calledWith(StubCharacter.stubProfile())
+    }
+
+    @Test
+    fun `GIVEN a field of spaces WHEN creating THEN nothing is stored`() = runTest {
+        val env = Environment()
+
+        val outcome = env.useCase(StubCharacter.stubProfile(manner = "   "))
+
+        env.characterRepository.createCall.notCalled()
+        assertEquals(expected = CreateCharacterOutcome.Invalid, actual = outcome)
+    }
+
     private class Environment {
 
         val characterRepository = StubCharacterRepository()

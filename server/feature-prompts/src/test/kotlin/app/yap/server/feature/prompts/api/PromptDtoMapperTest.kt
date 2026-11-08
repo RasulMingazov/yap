@@ -1,7 +1,6 @@
 package app.yap.server.feature.prompts.api
 
 import app.yap.contract.admin.PromptDto
-import app.yap.contract.admin.PromptTextDto
 import app.yap.contract.admin.PromptVersionDto
 import app.yap.server.feature.prompts.model.PromptKey
 import app.yap.server.feature.prompts.model.StubPrompt
@@ -10,15 +9,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 internal class PromptDtoMapperTest {
-
-    @Test
-    fun `GIVEN spaces and lines around the text WHEN mapping the text of a save THEN the text is trimmed`() {
-        val dto = PromptTextDto(text = " \n Play {interlocutor}.\n ")
-
-        val text = dto.toText()
-
-        assertEquals(expected = "Play {interlocutor}.", actual = text)
-    }
 
     @Test
     fun `GIVEN an older version that is current WHEN mapping the prompt THEN only that version is current`() {

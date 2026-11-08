@@ -9,7 +9,8 @@ class SavePromptUseCase(
 ) {
 
     suspend operator fun invoke(promptKey: PromptKey, text: String): SavePromptOutcome {
-        if (text.isEmpty()) return SavePromptOutcome.EmptyText
-        return SavePromptOutcome.Saved(promptRepository.save(promptKey, text))
+        val normalized = text.trim()
+        if (normalized.isEmpty()) return SavePromptOutcome.EmptyText
+        return SavePromptOutcome.Saved(promptRepository.save(promptKey, normalized))
     }
 }

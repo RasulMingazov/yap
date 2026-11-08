@@ -13,7 +13,7 @@ import kotlin.test.assertFailsWith
 internal class LevelDtoMapperTest {
 
     @Test
-    fun `GIVEN a vocabulary and a block with spaces around WHEN mapping the input THEN both are trimmed`() {
+    fun `GIVEN a vocabulary and a block with spaces around WHEN mapping the input THEN both stay as they are`() {
         val dto = StubLevelDto.stubInputDto(
             settings = StubLevelDto.stubSettingsDto(block = " Speak simply. ", vocabulary = " B1 "),
         )
@@ -23,7 +23,7 @@ internal class LevelDtoMapperTest {
         assertEquals(
             expected = LevelEntry(
                 code = LevelCode.B1,
-                settings = StubLevel.stubSettings(block = "Speak simply.", vocabulary = "B1"),
+                settings = StubLevel.stubSettings(block = " Speak simply. ", vocabulary = " B1 "),
             ),
             actual = entry,
         )

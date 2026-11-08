@@ -9,9 +9,10 @@ class UpdateCharacterUseCase(
 ) {
 
     suspend operator fun invoke(character: Character): UpdateCharacterOutcome {
-        if (!character.profile.isFilled) return UpdateCharacterOutcome.Invalid
-        return if (characterRepository.update(character)) {
-            UpdateCharacterOutcome.Updated(character)
+        val normalized = character.copy(profile = character.profile.normalized())
+        if (!normalized.profile.isFilled) return UpdateCharacterOutcome.Invalid
+        return if (characterRepository.update(normalized)) {
+            UpdateCharacterOutcome.Updated(normalized)
         } else {
             UpdateCharacterOutcome.NotFound
         }
