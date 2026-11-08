@@ -21,9 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
@@ -87,7 +85,7 @@ internal fun TopicsContent(
         )
         ScreenBody(
             maxWidth = Dp.Unspecified,
-            spacing = AdminTheme.Sizes.sectionGap,
+            spacing = AdminTheme.Sizes.listSectionGap,
         ) {
             when (uiState) {
                 is UiState.Content -> {
@@ -217,7 +215,7 @@ private fun TodoRow(
         )
         Text(
             text = buildAnnotatedString {
-                withStyle(SpanStyle(fontWeight = FontWeight.Medium)) {
+                withStyle(AdminTheme.Type.bodyMedium.toSpanStyle()) {
                     append(title)
                 }
                 append(" ")
@@ -340,8 +338,7 @@ private fun TopicRow(
                     onClick = { onTopicClick(row.topicId) },
                 ),
                 color = AdminTheme.Colors.ink,
-                style = AdminTheme.Type.tableCell,
-                fontWeight = FontWeight.Medium,
+                style = AdminTheme.Type.tableCellMedium,
             )
         }
         CellText(
@@ -355,7 +352,10 @@ private fun TopicRow(
             text = row.steps,
         )
         TableCell(modifier = Modifier.width(AdminTheme.Sizes.statusColumnWidth)) {
-            StatusText(status = row.status)
+            StatusText(
+                status = row.status,
+                style = AdminTheme.Type.tableCell,
+            )
         }
     }
 }
