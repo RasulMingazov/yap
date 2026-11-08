@@ -337,6 +337,7 @@ internal class ScreenCaptureTest {
             "error" to ModelsViewModel.DataState(isLoadFailed = true),
             "loaded" to loaded,
             "not-connected" to modelsDataState(NOT_CONNECTED_MODELS),
+            "refreshing" to loaded.copy(isLoading = true),
             "saving" to loaded.copy(isSaving = true),
             "saved" to loaded.copy(saveResult = SaveModelsResult.Saved(MODELS)),
             "rejected" to loaded.copy(saveResult = SaveModelsResult.Invalid),
@@ -394,11 +395,6 @@ internal class ScreenCaptureTest {
         }
     }
 
-    private fun modelsDataState(models: Models): ModelsViewModel.DataState = ModelsViewModel.DataState(
-        choices = models.tasks.associate { taskModel -> taskModel.task to taskModel.choice },
-        models = models,
-    )
-
     private fun levelsDataState(levels: List<Level>): LevelsViewModel.DataState = LevelsViewModel.DataState(
         forms = levels.toInputs(),
         levels = levels,
@@ -414,6 +410,11 @@ internal class ScreenCaptureTest {
             code = code,
             field = field,
         ),
+    )
+
+    private fun modelsDataState(models: Models): ModelsViewModel.DataState = ModelsViewModel.DataState(
+        choices = models.tasks.associate { taskModel -> taskModel.task to taskModel.choice },
+        models = models,
     )
 
     private companion object {
@@ -615,7 +616,7 @@ internal class ScreenCaptureTest {
             val chosen = mapOf(
                 ModelTask.TOPIC_CHECK to StubModels.stubTask(
                     task = ModelTask.TOPIC_CHECK,
-                    model = "other-mini",
+                    model = "other-large-2025-long-context",
                     provider = other.code,
                 ),
                 ModelTask.TOPIC_REVIEW to StubModels.stubTask(
@@ -625,7 +626,9 @@ internal class ScreenCaptureTest {
             )
             return StubModels.stubModels(
                 providers = listOf(StubModels.stubProvider(), other),
-                tasks = StubModels.stubTasks().map { taskModel -> chosen[taskModel.task] ?: taskModel },
+                tasks = StubModels
+                    .stubTasks()
+                    .map { taskModel -> chosen[taskModel.task] ?: taskModel },
             )
         }
 
