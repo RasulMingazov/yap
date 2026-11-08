@@ -17,7 +17,7 @@ internal class LevelsUiStateMapperTest {
     fun `GIVEN levels before a save WHEN mapping THEN a row has no range, an empty form and no idioms`() {
         val state = DataState().loaded(StubLevel.stubLevels(range = null, settings = null))
 
-        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
             expected = UiState.Row(
@@ -40,7 +40,7 @@ internal class LevelsUiStateMapperTest {
     fun `GIVEN saved levels WHEN mapping THEN C2 has an open end`() {
         val state = DataState().loaded(StubLevel.stubLevels(range = StubLevel.stubRange(from = 1500, to = null)))
 
-        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(expected = "1500+", actual = uiState.rows[LevelCode.C2.ordinal].range)
     }
@@ -49,7 +49,7 @@ internal class LevelsUiStateMapperTest {
     fun `GIVEN No rating WHEN mapping THEN its row has no rating from and shows the calibration`() {
         val state = DataState().loaded(StubLevel.stubLevels(range = null))
 
-        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
             expected = Triple("Без рейтинга", "и калибровка", false),
@@ -61,7 +61,7 @@ internal class LevelsUiStateMapperTest {
     fun `GIVEN a saved level WHEN mapping THEN its idioms show as chosen`() {
         val state = DataState().loaded(StubLevel.stubLevels())
 
-        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
             expected = UiState.IdiomsOption(idioms = Idioms.RARELY, label = "редко"),
@@ -73,7 +73,7 @@ internal class LevelsUiStateMapperTest {
     fun `GIVEN B1 is chosen WHEN mapping THEN its prompt block shows with its rating`() {
         val state = DataState().loaded(StubLevel.stubLevels())
 
-        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
             expected = UiState.Block(
@@ -90,7 +90,7 @@ internal class LevelsUiStateMapperTest {
     fun `GIVEN the levels WHEN mapping THEN the idioms show the names of the canvas`() {
         val state = DataState().loaded(StubLevel.stubLevels())
 
-        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
             expected = listOf("нет", "редко", "иногда", "да"),
@@ -104,7 +104,7 @@ internal class LevelsUiStateMapperTest {
             .loaded(StubLevel.stubLevels())
             .copy(isSaving = true)
 
-        val uiState = LevelsUiStateMapper.map(state) as UiState.Content
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
 
         assertEquals(
             expected = Status(text = "Сохранение…", tone = Status.Tone.MUTED) to false,
@@ -116,7 +116,7 @@ internal class LevelsUiStateMapperTest {
     fun `GIVEN the levels did not load WHEN mapping THEN Levels shows the load error`() {
         val state = DataState(load = Load.FAILED)
 
-        val uiState = LevelsUiStateMapper.map(state)
+        val uiState = LevelsUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить уровни"), actual = uiState)
     }

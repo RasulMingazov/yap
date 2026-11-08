@@ -10,7 +10,7 @@ internal class CharacterViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(CharacterUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, CharacterUiStateMapper)
 
     private val newsChannel = Channel<News>(Channel.BUFFERED)
     val news: Flow<News> = newsChannel.receiveAsFlow()
@@ -54,6 +54,10 @@ internal class CharacterViewModel(
   in `viewModelScope`.
 - Keep internal facts in an immutable `DataState` and map it to `UiState` with one mapper object,
   through `mapState`: a `StateFlow` mapping helper that the first view model adds.
+- A `UiState` mapper object implements `(DataState) -> UiState`. Its only public function is
+  `override fun invoke(state: DataState): UiState`, and the view model passes the object to
+  `mapState`. Every other function of the mapper is `private`. Do not split a mapper into a second
+  public object to pass Detekt: `TooManyFunctions` does not count private functions.
 - In a `UiState` mapper, build each non-trivial field with its own named function; keep
   constructor calls free of inline `when`, nested `let`, and `?:` chains. Choose between texts with
   an exhaustive `when`, one branch per outcome.

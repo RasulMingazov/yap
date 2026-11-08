@@ -25,7 +25,7 @@ internal class CharacterViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState(characterId = characterId))
-    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, CharacterUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, CharacterUiStateMapper)
 
     private val newsChannel = Channel<News>(Channel.BUFFERED)
     val news: Flow<News> = newsChannel.receiveAsFlow()

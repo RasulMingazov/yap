@@ -10,9 +10,9 @@ import app.yap.admin.feature.levels.presentation.LevelsViewModel.NumberField
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.SaveStatus
 import app.yap.admin.feature.levels.presentation.LevelsViewModel.UiState
 
-internal object LevelsUiStateMapper {
+internal object LevelsUiStateMapper : (DataState) -> UiState {
 
-    fun map(state: DataState): UiState = when (state.load) {
+    override fun invoke(state: DataState): UiState = when (state.load) {
         Load.FAILED -> UiState.Error(message = "Не удалось загрузить уровни")
         Load.LOADED -> state.toContent()
         Load.LOADING -> UiState.Loading
@@ -31,10 +31,12 @@ internal object LevelsUiStateMapper {
         return UiState.Block(
             code = chosen,
             form = forms.getValue(chosen),
-            rating = level.rangeText()?.let { text -> "рейтинг $text" },
+            rating = level.rating(),
             title = "Блок промпта · ${chosen.label()}",
         )
     }
+
+    private fun Level.rating(): String? = rangeText()?.let { text -> "рейтинг $text" }
 
     private fun DataState.row(level: Level): UiState.Row {
         val form = forms.getValue(level.code)

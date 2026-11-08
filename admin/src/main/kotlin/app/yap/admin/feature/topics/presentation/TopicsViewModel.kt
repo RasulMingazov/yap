@@ -16,7 +16,7 @@ internal class TopicsViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicsUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicsUiStateMapper)
 
     fun onEvent(event: Event) = when (event) {
         is Event.Opened -> onOpened()

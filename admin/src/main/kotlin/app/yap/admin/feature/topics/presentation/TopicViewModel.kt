@@ -34,7 +34,7 @@ internal class TopicViewModel(
 ) : ViewModel() {
 
     private val dataState = MutableStateFlow(DataState())
-    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicUiStateMapper::map)
+    val uiState: StateFlow<UiState> = dataState.mapState(viewModelScope, TopicUiStateMapper)
 
     private val newsChannel = Channel<News>(Channel.BUFFERED)
     val news: Flow<News> = newsChannel.receiveAsFlow()
@@ -54,9 +54,7 @@ internal class TopicViewModel(
         is Event.ReleaseDatePicked -> onReleaseDatePicked(event.date)
         is Event.RetryClicked -> onRetryClicked()
         is Event.SaveClicked -> onSaveClicked()
-        is Event.StepChanged -> edit { form ->
-            form.copy(steps = form.steps.mapIndexed { index, step -> if (index == event.index) event.step else step })
-        }
+        is Event.StepChanged -> onStepChanged(event.index, event.step)
     }
 
     override fun onCleared() {
@@ -150,6 +148,10 @@ internal class TopicViewModel(
     private suspend fun onSaveFailed() {
         dataState.update { state -> state.copy(isSaving = false) }
         newsChannel.send(News.ShowSnackbar("Не удалось сохранить. Попробуйте ещё раз."))
+    }
+
+    private fun onStepChanged(changedIndex: Int, changedStep: Step) = edit { form ->
+        form.copy(steps = form.steps.mapIndexed { index, step -> if (index == changedIndex) changedStep else step })
     }
 
     data class DataState(

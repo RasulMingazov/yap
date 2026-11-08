@@ -13,7 +13,7 @@ internal class NavigationUiStateMapperTest {
     fun `GIVEN a character is open WHEN mapping THEN the sidebar shows Characters as the current section`() {
         val screen = Screen.Character(CharacterId("2c7a5f1e-9a8b-4c3d-8e2f-1a2b3c4d5e6f"))
 
-        val uiState = NavigationUiStateMapper.map(DataState(screen = screen))
+        val uiState = NavigationUiStateMapper(DataState(screen = screen))
 
         assertEquals(
             expected = UiState.Content(
@@ -28,7 +28,7 @@ internal class NavigationUiStateMapperTest {
     fun `GIVEN a new topic is open WHEN mapping THEN the sidebar shows Topics as the current section`() {
         val screen = Screen.Topic(topicId = null)
 
-        val uiState = NavigationUiStateMapper.map(DataState(screen = screen))
+        val uiState = NavigationUiStateMapper(DataState(screen = screen))
 
         assertEquals(
             expected = UiState.Content(

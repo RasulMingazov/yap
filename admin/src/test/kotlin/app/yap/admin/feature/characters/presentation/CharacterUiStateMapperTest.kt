@@ -15,7 +15,7 @@ internal class CharacterUiStateMapperTest {
     fun `GIVEN a new character WHEN mapping THEN the form is empty with the hint to fill it in`() {
         val state = DataState(characterId = null)
 
-        val uiState = CharacterUiStateMapper.map(state)
+        val uiState = CharacterUiStateMapper(state)
 
         assertEquals(
             expected = UiState.Content(
@@ -37,7 +37,7 @@ internal class CharacterUiStateMapperTest {
             .saved(character.profile)
             .copy(saveStatus = SaveStatus.SAVED)
 
-        val uiState = CharacterUiStateMapper.map(state)
+        val uiState = CharacterUiStateMapper(state)
 
         assertEquals(
             expected = UiState.Content(
@@ -56,7 +56,7 @@ internal class CharacterUiStateMapperTest {
     fun `GIVEN the character did not load WHEN mapping THEN the form shows the error`() {
         val state = DataState(characterId = StubCharacter.stubCharacter().characterId).copy(load = Load.FAILED)
 
-        val uiState = CharacterUiStateMapper.map(state)
+        val uiState = CharacterUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить персонажа"), actual = uiState)
     }

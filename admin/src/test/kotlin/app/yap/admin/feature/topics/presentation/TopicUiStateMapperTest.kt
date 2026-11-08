@@ -117,10 +117,10 @@ internal class TopicUiStateMapperTest {
     fun `GIVEN the topic or the cast did not load WHEN mapping THEN the screen shows the error`() {
         val state = DataState(load = Load.FAILED)
 
-        val uiState = TopicUiStateMapper.map(state)
+        val uiState = TopicUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить тему"), actual = uiState)
     }
 
-    private fun contentOf(state: DataState): UiState.Content = assertIs<UiState.Content>(TopicUiStateMapper.map(state))
+    private fun contentOf(state: DataState): UiState.Content = assertIs<UiState.Content>(TopicUiStateMapper(state))
 }
