@@ -132,8 +132,9 @@ toolbar SHALL have a back arrow to Topics, and Save draft with its status.
 #### Scenario: A new topic
 
 - **WHEN** the owner clicks New topic
-- **THEN** the title is New topic, the subtitle says that it is not saved yet, the fields and the
-  release date are empty, and the Steps section has one empty step
+- **THEN** the title is New topic, the subtitle says that it is not saved yet, the fields are empty,
+  Release date shows Choose a date, the Steps section has one empty step, and a hint says that a
+  draft needs a title and a release date and that the rest can wait
 
 #### Scenario: Pick a date
 
@@ -149,6 +150,30 @@ toolbar SHALL have a back arrow to Topics, and Save draft with its status.
 
 - **WHEN** the admin app cannot load the topic or the cast
 - **THEN** the screen shows an error that the topic did not load, and Retry
+
+### Requirement: The Topic screen guides the owner
+
+While the topic loads, and when it does not load, the toolbar SHALL show the title Topic and the
+back arrow to Topics. A new topic SHALL show a hint that a draft needs a title and a release date.
+Release date without a date SHALL show Choose a date. A pick of the day that Release date already
+shows SHALL change nothing.
+
+#### Scenario: The topic loads
+
+- **WHEN** the admin app loads the topic and the cast
+- **THEN** the screen shows a loader below a toolbar with the title Topic and the back arrow to
+  Topics
+
+#### Scenario: The error keeps the way back
+
+- **WHEN** the topic does not load
+- **THEN** the error and Retry show below a toolbar with the title Topic and the back arrow to
+  Topics
+
+#### Scenario: Pick the same day
+
+- **WHEN** the Saved status shows, and the owner picks the day that Release date already shows
+- **THEN** the form does not change and the Saved status stays
 
 ### Requirement: The Interlocutor and Steps sections
 
@@ -190,3 +215,25 @@ and a Saved status beside Save draft. A new topic SHALL then become a saved topi
 
 - **WHEN** the admin app cannot reach the server on Save draft
 - **THEN** it keeps the form as it is and shows a snackbar that the save failed
+
+### Requirement: The status of a save
+
+While the save runs, the admin app SHALL show Saving… beside Save draft, and SHALL disable Save
+draft, the fields, the date popup and the back arrow. A field edit SHALL remove the Saved status.
+The error of a rejected draft SHALL stay until the next click on Save draft.
+
+#### Scenario: The save runs
+
+- **WHEN** the owner clicks Save draft and the server has not answered yet
+- **THEN** Saving… shows beside Save draft, and Save draft, the fields, the date popup and the back
+  arrow are disabled
+
+#### Scenario: An edit after a rejected draft
+
+- **WHEN** the server rejected the draft, and the owner edits a field
+- **THEN** the error stays beside Save draft until the next click on Save draft
+
+#### Scenario: An edit after a save
+
+- **WHEN** the Saved status shows, and the owner edits a field
+- **THEN** the Saved status goes away

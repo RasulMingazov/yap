@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import app.yap.admin.core.design.AdminTheme
 import app.yap.admin.core.design.PopupButton
 import app.yap.admin.core.design.PrimaryButton
@@ -53,7 +54,7 @@ internal fun ReleaseDateField(
             date = date,
             onDatePick = { picked ->
                 isPickerOpen = false
-                if (picked != date) onDatePick(picked)
+                onDatePick(picked)
             },
             onDismiss = { isPickerOpen = false },
         )
@@ -62,7 +63,7 @@ internal fun ReleaseDateField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ReleaseDatePicker(
+internal fun ReleaseDatePicker(
     date: LocalDate?,
     onDatePick: (LocalDate) -> Unit,
     onDismiss: () -> Unit,
@@ -97,6 +98,9 @@ private fun ReleaseDatePicker(
             headline = {
                 Text(
                     text = "Дата выхода",
+                    color = AdminTheme.Colors.ink,
+                    style = AdminTheme.Type.title,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(
                         start = AdminTheme.Sizes.dialogPadding,
                         top = AdminTheme.Sizes.dialogPadding,
@@ -119,4 +123,4 @@ private fun Long.toUtcDate(): LocalDate = Instant
     .atOffset(ZoneOffset.UTC)
     .toLocalDate()
 
-private val RUSSIAN = Locale.forLanguageTag("ru")
+private val RUSSIAN = Locale.forLanguageTag("ru-RU")
