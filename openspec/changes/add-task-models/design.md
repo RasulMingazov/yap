@@ -83,7 +83,8 @@ ModelCatalog.DEFAULT = ModelChoice(DEEPSEEK, "deepseek-flash")
 ModelTask = TOPIC_REPLY | TOPIC_CHECK | TOPIC_HINTS | TOPIC_REVIEW | CALIBRATION
             (enum, the order of the table; dependsOnLevel = TOPIC_REPLY, TOPIC_HINTS)
 TaskModel(task, choice: ModelChoice)
-ModelsOverview(tasks: List<TaskModel>, providers: List<ProviderState(id, name, models, connected)>)
+ModelsOverview(tasks: List<TaskModel>, providers: List<ProviderState(id, connected)>)
+            (the name, the models and keySetting come from ModelProviderId)
 SaveTaskModelsOutcome = Invalid | CatalogChanged | Saved(ModelsOverview)
 ```
 

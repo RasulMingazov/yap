@@ -17,10 +17,10 @@ class GetModelsUseCase(
     suspend operator fun invoke(): ModelsOverview {
         val stored = taskModelRepository.list()
         return ModelsOverview(
-            providers = ModelCatalog.providers.map { id ->
+            providers = ModelCatalog.providers.map { provider ->
                 ProviderState(
-                    connected = providerConnections.isConnected(id),
-                    id = id,
+                    connected = providerConnections.isConnected(provider),
+                    id = provider,
                 )
             },
             tasks = ModelTask.entries.map { task ->
