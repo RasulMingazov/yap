@@ -236,6 +236,7 @@ internal class ScreenCaptureTest {
                 forms = LevelCode.entries.associateWith { StubLevel.stubInput(idioms = null) },
                 saveResult = SaveLevelsResult.NoIdioms(LevelCode.A1),
             ),
+            "no-word-count" to new.copy(saveResult = SaveLevelsResult.NoWordCount(LevelCode.A1)),
             "unread-rating-from" to saved.unread(
                 code = LevelCode.B2,
                 field = SaveLevelsResult.NumberField.RATING_FROM,

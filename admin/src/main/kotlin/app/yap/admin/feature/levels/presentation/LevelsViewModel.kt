@@ -90,6 +90,7 @@ internal class LevelsViewModel(
                 is SaveLevelsResult.Failed -> onSaveFailed(result)
                 is SaveLevelsResult.Invalid,
                 is SaveLevelsResult.NoIdioms,
+                is SaveLevelsResult.NoWordCount,
                 is SaveLevelsResult.UnreadNumber -> endSave(result)
                 is SaveLevelsResult.Saved -> onSaved(result)
             }

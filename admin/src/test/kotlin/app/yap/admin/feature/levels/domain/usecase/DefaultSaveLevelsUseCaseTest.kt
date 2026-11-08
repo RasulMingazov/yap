@@ -74,16 +74,22 @@ internal class DefaultSaveLevelsUseCaseTest {
         }
 
     @Test
-    fun `GIVEN an empty word count WHEN saving THEN it names the level and sends nothing`() = runTest {
+    fun `GIVEN an empty word count WHEN saving THEN it asks for the word count and sends nothing`() = runTest {
         val env = Environment()
 
-        val result = env.useCase(mapOf(LevelCode.B1 to StubLevel.stubInput(maxWords = "")))
+        val result = env.useCase(mapOf(LevelCode.B1 to StubLevel.stubInput(maxWords = " ")))
 
         env.levelRepository.saveCall.notCalled()
-        assertEquals(
-            expected = SaveLevelsResult.UnreadNumber(LevelCode.B1, SaveLevelsResult.NumberField.MAX_WORDS),
-            actual = result,
-        )
+        assertEquals(expected = SaveLevelsResult.NoWordCount(LevelCode.B1), actual = result)
+    }
+
+    @Test
+    fun `GIVEN numbers with spaces around them WHEN saving THEN the numbers are sent`() = runTest {
+        val env = Environment()
+
+        env.useCase(mapOf(LevelCode.B1 to StubLevel.stubInput(maxWords = " 16", ratingFrom = "1050 ")))
+
+        env.levelRepository.saveCall.calledWith(listOf(StubLevel.stubEntry()))
     }
 
     @Test

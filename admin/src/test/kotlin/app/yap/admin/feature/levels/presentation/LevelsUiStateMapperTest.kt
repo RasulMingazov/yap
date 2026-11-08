@@ -145,6 +145,18 @@ internal class LevelsUiStateMapperTest {
         )
     }
 
+    @Test
+    fun `GIVEN B1 without a word count WHEN mapping THEN the status asks to type the number`() {
+        val state = loaded(StubLevel.stubLevels()).copy(saveResult = SaveLevelsResult.NoWordCount(LevelCode.B1))
+
+        val uiState = LevelsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = Status(text = "Введите число в «Слов в фразе»: B1", tone = Status.Tone.ERROR),
+            actual = uiState.saveStatus,
+        )
+    }
+
     private fun loaded(levels: List<Level>): DataState = DataState(
         forms = levels.toInputs(),
         levels = levels,

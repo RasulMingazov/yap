@@ -90,6 +90,10 @@ internal object LevelsUiStateMapper : (DataState) -> UiState {
             tone = Status.Tone.ERROR,
         )
         is SaveLevelsResult.NoIdioms -> Status(text = "Выберите идиомы: ${code.label()}", tone = Status.Tone.ERROR)
+        is SaveLevelsResult.NoWordCount -> Status(
+            text = "Введите число в «${NumberField.MAX_WORDS.label()}»: ${code.label()}",
+            tone = Status.Tone.ERROR,
+        )
         is SaveLevelsResult.Saved -> Status(text = "Сохранено", tone = Status.Tone.SUCCESS)
         is SaveLevelsResult.UnreadNumber -> Status(
             text = "Проверьте число в «${field.label()}»: ${code.label()}",

@@ -28,11 +28,13 @@ internal class DefaultSaveLevelsUseCase(
 
     private fun read(code: LevelCode, input: LevelInput): Reading {
         val idioms = input.idioms
-        val maxWords = input.maxWords.toIntOrNull()
+        val maxWords = input.maxWords.trim()
+        val ratingFrom = input.ratingFrom.trim()
         return when {
-            input.ratingFrom.isNotBlank() && input.ratingFrom.toIntOrNull() == null ->
+            ratingFrom.isNotEmpty() && ratingFrom.toIntOrNull() == null ->
                 Reading.Unread(SaveLevelsResult.UnreadNumber(code, NumberField.RATING_FROM))
-            maxWords == null -> Reading.Unread(SaveLevelsResult.UnreadNumber(code, NumberField.MAX_WORDS))
+            maxWords.isEmpty() -> Reading.Unread(SaveLevelsResult.NoWordCount(code))
+            maxWords.toIntOrNull() == null -> Reading.Unread(SaveLevelsResult.UnreadNumber(code, NumberField.MAX_WORDS))
             idioms == null -> Reading.Unread(SaveLevelsResult.NoIdioms(code))
             else -> Reading.Read(
                 LevelEntry(
@@ -40,8 +42,8 @@ internal class DefaultSaveLevelsUseCase(
                     settings = LevelSettings(
                         block = input.block,
                         idioms = idioms,
-                        maxWords = maxWords,
-                        ratingFrom = input.ratingFrom.toIntOrNull(),
+                        maxWords = maxWords.toInt(),
+                        ratingFrom = ratingFrom.toIntOrNull(),
                         vocabulary = input.vocabulary,
                     ),
                 ),

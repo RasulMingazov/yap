@@ -8,6 +8,8 @@ internal sealed interface SaveLevelsResult {
 
     data class NoIdioms(val code: LevelCode) : SaveLevelsResult
 
+    data class NoWordCount(val code: LevelCode) : SaveLevelsResult
+
     data class Saved(val levels: List<Level>) : SaveLevelsResult
 
     data class UnreadNumber(
