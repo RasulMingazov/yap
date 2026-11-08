@@ -2,10 +2,9 @@ package app.yap.admin.feature.prompts.presentation
 
 import app.yap.admin.core.presentation.Status
 import app.yap.admin.feature.prompts.domain.Prompt
+import app.yap.admin.feature.prompts.domain.SavePromptResult
 import app.yap.admin.feature.prompts.domain.StubPrompt
 import app.yap.admin.feature.prompts.presentation.PromptsViewModel.DataState
-import app.yap.admin.feature.prompts.presentation.PromptsViewModel.Load
-import app.yap.admin.feature.prompts.presentation.PromptsViewModel.SendStatus
 import app.yap.admin.feature.prompts.presentation.PromptsViewModel.UiState
 import java.time.Instant
 import java.time.LocalDateTime
@@ -91,7 +90,7 @@ internal class PromptsUiStateMapperTest {
 
     @Test
     fun `GIVEN a save in progress WHEN mapping THEN the status says the prompt is saving`() {
-        val state = loaded().copy(sendStatus = SendStatus.Saving)
+        val state = loaded().copy(isSaving = true)
 
         val uiState = PromptsUiStateMapper(state) as UiState.Content
 
@@ -100,7 +99,7 @@ internal class PromptsUiStateMapperTest {
 
     @Test
     fun `GIVEN a restore in progress WHEN mapping THEN the status says the version is restoring`() {
-        val state = loaded().copy(sendStatus = SendStatus.Restoring)
+        val state = loaded().copy(isRestoring = true)
 
         val uiState = PromptsUiStateMapper(state) as UiState.Content
 
@@ -109,7 +108,7 @@ internal class PromptsUiStateMapperTest {
 
     @Test
     fun `GIVEN a request in progress WHEN mapping THEN the editor, the list and Save are disabled`() {
-        val state = loaded().copy(sendStatus = SendStatus.Saving)
+        val state = loaded().copy(isSaving = true)
 
         val uiState = PromptsUiStateMapper(state) as UiState.Content
 
@@ -121,7 +120,7 @@ internal class PromptsUiStateMapperTest {
 
     @Test
     fun `GIVEN a restore in progress WHEN mapping THEN the editor, the list and Restore are disabled`() {
-        val state = loaded().copy(sendStatus = SendStatus.Restoring)
+        val state = loaded().copy(isRestoring = true)
 
         val uiState = PromptsUiStateMapper(state) as UiState.Content
 
@@ -133,7 +132,7 @@ internal class PromptsUiStateMapperTest {
 
     @Test
     fun `GIVEN a save WHEN mapping THEN the Saved status shows beside Save`() {
-        val state = loaded().copy(sendStatus = SendStatus.Saved)
+        val state = loaded().copy(saveResult = SavePromptResult.Saved(StubPrompt.stubPrompt()))
 
         val uiState = PromptsUiStateMapper(state) as UiState.Content
 
@@ -142,7 +141,7 @@ internal class PromptsUiStateMapperTest {
 
     @Test
     fun `GIVEN the server rejects an empty text WHEN mapping THEN the status and the editor show the error`() {
-        val state = loaded().copy(sendStatus = SendStatus.EmptyText)
+        val state = loaded().copy(saveResult = SavePromptResult.Rejected)
 
         val uiState = PromptsUiStateMapper(state) as UiState.Content
 
@@ -154,7 +153,7 @@ internal class PromptsUiStateMapperTest {
 
     @Test
     fun `GIVEN a prompt loads WHEN mapping THEN the editor shows the loader and the list is disabled`() {
-        val state = loaded().copy(promptLoad = Load.LOADING)
+        val state = loaded().copy(isPromptLoading = true)
 
         val uiState = PromptsUiStateMapper(state) as UiState.Content
 
@@ -166,17 +165,47 @@ internal class PromptsUiStateMapperTest {
 
     @Test
     fun `GIVEN the prompts did not load WHEN mapping THEN Prompts shows the load error`() {
-        val state = DataState(load = Load.FAILED)
+        val state = DataState(isListLoadFailed = true)
 
         val uiState = PromptsUiStateMapper(state)
 
         assertEquals(expected = UiState.Error(message = "Не удалось загрузить промпты"), actual = uiState)
     }
 
+    @Test
+    fun `GIVEN a shown list WHEN the list loads again THEN Prompts shows the loader`() {
+        val state = loaded().copy(isListLoading = true)
+
+        val uiState = PromptsUiStateMapper(state)
+
+        assertEquals(expected = UiState.Loading, actual = uiState)
+    }
+
+    @Test
+    fun `GIVEN a prompt did not load WHEN mapping THEN the editor shows the error and Save is disabled`() {
+        val state = loaded().copy(isPromptLoadFailed = true)
+
+        val uiState = PromptsUiStateMapper(state) as UiState.Content
+
+        assertEquals(
+            expected = UiState.Editor.Error(message = "Не удалось загрузить промпт") to false,
+            actual = uiState.editor to uiState.isSaveEnabled,
+        )
+    }
+
+    @Test
+    fun `GIVEN the server does not answer a save WHEN mapping THEN the status shows the note again`() {
+        val state = loaded().copy(saveResult = SavePromptResult.Failed)
+
+        val uiState = PromptsUiStateMapper(state) as UiState.Content
+
+        assertEquals(expected = "Новая версия сразу уйдёт пользователям", actual = uiState.saveStatus.text)
+    }
+
     private fun loaded(prompt: Prompt = StubPrompt.stubPrompt()): DataState = DataState(
-        load = Load.LOADED,
-        promptLoad = Load.LOADED,
         prompts = mapOf(prompt.promptKey to prompt),
+        summaries = emptyList(),
+        texts = mapOf(prompt.promptKey to prompt.text.orEmpty()),
     )
 
     private fun editor(state: DataState): UiState.Editor.Loaded {

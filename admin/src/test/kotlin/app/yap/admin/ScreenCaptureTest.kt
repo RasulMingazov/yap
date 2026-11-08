@@ -31,6 +31,7 @@ import app.yap.admin.feature.levels.presentation.toInputs
 import app.yap.admin.feature.levels.presentation.ui.LevelsContent
 import app.yap.admin.feature.prompts.domain.PromptKey
 import app.yap.admin.feature.prompts.domain.PromptVersion
+import app.yap.admin.feature.prompts.domain.SavePromptResult
 import app.yap.admin.feature.prompts.domain.StubPrompt
 import app.yap.admin.feature.prompts.presentation.PromptsUiStateMapper
 import app.yap.admin.feature.prompts.presentation.PromptsViewModel
@@ -273,39 +274,42 @@ internal class ScreenCaptureTest {
 
     @Test
     fun `GIVEN every state of Prompts WHEN capturing THEN each state has an image`() {
-        val listed = PromptsViewModel.DataState(
-            load = PromptsViewModel.Load.LOADED,
-            summaries = StubPrompt.stubPromptSummaries(),
+        val listed = PromptsViewModel.DataState(summaries = StubPrompt.stubPromptSummaries())
+        val content = listed.copy(
+            prompts = mapOf(PromptKey.TOPIC_REPLY to REPLY_PROMPT),
+            texts = mapOf(PromptKey.TOPIC_REPLY to REPLY_PROMPT.text.orEmpty()),
         )
-        val content = listed.loaded(REPLY_PROMPT)
+        val restoredPrompt = REPLY_PROMPT.copy(versions = replyVersions(current = RESTORED_NUMBER))
         val states = mapOf(
             "loading" to PromptsViewModel.DataState(),
-            "error" to PromptsViewModel.DataState(load = PromptsViewModel.Load.FAILED),
+            "error" to PromptsViewModel.DataState(isListLoadFailed = true),
             "content" to content,
             "long-text" to content.copy(
                 texts = mapOf(PromptKey.TOPIC_REPLY to "${REPLY_PROMPT.text}\n\n${REPLY_PROMPT.text}"),
             ),
-            "no-version" to listed
-                .copy(chosen = PromptKey.TOPIC_HINTS)
-                .loaded(NEW_PROMPT),
+            "no-version" to listed.copy(
+                chosen = PromptKey.TOPIC_HINTS,
+                prompts = mapOf(PromptKey.TOPIC_HINTS to NEW_PROMPT),
+                texts = mapOf(PromptKey.TOPIC_HINTS to ""),
+            ),
             "prompt-loading" to content.copy(
                 chosen = PromptKey.TOPIC_HINTS,
-                promptLoad = PromptsViewModel.Load.LOADING,
+                isPromptLoading = true,
             ),
             "prompt-error" to content.copy(
                 chosen = PromptKey.TOPIC_HINTS,
-                promptLoad = PromptsViewModel.Load.FAILED,
+                isPromptLoadFailed = true,
             ),
-            "saving" to content.copy(sendStatus = PromptsViewModel.SendStatus.Saving),
-            "restoring" to content.copy(sendStatus = PromptsViewModel.SendStatus.Restoring),
-            "saved" to content.copy(sendStatus = PromptsViewModel.SendStatus.Saved),
+            "saving" to content.copy(isSaving = true),
+            "restoring" to content.copy(isRestoring = true),
+            "saved" to content.copy(saveResult = SavePromptResult.Saved(REPLY_PROMPT)),
             "empty-text" to content.copy(
-                sendStatus = PromptsViewModel.SendStatus.EmptyText,
+                saveResult = SavePromptResult.Rejected,
                 texts = mapOf(PromptKey.TOPIC_REPLY to ""),
             ),
-            "restored" to listed.sent(
-                prompt = REPLY_PROMPT.copy(versions = replyVersions(current = RESTORED_NUMBER)),
-                sendStatus = PromptsViewModel.SendStatus.Restored(RESTORED_NUMBER),
+            "restored" to content.copy(
+                prompts = mapOf(PromptKey.TOPIC_REPLY to restoredPrompt),
+                restoredNumber = RESTORED_NUMBER,
             ),
         )
 

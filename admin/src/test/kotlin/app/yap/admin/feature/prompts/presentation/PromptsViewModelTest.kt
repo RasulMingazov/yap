@@ -141,7 +141,7 @@ internal class PromptsViewModelTest {
             val env = Environment()
             env.viewModel.onEvent(Event.Opened)
             advanceUntilIdle()
-            env.savePromptUseCase.invokeCall.returns(SavePromptResult.EmptyText)
+            env.savePromptUseCase.invokeCall.returns(SavePromptResult.Rejected)
 
             env.viewModel.onEvent(Event.SaveClicked)
             advanceUntilIdle()
@@ -154,7 +154,7 @@ internal class PromptsViewModelTest {
         val env = Environment()
         env.viewModel.onEvent(Event.Opened)
         advanceUntilIdle()
-        env.savePromptUseCase.invokeCall.returns(SavePromptResult.EmptyText)
+        env.savePromptUseCase.invokeCall.returns(SavePromptResult.Rejected)
 
         env.viewModel.onEvent(Event.SaveClicked)
         env.viewModel.onEvent(Event.TextChanged("Typed text"))

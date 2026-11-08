@@ -7,45 +7,48 @@ import app.yap.admin.feature.prompts.domain.PromptGroup
 import app.yap.admin.feature.prompts.domain.PromptKey
 import app.yap.admin.feature.prompts.domain.PromptSummary
 import app.yap.admin.feature.prompts.domain.PromptVersion
+import app.yap.admin.feature.prompts.domain.SavePromptResult
 import app.yap.admin.feature.prompts.presentation.PromptsViewModel.DataState
-import app.yap.admin.feature.prompts.presentation.PromptsViewModel.Load
-import app.yap.admin.feature.prompts.presentation.PromptsViewModel.SendStatus
 import app.yap.admin.feature.prompts.presentation.PromptsViewModel.UiState
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 internal object PromptsUiStateMapper : (DataState) -> UiState {
 
+    private val SAVE_NOTE = Status(text = "Новая версия сразу уйдёт пользователям", tone = Status.Tone.MUTED)
     private val TIME = DateTimeFormatter.ofPattern("HH:mm")
 
-    override fun invoke(state: DataState): UiState = when (state.load) {
-        Load.FAILED -> UiState.Error(message = "Не удалось загрузить промпты")
-        Load.LOADED -> state.toContent()
-        Load.LOADING -> UiState.Loading
+    override fun invoke(state: DataState): UiState {
+        val summaries = state.summaries
+        return when {
+            state.isListLoadFailed -> UiState.Error(message = "Не удалось загрузить промпты")
+            state.isListLoading || summaries == null -> UiState.Loading
+            else -> state.toContent(summaries)
+        }
     }
 
-    private fun DataState.toContent(): UiState.Content = UiState.Content(
+    private fun DataState.toContent(summaries: List<PromptSummary>): UiState.Content = UiState.Content(
         editor = editor(),
-        groups = groups(),
+        groups = groups(summaries),
         isListEnabled = isListEnabled(),
         isSaveEnabled = isSaveEnabled(),
         saveStatus = saveStatus(),
     )
 
-    private fun DataState.editor(): UiState.Editor = when (promptLoad) {
-        Load.FAILED -> UiState.Editor.Error(message = "Не удалось загрузить промпт")
-        Load.LOADED -> toEditor()
-        Load.LOADING -> UiState.Editor.Loading
+    private fun DataState.editor(): UiState.Editor = when {
+        isPromptLoadFailed -> UiState.Editor.Error(message = "Не удалось загрузить промпт")
+        isPromptLoading -> UiState.Editor.Loading
+        else -> toEditor()
     }
 
     private fun DataState.toEditor(): UiState.Editor.Loaded {
         val prompt = prompts.getValue(chosen)
         return UiState.Editor.Loaded(
-            isEditable = !isSending,
-            isRestoreEnabled = !isSending,
-            isTextError = sendStatus is SendStatus.EmptyText,
+            isEditable = !isSending(),
+            isRestoreEnabled = !isSending(),
+            isTextError = saveResult is SavePromptResult.Rejected,
             state = prompt.state(),
-            text = text,
+            text = texts.getValue(chosen),
             title = chosen.title(),
             variables = prompt.variables,
             versions = prompt.versions.map { version -> version.row() },
@@ -83,7 +86,7 @@ internal object PromptsUiStateMapper : (DataState) -> UiState {
         null
     }
 
-    private fun DataState.groups(): List<UiState.Group> = summaries
+    private fun DataState.groups(summaries: List<PromptSummary>): List<UiState.Group> = summaries
         .groupBy { summary -> summary.group }
         .map { (group, summaries) -> group(group, summaries) }
 
@@ -99,16 +102,26 @@ internal object PromptsUiStateMapper : (DataState) -> UiState {
         usage = promptKey.usage(),
     )
 
-    private fun DataState.isListEnabled(): Boolean = !isSending && promptLoad != Load.LOADING
+    private fun DataState.isListEnabled(): Boolean = !isSending() && !isPromptLoading
 
-    private fun DataState.isSaveEnabled(): Boolean = !isSending && promptLoad == Load.LOADED
+    private fun DataState.isSaveEnabled(): Boolean = !isSending() && !isPromptLoading && !isPromptLoadFailed
 
-    private fun DataState.saveStatus(): Status = when (val status = sendStatus) {
-        is SendStatus.EmptyText -> Status(text = "Введите текст промпта", tone = Status.Tone.ERROR)
-        is SendStatus.Idle -> Status(text = "Новая версия сразу уйдёт пользователям", tone = Status.Tone.MUTED)
-        is SendStatus.Restored -> Status(text = "v${status.number} снова у пользователей", tone = Status.Tone.SUCCESS)
-        is SendStatus.Restoring -> Status(text = "Возврат версии…", tone = Status.Tone.MUTED)
-        is SendStatus.Saved -> Status(text = "Сохранено", tone = Status.Tone.SUCCESS)
-        is SendStatus.Saving -> Status(text = "Сохранение…", tone = Status.Tone.MUTED)
+    private fun DataState.isSending(): Boolean = isRestoring || isSaving
+
+    private fun DataState.saveStatus(): Status {
+        val saveResult = saveResult
+        return when {
+            isSaving -> Status(text = "Сохранение…", tone = Status.Tone.MUTED)
+            isRestoring -> Status(text = "Возврат версии…", tone = Status.Tone.MUTED)
+            restoredNumber != null -> Status(text = "v$restoredNumber снова у пользователей", tone = Status.Tone.SUCCESS)
+            saveResult == null -> SAVE_NOTE
+            else -> saveResult.status()
+        }
+    }
+
+    private fun SavePromptResult.status(): Status = when (this) {
+        is SavePromptResult.Failed -> SAVE_NOTE
+        is SavePromptResult.Rejected -> Status(text = "Введите текст промпта", tone = Status.Tone.ERROR)
+        is SavePromptResult.Saved -> Status(text = "Сохранено", tone = Status.Tone.SUCCESS)
     }
 }
