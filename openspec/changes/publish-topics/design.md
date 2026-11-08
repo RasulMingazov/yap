@@ -58,7 +58,7 @@ The day starts at midnight in `Europe/Moscow`. Moscow time is UTC+3 all year, wi
 saving, since 26 October 2014 [3]. The learners and the server are in Russia. Options were UTC (the
 day changes at 03:00 for the learners) and a setting (no second time zone exists). `feature-topics`
 holds the zone as a constant beside the release rule and binds a `java.time.Clock` [4] with
-`Clock.system(zone)` in its Koin module. Tests bind a fixed clock.
+`Clock.systemUTC()`; `ReleaseState.today(clock)` reads the Moscow day. Tests bind a fixed clock.
 
 ### The model in `feature-topics`
 
